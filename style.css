@@ -1,0 +1,383 @@
+/* =========================
+   VARIABLES CYBERPUNK
+========================= */
+:root {
+  --bg-main: #03020a;
+  --bg-card: #0b0f1a;
+  --neon-pink: #ff00d0;
+  --neon-blue: #00f0ff;
+  --neon-purple: #9b4dff;
+  --text-main: #e6eefc;
+  --text-muted: #9aa3b8;
+  --border-neon: rgba(0, 240, 255, 0.3);
+  --glass: rgba(255, 255, 255, 0.03);
+  --vh: 1vh; /* Variable para corregir altura en móviles */
+}
+
+/* =========================
+   RESET & BASE
+========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--bg-main);
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(155, 77, 255, 0.15), transparent),
+    radial-gradient(circle at 0% 100%, rgba(0, 240, 255, 0.05), transparent);
+  color: var(--text-main);
+  min-height: 100vh;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 {
+  font-family: 'Orbitron', 'Audiowide', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* =========================
+   HEADER & NAV
+========================= */
+header {
+  padding: 40px 20px 20px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-neon);
+}
+
+header h1 {
+  color: var(--neon-pink);
+  text-shadow: 0 0 15px var(--neon-pink);
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+header p {
+  color: var(--neon-blue);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.tabs {
+  display: flex;
+  overflow-x: auto;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-neon);
+}
+
+/* Ocultar barra de desplazamiento en pestañas para estética limpia */
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  padding: 10px 20px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: 0.3s;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.tab.active {
+  color: var(--neon-blue);
+  border: 1px solid var(--neon-blue);
+  box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.2);
+  background: rgba(0, 240, 255, 0.05);
+}
+
+/* =========================
+   DASHBOARD & CARDS
+========================= */
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-neon);
+  padding: 20px;
+  border-radius: 12px;
+  position: relative;
+  transition: transform 0.3s;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: var(--neon-blue);
+}
+
+.card h3 {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.card p {
+  font-size: 1.8rem;
+  font-weight: bold;
+  font-family: 'Orbitron', sans-serif;
+  color: #fff;
+}
+
+.card small {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.75rem;
+  color: var(--neon-blue);
+}
+
+/* =========================
+   FORMS & SECTIONS
+========================= */
+.section {
+  padding: 25px;
+  margin: 20px;
+  background: var(--bg-card);
+  border-radius: 15px;
+  border: 1px solid var(--border-neon);
+  display: none;
+}
+
+.section.active {
+  display: block;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--neon-blue);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-family: 'Orbitron', sans-serif;
+}
+
+input, select, textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-neon);
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  outline: none;
+  transition: 0.3s;
+}
+
+input:focus, textarea:focus {
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 10px rgba(255, 0, 208, 0.2);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+/* =========================
+   BOTONES
+========================= */
+button {
+  background: linear-gradient(45deg, var(--neon-purple), var(--neon-blue));
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  transition: 0.3s;
+  letter-spacing: 1px;
+}
+
+button:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--neon-pink);
+  color: var(--neon-pink);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 0, 208, 0.1);
+}
+
+/* =========================
+   LISTAS (Comidas y Ejercicios)
+========================= */
+ul {
+  list-style: none;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 15px;
+}
+
+li {
+  background: rgba(255, 255, 255, 0.03);
+  margin-bottom: 12px;
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.3s;
+  border: 1px solid transparent;
+}
+
+/* Estilo específico para comidas */
+#mealList li {
+  border-left: 4px solid var(--neon-pink);
+}
+
+/* Estilo específico para entrenamientos (Púrpura) */
+#exerciseList li {
+  border-left: 4px solid var(--neon-purple);
+}
+
+li:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.delete-btn {
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff4d4d;
+  border: 1px solid #ff4d4d;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  border-radius: 5px;
+  min-width: auto;
+}
+
+.delete-btn:hover {
+  background: #ff4d4d;
+  color: white;
+}
+
+/* =========================
+   IA COACH (CHAT)
+========================= */
+.ai-chat-container {
+  background: linear-gradient(145deg, #0b0f1a, #161b2e);
+  border-left: 4px solid var(--neon-blue);
+}
+
+.ai-bubble {
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-style: italic;
+  color: var(--neon-blue);
+  position: relative;
+}
+
+.ai-bubble::before {
+  content: "BIO-SYSTEM AI:";
+  display: block;
+  font-size: 0.6rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+  letter-spacing: 2px;
+  color: var(--neon-blue);
+  opacity: 0.7;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* =========================
+   TOASTS (Notificaciones)
+========================= */
+.toasts {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  background: var(--bg-card);
+  border: 1px solid var(--neon-blue);
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+  animation: slideIn 0.3s ease-out forwards;
+  font-size: 0.9rem;
+}
+
+/* =========================
+   ANIMACIONES
+========================= */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* =========================
+   MODO COMPACTO
+========================= */
+body.compact header { padding: 20px 10px; }
+body.compact .dashboard { gap: 10px; padding: 10px; }
+body.compact .card { padding: 12px; }
+body.compact .card p { font-size: 1.3rem; }
+body.compact .section { margin: 10px; padding: 15px; }
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  header { padding: 25px 15px; }
+  header h1 { font-size: 1.6rem; }
+  .tabs { padding: 5px; }
+  .tab { padding: 10px 14px; font-size: 0.7rem; }
+  
+  .dashboard {
+    grid-template-columns: 1fr 1fr; /* Dos columnas en móvil */
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  button { width: 100%; }
+}

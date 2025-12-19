@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Fitness Tracker | Cyberpunk Edition</title>
+  <meta name="description" content="Bio-hacking y seguimiento nutricional inteligente con IA de compensación." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>AI Fitness Tracker</h1>
+    <p>Bio-hacking y seguimiento nutricional inteligente</p>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-target="dashboard">Dashboard</button>
+    <button class="tab" data-target="body">Cuerpo</button>
+    <button class="tab" data-target="meals">Comidas</button>
+    <button class="tab" data-target="workout-log">Entrenar</button> <button class="tab" data-target="ai-coach">IA Coach</button>
+    <button class="tab" data-target="ai-settings">Ajustes</button>
+    <button id="toggleCompact" class="tab">Compacto</button>
+  </nav>
+
+  <main>
+    <section id="dashboard" class="dashboard tab-panel active">
+      <div class="card">
+        <h3>Calorías</h3>
+        <p id="calories">0 kcal</p>
+        <small class="muted" id="calStatus">Cargando biometría...</small>
+      </div>
+      <div class="card">
+        <h3>Proteína</h3>
+        <p id="protein">0 g</p>
+        <small class="muted" id="protStatus">Meta: 150g</small>
+      </div>
+      <div class="card">
+        <h3>Meta Diaria</h3>
+        <p id="calorieGoal">3200</p>
+        <small class="muted">kcal objetivo</small>
+      </div>
+      <div class="card">
+        <h3>Estado IA</h3>
+        <p id="aiStatusText">Activa</p>
+        <small class="muted">Monitorizando plan</small>
+      </div>
+    </section>
+
+    <section id="body" class="section tab-panel">
+      <h2>Registro Biométrico</h2>
+      <div class="form-grid">
+        <div class="form-group">
+            <label>Peso Actual (kg)</label>
+            <input type="number" id="bodyWeight" step="0.1" placeholder="0.0">
+        </div>
+        <div class="form-group">
+            <label>Grasa Corporal (%)</label>
+            <input type="number" id="bodyFat" step="0.1" placeholder="0.0">
+        </div>
+      </div>
+      <button id="saveBodyBtn">Sincronizar Datos</button>
+    </section>
+
+    <section id="meals" class="section tab-panel">
+      <h2>Log de Nutrientes</h2>
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label>Análisis Rápido por Voz o Texto (IA)</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="aiMealText" placeholder="Ej: He comido 2 huevos y 100g de arroz" style="flex-grow: 1;">
+            <button id="analyzeMealBtn" class="btn-secondary">Analizar</button>
+        </div>
+      </div>
+      <div class="form-grid">
+        <input type="text" id="mealName" placeholder="Alimento manual">
+        <input type="number" id="mealCalories" placeholder="Kcal">
+        <input type="number" id="mealProtein" placeholder="Prot (g)">
+      </div>
+      <button id="addMealBtn">Añadir al Registro</button>
+      <h3 style="margin-top: 30px; color: var(--neon-blue);">Historial de Hoy</h3>
+      <ul id="mealList"></ul>
+    </section>
+
+    <section id="workout-log" class="section tab-panel">
+      <h2>Centro de Entrenamiento Evolutivo</h2>
+      <div class="card" style="border-color: var(--neon-purple); margin-bottom: 20px;">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Ejercicio</label>
+            <input type="text" id="exerciseName" placeholder="Flexiones, Sentadillas...">
+          </div>
+          <div class="form-group">
+            <label>Series x Reps</label>
+            <div style="display: flex; gap: 5px;">
+              <input type="number" id="workoutSets" placeholder="4">
+              <input type="number" id="workoutReps" placeholder="12">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Mochila / Lastre (kg)</label>
+            <input type="number" id="workoutWeight" placeholder="0">
+          </div>
+        </div>
+        <button id="addExerciseBtn" style="width: 100%; background: var(--neon-purple);">Registrar Serie</button>
+      </div>
+      <h3 style="color: var(--neon-purple);">Sesión Actual</h3>
+      <ul id="exerciseList"></ul>
+    </section>
+
+    <section id="ai-coach" class="section tab-panel">
+      <h2>Bio-Asistente de Emergencia</h2>
+      <div class="card ai-chat-container">
+        <div id="aiResponse" class="ai-bubble">
+          "¿No puedes entrenar o te falta una comida? Dímelo y ajustaré tus objetivos."
+        </div>
+        <div class="form-group">
+          <textarea id="aiEmergencyText" placeholder="Ej: No puedo ir al gym / No tengo pollo..."></textarea>
+          <button id="compensateBtn" class="btn-primary" style="width: 100%; margin-top: 10px;">Calcular Compensación</button>
+        </div>
+      </div>
+      <div id="adjustmentPlan" class="card" style="display:none; border-color: var(--neon-pink); margin-top: 20px;">
+        <h3 style="color: var(--neon-pink);">Plan de Ajuste Aplicado</h3>
+        <p id="planDetails"></p>
+      </div>
+    </section>
+
+    <section id="ai-settings" class="section tab-panel">
+      <h2>Configuración</h2>
+      <div class="form-group">
+        <label>Modo de Asistencia IA</label>
+        <select id="aiMode">
+          <option value="suggestions">Sugerencias Proactivas</option>
+          <option value="auto">Auto-Compensación</option>
+          <option value="off">Manual</option>
+        </select>
+      </div>
+      <button id="saveAiSettings">Guardar Cambios</button>
+    </section>
+
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
