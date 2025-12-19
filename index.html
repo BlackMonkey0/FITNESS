@@ -19,7 +19,8 @@
     <button class="tab active" data-target="dashboard">Dashboard</button>
     <button class="tab" data-target="body">Cuerpo</button>
     <button class="tab" data-target="meals">Comidas</button>
-    <button class="tab" data-target="workout-log">Entrenar</button> <button class="tab" data-target="ai-coach">IA Coach</button>
+    <button class="tab" data-target="workout-log">Entrenar</button> 
+    <button class="tab" data-target="ai-coach">IA Coach</button>
     <button class="tab" data-target="ai-settings">Ajustes</button>
     <button id="toggleCompact" class="tab">Compacto</button>
   </nav>
@@ -38,7 +39,7 @@
       </div>
       <div class="card">
         <h3>Meta Diaria</h3>
-        <p id="calorieGoal">3200</p>
+        <p id="calorieGoalDisplay">3200</p>
         <small class="muted">kcal objetivo</small>
       </div>
       <div class="card">
@@ -115,7 +116,7 @@
           "¿No puedes entrenar o te falta una comida? Dímelo y ajustaré tus objetivos."
         </div>
         <div class="form-group">
-          <textarea id="aiEmergencyText" placeholder="Ej: No puedo ir al gym / No tengo pollo..."></textarea>
+          <textarea id="aiEmergencyText" placeholder="Ej: No puedo ir al gym..."></textarea>
           <button id="compensateBtn" class="btn-primary" style="width: 100%; margin-top: 10px;">Calcular Compensación</button>
         </div>
       </div>
