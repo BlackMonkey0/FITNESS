@@ -23,14 +23,14 @@
 <!-- Smile overlay (temporary, announced) -->
 <div id="smileOverlay" class="smile-overlay" role="status" aria-live="polite" aria-hidden="true"></div>
 
-<nav class="tabs" role="tablist">
-  <button class="tab active" data-target="dashboard">Dashboard</button>
-  <button class="tab" data-target="body">Cuerpo</button>
-  <button class="tab" data-target="meals">Comidas</button>
-  <button class="tab" data-target="workout-log">Entrenar</button> 
-  <button class="tab" data-target="ai-coach">IA Coach</button>
-  <button class="tab" data-target="ai-settings">Ajustes</button>
-  <button id="toggleCompact" class="tab">Compacto</button>
+<nav class="tabs" role="tablist" aria-label="Navegación principal">
+  <button id="tab-dashboard" class="tab active" role="tab" aria-selected="true" aria-controls="dashboard" data-target="dashboard">Dashboard</button>
+  <button id="tab-body" class="tab" role="tab" aria-selected="false" aria-controls="body" data-target="body">Cuerpo</button>
+  <button id="tab-meals" class="tab" role="tab" aria-selected="false" aria-controls="meals" data-target="meals">Comidas</button>
+  <button id="tab-workout" class="tab" role="tab" aria-selected="false" aria-controls="workout-log" data-target="workout-log">Entrenar</button>
+  <button id="tab-ai" class="tab" role="tab" aria-selected="false" aria-controls="ai-coach" data-target="ai-coach">IA Coach</button>
+  <button id="tab-ai-settings" class="tab" role="tab" aria-selected="false" aria-controls="ai-settings" data-target="ai-settings">Ajustes</button>
+  <button id="toggleCompact" class="tab" aria-pressed="false">Compacto</button>
 </nav>
 
 <div class="app-grid">
@@ -41,12 +41,14 @@
     <h3>Calorías</h3>
     <p id="calories">0 kcal</p>
     <small class="muted" id="calStatus">Cargando biometría...</small>
+    <div class="progress" aria-hidden="true"><div class="progress-fill" id="calProgress"></div></div>
   </div>
 
   <div class="card">
     <h3>Proteína</h3>
     <p id="protein">0 g</p>
     <small class="muted" id="protStatus">Meta: 150g</small>
+    <div class="progress" aria-hidden="true"><div class="progress-fill" id="protProgress"></div></div>
   </div>
 
   <div class="card">
@@ -147,15 +149,26 @@
 
   <aside id="sidebar" class="sidebar" aria-label="Panel lateral">
     <div class="side-card side-top">
-      <div id="clock" class="clock" aria-hidden="true" title="Fecha y hora locales"></div>
-      <div id="clockJoke" class="clock-joke" title="Haz clic para otra broma" role="note" aria-live="polite"></div>
-      <button id="smileBtn" class="smile-btn" aria-label="Sácame una sonrisa">Sácame una sonrisa 😊</button>
+      <div class="side-top-controls" style="display:flex; gap:8px; align-items:center; justify-content:space-between;">
+        <div>
+          <div id="clock" class="clock" aria-hidden="true" title="Fecha y hora locales"></div>
+          <div id="clockJoke" class="clock-joke" title="Haz clic para otra broma" role="note" aria-live="polite"></div>
+        </div>
+        <div>
+          <button id="smileBtn" class="smile-btn" aria-label="Sácame una sonrisa">😊</button>
+          <button id="toggleSidebar" class="sm-toggle" aria-pressed="false" title="Ocultar/mostrar panel">⇄</button>
+        </div>
+      </div>
     </div>
 
     <div class="side-card">
       <h4>Resumen</h4>
       <p><strong>Meta kcal:</strong> <span id="calorieGoalDisplay">3200</span> kcal</p>
       <p><strong>Estado IA:</strong> <span id="aiStatusText">Activa</span></p>
+      <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+        <button id="toggleGym" class="gym-toggle" aria-pressed="false" title="Activar modo GYM">Modo GYM 🏋️</button>
+        <small style="opacity:0.8;">Activa estética gym y barras de progreso</small>
+      </div>
     </div>
   </aside>
 </div>
