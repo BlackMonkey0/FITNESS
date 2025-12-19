@@ -8,6 +8,201 @@ let proteinGoal = 150;
 let userBiometrics = { weight: 0, fat: 0 };
 let aiMode = "suggestions";
 
+/* Cached DOM references */
+const DOM = {};
+
+function initDOM() {
+  DOM.mealList = document.getElementById('mealList');
+  DOM.mealName = document.getElementById('mealName');
+  DOM.mealCalories = document.getElementById('mealCalories');
+  DOM.mealProtein = document.getElementById('mealProtein');
+  DOM.aiMealText = document.getElementById('aiMealText');
+  DOM.analyzeMealBtn = document.getElementById('analyzeMealBtn');
+  DOM.addMealBtn = document.getElementById('addMealBtn');
+  DOM.toasts = document.getElementById('toasts');
+  DOM.confirmModal = document.getElementById('confirmModal');
+  DOM.confirmMessage = document.getElementById('confirmMessage');
+  DOM.confirmOk = document.getElementById('confirmOk');
+  DOM.confirmCancel = document.getElementById('confirmCancel');
+  DOM.aiModeSelect = document.getElementById('aiMode');
+  DOM.clock = document.getElementById('clock');
+  DOM.clockJoke = document.getElementById('clockJoke');
+    DOM.smileBtn = document.getElementById('smileBtn');
+    DOM.smileOverlay = document.getElementById('smileOverlay');
+}
+
+// Clock: update visible date/time every second
+function formatNow() {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  return `${dateStr} — ${timeStr}`;
+}
+
+function updateClock() {
+  const el = DOM.clock || document.getElementById('clock');
+  if (!el) return;
+  el.textContent = formatNow();
+}
+
+function startClock() {
+  updateClock();
+  // update every second
+  setInterval(updateClock, 1000);
+}
+
+// --- Fun / jokes (upgraded) ---
+const JOKES = [
+  "¿Sabías que las calorías tienen miedo a la báscula? Se esconden en la despensa.",
+  "Si entrenas con buena actitud, la báscula también se anima (o eso dicen).",
+  "Hoy tu cuerpo pide 3 cosas: agua, respeto... y otra galleta (moderación opcional).",
+  "Si caminar a la nevera no fuera ejercicio, Netflix estaría preocupado.",
+  "Hacer flexiones con buena intención cuenta como cardio mental.",
+  "Los vegetales también son gente: trátalos con una salsa guay.",
+  "Científicamente comprobado: sonreír al comer aumenta el sabor. Inténtalo.",
+  "Recuerda: las proteínas no son enemigos, solo se hacen notar mucho.",
+  "Entrena con orgullo. O con auriculares. Ambos funcionan.",
+  "Si completas los pasos hasta la cocina, ya hiciste 200 pasos con honor."
+];
+
+function generateJoke() {
+  // 50% chance to pick a classic joke, 50% to generate a time-aware quip
+  if (Math.random() < 0.5) return JOKES[Math.floor(Math.random() * JOKES.length)];
+  const now = new Date();
+  const h = now.getHours();
+  if (h >= 6 && h < 10) {
+    return `Buenos días ☀️ — el desayuno es la excusa perfecta para algo delicioso y sensato.`;
+  } else if (h >= 10 && h < 14) {
+    return `Hora de recargar: si no es comida, es una idea para la comida.`;
+  } else if (h >= 14 && h < 18) {
+    return `Tarde productiva: camina un poco y dile adiós a la siesta mental.`;
+  } else if (h >= 18 && h < 22) {
+    return `Noche: buen momento para planificar comida épica pero equilibrada.`;
+  }
+  return `Noche avanzada: perfecto para pensar en metas y en otra ronda de agua.`;
+}
+
+let jokeIntervalId = null;
+const JOKE_AUTO_INTERVAL = 15000; // 15s
+
+function showRandomJoke(announce = false, animate = true) {
+  const el = DOM.clockJoke || document.getElementById('clockJoke');
+  if (!el) return;
+  const joke = generateJoke();
+  el.textContent = joke;
+  if (animate) {
+    el.classList.remove('pop');
+    // force reflow to restart animation
+    void el.offsetWidth;
+    el.classList.add('pop');
+    // remove class after animation (safety)
+    setTimeout(() => el.classList.remove('pop'), 900);
+  }
+  if (announce) {
+    el.setAttribute('aria-live', 'polite');
+  }
+}
+
+function startJokeAutoRotate() {
+  if (jokeIntervalId) return;
+  jokeIntervalId = setInterval(() => showRandomJoke(true, true), JOKE_AUTO_INTERVAL);
+}
+
+function stopJokeAutoRotate() {
+  if (!jokeIntervalId) return;
+  clearInterval(jokeIntervalId);
+  jokeIntervalId = null;
+}
+
+function setupJokes() {
+  const el = DOM.clockJoke || document.getElementById('clockJoke');
+  if (!el) return;
+  // initial joke
+  showRandomJoke(false, false);
+  // click to change (animated, announced)
+  el.addEventListener('click', () => showRandomJoke(true, true));
+  // Start auto-rotation but stop briefly if user hovers/clicks repeatedly
+  startJokeAutoRotate();
+  el.addEventListener('mouseenter', () => stopJokeAutoRotate());
+  el.addEventListener('mouseleave', () => startJokeAutoRotate());
+}
+
+// --- Smile feature: emoji + confetti + chime ---
+const SMILE_LINES = [
+  'Eres increíble tal como eres 😄',
+  'Pequeños pasos, grandes victorias ✨',
+  'Una sonrisa ha sido activada — buena elección 😀',
+  'Esa energía se nota, sigue así 💪',
+  'Hoy vas a comerte el día (y no solo la comida) 🌟'
+];
+
+function playChime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.value = 880;
+    g.gain.value = 0.0001;
+    o.connect(g);
+    g.connect(ctx.destination);
+    const now = ctx.currentTime;
+    g.gain.linearRampToValueAtTime(0.12, now + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+    o.start(now);
+    o.stop(now + 0.5);
+  } catch (e) {
+    // ignore audio errors
+    console.warn('Audio not available', e);
+  }
+}
+
+function makeYouSmile() {
+  const btn = DOM.smileBtn || document.getElementById('smileBtn');
+  const overlay = DOM.smileOverlay || document.getElementById('smileOverlay');
+  if (!btn || !overlay) return;
+  // prevent spam
+  if (btn.disabled) return;
+  btn.disabled = true;
+  setTimeout(() => btn.disabled = false, 1400);
+
+  // choose compliment
+  const text = SMILE_LINES[Math.floor(Math.random() * SMILE_LINES.length)];
+  overlay.setAttribute('aria-hidden', 'false');
+  overlay.innerHTML = `<div class="smile-card"><div class="smile-emoji">😊</div><div class="smile-text">${text}</div></div>`;
+
+  // emoji bounce
+  const emoji = overlay.querySelector('.smile-emoji');
+  if (emoji) {
+    emoji.classList.add('bounce');
+    setTimeout(() => emoji.classList.remove('bounce'), 900);
+  }
+
+  // confetti
+  const colors = ['var(--neon-pink)', 'var(--radon-blue)', 'var(--neon-purple)', 'var(--bio-green)'];
+  for (let i = 0; i < 12; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = `${50 + (Math.random() - 0.5) * 40}%`;
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.transform = `translateY(${0}px) rotate(${Math.random() * 360}deg)`;
+    c.style.top = `${30 + Math.random() * 12}%`;
+    c.style.animationDelay = `${Math.random() * 120}ms`;
+    overlay.appendChild(c);
+    // cleanup
+    setTimeout(() => c.remove(), 1100 + Math.random() * 400);
+  }
+
+  // play chime
+  playChime();
+
+  // cleanup overlay after short time
+  setTimeout(() => {
+    overlay.innerHTML = '';
+    overlay.setAttribute('aria-hidden', 'true');
+  }, 1400);
+}
+
 /**********************
  * PERSISTENCIA (LOCAL STORAGE)
  **********************/
@@ -34,10 +229,10 @@ function loadFromDisk() {
         userBiometrics = data.userBiometrics || { weight: 0, fat: 0 };
         aiMode = data.aiMode || "suggestions";
 
-        // Rellenar campos biométricos
-        document.getElementById("bodyWeight").value = userBiometrics.weight || "";
-        document.getElementById("bodyFat").value = userBiometrics.fat || "";
-        document.getElementById("aiMode").value = aiMode;
+        // Rellenar campos en la interfaz
+        if(document.getElementById("bodyWeight")) document.getElementById("bodyWeight").value = userBiometrics.weight || "";
+        if(document.getElementById("bodyFat")) document.getElementById("bodyFat").value = userBiometrics.fat || "";
+        if(document.getElementById("aiMode")) document.getElementById("aiMode").value = aiMode;
         
         renderMeals();
         renderExercises();
@@ -64,10 +259,13 @@ const foodDatabase = {
 };
 
 /**********************
- * IA LOCAL - ANALIZADOR DE COMIDAS
+ * IA LOCAL - ANALIZADOR
  **********************/
-function analyzeMealLocally(text) {
-  text = text.toLowerCase();
+function handleAnalyze() {
+  const textInput = DOM.aiMealText || document.getElementById("aiMealText");
+  const text = (textInput.value || '').toLowerCase();
+  if (!text) return showToast("Escribe qué has comido...");
+
   let calories = 0;
   let protein = 0;
   let found = false;
@@ -82,16 +280,13 @@ function analyzeMealLocally(text) {
       found = true;
     }
   });
-  return found ? { calories, protein } : { calories: 450, protein: 25, unknown: true };
-}
 
-function handleAnalyze() {
-  const text = document.getElementById("aiMealText").value;
-  if (!text) return showToast("Escribe qué has comido...");
-  const result = analyzeMealLocally(text);
-  document.getElementById("mealName").value = text;
-  document.getElementById("mealCalories").value = Math.round(result.calories);
-  document.getElementById("mealProtein").value = Math.round(result.protein);
+  const result = found ? { calories, protein } : { calories: 450, protein: 25, unknown: true };
+  
+  if (DOM.mealName) DOM.mealName.value = textInput.value; else document.getElementById("mealName").value = textInput.value;
+  if (DOM.mealCalories) DOM.mealCalories.value = Math.round(result.calories); else document.getElementById("mealCalories").value = Math.round(result.calories);
+  if (DOM.mealProtein) DOM.mealProtein.value = Math.round(result.protein); else document.getElementById("mealProtein").value = Math.round(result.protein);
+  
   if (result.unknown) showToast("⚠️ IA: Alimento desconocido. Usando promedio.");
   else showToast("✅ IA: Análisis completado.");
 }
@@ -101,9 +296,6 @@ function handleAnalyze() {
  **********************/
 function handleEmergencyCompensate() {
     const input = document.getElementById("aiEmergencyText").value.toLowerCase();
-    const responseBox = document.getElementById("aiResponse");
-    const planBox = document.getElementById("adjustmentPlan");
-    const planDetails = document.getElementById("planDetails");
     if (!input) return showToast("Dime qué ha pasado...");
 
     let advice = "";
@@ -112,55 +304,77 @@ function handleEmergencyCompensate() {
     if (input.includes("entrenar") || input.includes("gimnasio") || input.includes("gym")) {
         calorieGoal -= 400;
         proteinGoal += 15;
-        advice = "Protocolo sedentarismo: He reducido calorías y subido proteína para proteger el músculo.";
-        adjustment = "📉 Meta: -400 kcal | 📈 Proteína: +15g";
+        advice = "PROTOCOLO SEDENTARISMO ACTIVADO: Reduciendo ingesta calórica y aumentando aminoácidos para preservar tejido muscular.";
+        adjustment = "📉 Meta: -400 kcal | 📈 Prot: +15g";
     } else if (input.includes("comer") || input.includes("comida")) {
         calorieGoal -= 600;
-        advice = "Ajuste de balance: He restado la comida perdida del objetivo diario.";
+        advice = "COMPENSACIÓN DE NUTRIENTES: Reajustando balance diario por omisión de toma de alimentos.";
         adjustment = "📉 Ajuste: -600 kcal al total.";
     } else {
-        advice = "Mantén la hidratación y el plan actual.";
-        adjustment = "⚖️ Sin cambios drásticos necesarios.";
+        advice = "ESTADO ESTABLE: No se requieren ajustes críticos en el bio-plan actual.";
+        adjustment = "⚖️ Sin cambios.";
     }
 
-    responseBox.textContent = `"${advice}"`;
-    planBox.style.display = "block";
-    planDetails.textContent = adjustment;
+    // Efecto visual y de escritura
+    typeWriter(advice, "aiResponse");
+    document.getElementById("adjustmentPlan").style.display = "block";
+    document.getElementById("planDetails").textContent = adjustment;
+    
+    document.body.classList.add("security-breach");
+    setTimeout(() => document.body.classList.remove("security-breach"), 500);
+
     updateTotals();
     saveToDisk();
-    showToast("⚙️ IA: Plan re-calibrado");
+    showToast("⚙️ IA: Sistema recalibrado");
 }
 
 /**********************
- * GESTIÓN DE DATOS
+ * GESTIÓN DE DATOS (MEALS & WORKOUT)
  **********************/
 function addMeal() {
-  const name = document.getElementById("mealName").value;
-  const cal = Number(document.getElementById("mealCalories").value);
-  const prot = Number(document.getElementById("mealProtein").value);
+  const name = (DOM.mealName && DOM.mealName.value) || document.getElementById("mealName").value;
+  const cal = Number((DOM.mealCalories && DOM.mealCalories.value) || document.getElementById("mealCalories").value);
+  const prot = Number((DOM.mealProtein && DOM.mealProtein.value) || document.getElementById("mealProtein").value);
   if (!name || isNaN(cal)) return showToast("Faltan datos de comida");
+  
   meals.push({ name, cal, prot, id: Date.now() });
   updateTotals();
   renderMeals();
   saveToDisk();
-  ["mealName", "mealCalories", "mealProtein", "aiMealText"].forEach(id => document.getElementById(id).value = "");
+  if (DOM.mealName) DOM.mealName.value = ""; else document.getElementById('mealName').value = '';
+  if (DOM.mealCalories) DOM.mealCalories.value = '';
+  if (DOM.mealProtein) DOM.mealProtein.value = '';
+  if (DOM.aiMealText) DOM.aiMealText.value = '';
 }
 
-function deleteMeal(id) {
+async function deleteMeal(id) {
+  const ok = await showConfirm('¿Eliminar esta comida? Esta acción no se puede deshacer.');
+  if (!ok) return showToast('Operación cancelada');
   meals = meals.filter(m => m.id !== id);
   updateTotals();
   renderMeals();
   saveToDisk();
+  showToast('🗑️ Comida eliminada');
 }
 
 function renderMeals() {
-  const list = document.getElementById("mealList");
+  const list = DOM.mealList || document.getElementById("mealList");
   list.innerHTML = "";
+  const frag = document.createDocumentFragment();
   meals.forEach((m) => {
     const li = document.createElement("li");
-    li.innerHTML = `<div><strong>${m.name}</strong><br><small>${m.cal} kcal | ${m.prot}g P</small></div><button onclick="deleteMeal(${m.id})" class="delete-btn">×</button>`;
-    list.appendChild(li);
+    const info = document.createElement('div');
+    info.innerHTML = `<strong>${m.name}</strong><br><small>${m.cal} kcal | ${m.prot}g P</small>`;
+    const btn = document.createElement('button');
+    btn.className = 'delete-btn';
+    btn.setAttribute('aria-label', `Eliminar ${m.name}`);
+    btn.textContent = '×';
+    btn.addEventListener('click', () => deleteMeal(m.id));
+    li.appendChild(info);
+    li.appendChild(btn);
+    frag.appendChild(li);
   });
+  list.appendChild(frag);
 }
 
 function addExercise() {
@@ -169,6 +383,7 @@ function addExercise() {
   const reps = document.getElementById("workoutReps").value;
   const weight = document.getElementById("workoutWeight").value || 0;
   if (!name || !sets || !reps) return showToast("Faltan datos");
+
   exercises.push({ name, sets, reps, weight, id: Date.now() });
   renderExercises();
   saveToDisk();
@@ -185,27 +400,39 @@ function deleteExercise(id) {
 function renderExercises() {
   const list = document.getElementById("exerciseList");
   list.innerHTML = "";
+  const frag = document.createDocumentFragment();
   exercises.forEach(ex => {
     const li = document.createElement("li");
-    li.innerHTML = `<div><strong>${ex.name}</strong><br><small>${ex.sets}x${ex.reps} ${ex.weight > 0 ? '| +' + ex.weight + 'kg' : ''}</small></div><button onclick="deleteExercise(${ex.id})" class="delete-btn">×</button>`;
-    list.appendChild(li);
+    const info = document.createElement('div');
+    info.innerHTML = `<strong>${ex.name}</strong><br><small>${ex.sets}x${ex.reps} ${ex.weight > 0 ? '| +' + ex.weight + 'kg' : ''}</small>`;
+    const btn = document.createElement('button');
+    btn.className = 'delete-btn';
+    btn.setAttribute('aria-label', `Eliminar ${ex.name}`);
+    btn.textContent = '×';
+    btn.addEventListener('click', () => deleteExercise(ex.id));
+    li.appendChild(info);
+    li.appendChild(btn);
+    frag.appendChild(li);
   });
+  list.appendChild(frag);
 }
 
 /**********************
- * DASHBOARD Y AJUSTES
+ * DASHBOARD & BIOMETRÍA
  **********************/
 function updateTotals() {
   const totalCalories = meals.reduce((s, m) => s + m.cal, 0);
   const totalProtein = meals.reduce((s, m) => s + m.prot, 0);
+  
   document.getElementById("calories").textContent = `${totalCalories} kcal`;
   document.getElementById("protein").textContent = `${totalProtein} g`;
   document.getElementById("calorieGoalDisplay").textContent = calorieGoal;
+  
   const remaining = calorieGoal - totalCalories;
   const statusEl = document.getElementById("calStatus");
   if (statusEl) {
-    statusEl.textContent = remaining > 0 ? `Faltan ${remaining} kcal` : "Meta superada";
-    statusEl.style.color = remaining > 0 ? "var(--neon-blue)" : "var(--neon-pink)";
+    statusEl.textContent = remaining > 0 ? `Faltan ${remaining} kcal` : "META SUPERADA";
+    statusEl.style.color = remaining > 0 ? "var(--bio-green)" : "var(--system-red)";
   }
 }
 
@@ -213,15 +440,16 @@ function saveBiometrics() {
     userBiometrics.weight = document.getElementById("bodyWeight").value;
     userBiometrics.fat = document.getElementById("bodyFat").value;
     saveToDisk();
-    showToast("🧬 Biometría sincronizada");
+    
+    showToast(">> UPLOADING_BIOMETRICS... DONE");
+    // Efecto visual Matrix
+    canvas.style.opacity = "0.8";
+    setTimeout(() => canvas.style.opacity = "0.15", 1000);
 }
 
-function saveAiSettings() {
-    aiMode = document.getElementById("aiMode").value;
-    saveToDisk();
-    showToast("⚙️ Ajustes de IA guardados");
-}
-
+/**********************
+ * UTILIDADES (MATRIX & TYPEWRITER)
+ **********************/
 function showToast(msg) {
   const container = document.getElementById("toasts");
   const t = document.createElement("div");
@@ -231,68 +459,63 @@ function showToast(msg) {
   setTimeout(() => t.remove(), 3000);
 }
 
-/**********************
- * NAVEGACIÓN E INICIO
- **********************/
-function init() {
-  loadFromDisk(); // Carga los datos al iniciar
+// Accessible confirm dialog that returns a Promise<boolean>
+function showConfirm(message, title = 'Confirmar') {
+  return new Promise((resolve) => {
+    const modal = DOM.confirmModal || document.getElementById('confirmModal');
+    const msgEl = DOM.confirmMessage || document.getElementById('confirmMessage');
+    const okBtn = DOM.confirmOk || document.getElementById('confirmOk');
+    const cancelBtn = DOM.confirmCancel || document.getElementById('confirmCancel');
+    if (!modal || !okBtn || !cancelBtn) return resolve(confirm(message)); // fallback to native if missing
 
-  document.querySelectorAll('.tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (btn.id === 'toggleCompact') {
-        document.body.classList.toggle('compact');
-        return;
-      }
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(btn.dataset.target).classList.add('active');
-    });
-  });
+    let previousActive = document.activeElement;
+    msgEl.textContent = message;
+    modal.setAttribute('aria-hidden', 'false');
 
-  document.getElementById("analyzeMealBtn")?.addEventListener("click", handleAnalyze);
-  document.getElementById("addMealBtn")?.addEventListener("click", addMeal);
-  document.getElementById("compensateBtn")?.addEventListener("click", handleEmergencyCompensate);
-  document.getElementById("addExerciseBtn")?.addEventListener("click", addExercise);
-  document.getElementById("saveBodyBtn")?.addEventListener("click", saveBiometrics);
-  document.getElementById("saveAiSettings")?.addEventListener("click", saveAiSettings);
-}
-
-window.onload = init;
-
-// --- 1. MOTOR MATRIX RAIN ---
-const canvas = document.getElementById('matrixCanvas');
-const ctx = canvas.getContext('2d');
-
-canvas.height = window.innerHeight;
-canvas.width = window.innerWidth;
-
-const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
-const fontSize = 16;
-const columns = canvas.width / fontSize;
-const drops = Array(Math.floor(columns)).fill(1);
-
-function drawMatrix() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#39ff14"; // Color Biohacker
-    ctx.font = fontSize + "px monospace";
-
-    for (let i = 0; i < drops.length; i++) {
-        const text = letters.charAt(Math.floor(Math.random() * letters.length));
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-        drops[i]++;
+    function cleanup(result) {
+      modal.setAttribute('aria-hidden', 'true');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      document.removeEventListener('keydown', onKeyDown);
+      modal.removeEventListener('click', onOverlayClick);
+      if (previousActive && previousActive.focus) previousActive.focus();
+      resolve(result);
     }
-}
-setInterval(drawMatrix, 33);
 
-// --- 2. EFECTO DE ESCRITURA IA ---
+    function onOk() { cleanup(true); }
+    function onCancel() { cleanup(false); }
+
+    function onKeyDown(e) {
+      if (e.key === 'Escape') { e.preventDefault(); cleanup(false); }
+      // basic trap: keep focus inside modal
+      if (e.key === 'Tab') {
+        const focusables = [okBtn, cancelBtn];
+        const idx = focusables.indexOf(document.activeElement);
+        if (e.shiftKey) {
+          if (idx === 0) { focusables[focusables.length - 1].focus(); e.preventDefault(); }
+        } else {
+          if (idx === focusables.length - 1) { focusables[0].focus(); e.preventDefault(); }
+        }
+      }
+    }
+
+    function onOverlayClick(e) {
+      if (e.target === modal) cleanup(false);
+    }
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    document.addEventListener('keydown', onKeyDown);
+    modal.addEventListener('click', onOverlayClick);
+    // focus first focusable
+    setTimeout(() => cancelBtn.focus(), 0);
+  });
+}
+
 function typeWriter(text, elementId, speed = 30) {
     let i = 0;
     const element = document.getElementById(elementId);
-    element.innerHTML = ""; // Limpiar antes de escribir
-    
+    element.innerHTML = ""; 
     function type() {
         if (i < text.length) {
             element.innerHTML += text.charAt(i);
@@ -303,30 +526,71 @@ function typeWriter(text, elementId, speed = 30) {
     type();
 }
 
-// --- 3. MODIFICACIÓN DE LA FUNCIÓN DE COMPENSACIÓN (IA) ---
-// Busca tu función handleEmergencyCompensate y cambia el final por esto:
-function handleEmergencyCompensate() {
-    // ... (todo tu código anterior de lógica de IA) ...
-    
-    // En lugar de responseBox.textContent = advice, usamos:
-    typeWriter(advice, "aiResponse"); 
-    
-    // ¡LLAMATIVO!: Efecto visual de hackeo al calcular
-    document.body.classList.add("security-breach");
-    setTimeout(() => document.body.classList.remove("security-breach"), 500);
+// MATRIX RAIN ENGINE
+const canvas = document.getElementById('matrixCanvas');
+const ctx = canvas.getContext('2d');
+let columns, drops;
+
+function resizeMatrix() {
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    columns = canvas.width / 16;
+    drops = Array(Math.floor(columns)).fill(1);
 }
 
-// --- 4. MODIFICACIÓN DE SINCRONIZACIÓN ---
-// Busca tu función saveBiometrics y añade esto:
-function saveBiometrics() {
-    userBiometrics.weight = document.getElementById("bodyWeight").value;
-    userBiometrics.fat = document.getElementById("bodyFat").value;
-    saveToDisk();
-    
-    // ¡LLAMATIVO!: Mensaje estilo terminal
-    showToast(">> UPLOADING_BIOMETRICS... DONE");
-    
-    // Aumentar la velocidad de la matriz por un momento
-    canvas.style.opacity = "0.8";
-    setTimeout(() => canvas.style.opacity = "0.15", 1000);
+function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#39ff14"; 
+    ctx.font = "16px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+        const text = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 28)];
+        ctx.fillText(text, i * 16, drops[i] * 16);
+        if (drops[i] * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+    }
 }
+
+/**********************
+ * INICIO
+ **********************/
+window.onload = () => {
+  resizeMatrix();
+  initDOM();
+  loadFromDisk();
+  startClock();
+  setupJokes();
+    setInterval(drawMatrix, 33);
+    window.addEventListener('resize', resizeMatrix);
+
+    // Navegación de pestañas
+    document.querySelectorAll('.tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.id === 'toggleCompact') {
+                document.body.classList.toggle('compact');
+                return;
+            }
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.target).classList.add('active');
+        });
+    });
+
+    // Listeners
+    if (DOM.analyzeMealBtn) DOM.analyzeMealBtn.onclick = handleAnalyze;
+    else document.getElementById("analyzeMealBtn").onclick = handleAnalyze;
+    if (DOM.addMealBtn) DOM.addMealBtn.onclick = addMeal;
+    else document.getElementById("addMealBtn").onclick = addMeal;
+    if (DOM.smileBtn) DOM.smileBtn.addEventListener('click', makeYouSmile);
+    else if (document.getElementById('smileBtn')) document.getElementById('smileBtn').addEventListener('click', makeYouSmile);
+    document.getElementById("compensateBtn").onclick = handleEmergencyCompensate;
+    document.getElementById("addExerciseBtn").onclick = addExercise;
+    document.getElementById("saveBodyBtn").onclick = saveBiometrics;
+    document.getElementById("saveAiSettings").onclick = () => {
+      aiMode = (DOM.aiModeSelect && DOM.aiModeSelect.value) || document.getElementById("aiMode").value;
+      saveToDisk();
+      showToast("⚙️ Ajustes guardados");
+    };
+};
