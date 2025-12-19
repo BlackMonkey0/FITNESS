@@ -9,139 +9,157 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<canvas id="matrixCanvas" style="position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.15;"></canvas>
-  <header>
-    <h1>AI Fitness Tracker</h1>
-    <p>Bio-hacking y seguimiento nutricional inteligente</p>
-  </header>
 
-  <nav class="tabs" role="tablist">
-    <button class="tab active" data-target="dashboard">Dashboard</button>
-    <button class="tab" data-target="body">Cuerpo</button>
-    <button class="tab" data-target="meals">Comidas</button>
-    <button class="tab" data-target="workout-log">Entrenar</button> 
-    <button class="tab" data-target="ai-coach">IA Coach</button>
-    <button class="tab" data-target="ai-settings">Ajustes</button>
-    <button id="toggleCompact" class="tab">Compacto</button>
-  </nav>
+<canvas id="matrixCanvas"
+  style="position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.15;">
+</canvas>
 
-  <main>
-    <section id="dashboard" class="dashboard tab-panel active">
-      <div class="card">
-        <h3>Calorías</h3>
-        <p id="calories">0 kcal</p>
-        <small class="muted" id="calStatus">Cargando biometría...</small>
-      </div>
-      <div class="card">
-        <h3>Proteína</h3>
-        <p id="protein">0 g</p>
-        <small class="muted" id="protStatus">Meta: 150g</small>
-      </div>
-      <div class="card">
-        <h3>Meta Diaria</h3>
-        <p id="calorieGoalDisplay">3200</p>
-        <small class="muted">kcal objetivo</small>
-      </div>
-      <div class="card">
-        <h3>Estado IA</h3>
-        <p id="aiStatusText">Activa</p>
-        <small class="muted">Monitorizando plan</small>
-      </div>
-    </section>
+<header>
+  <h1>AI Fitness Tracker</h1>
+  <p>Bio-hacking y seguimiento nutricional inteligente</p>
+  <!-- header compact: controls moved to sidebar for a cleaner, responsive layout -->
+</header>
 
-    <section id="body" class="section tab-panel">
-      <h2>Registro Biométrico</h2>
-      <div class="form-grid">
-        <div class="form-group">
-            <label>Peso Actual (kg)</label>
-            <input type="number" id="bodyWeight" step="0.1" placeholder="0.0">
-        </div>
-        <div class="form-group">
-            <label>Grasa Corporal (%)</label>
-            <input type="number" id="bodyFat" step="0.1" placeholder="0.0">
-        </div>
-      </div>
-      <button id="saveBodyBtn">Sincronizar Datos</button>
-    </section>
+<!-- Smile overlay (temporary, announced) -->
+<div id="smileOverlay" class="smile-overlay" role="status" aria-live="polite" aria-hidden="true"></div>
 
-    <section id="meals" class="section tab-panel">
-      <h2>Log de Nutrientes</h2>
-      <div class="form-group" style="margin-bottom: 20px;">
-        <label>Análisis Rápido por Voz o Texto (IA)</label>
-        <div style="display: flex; gap: 10px;">
-            <input type="text" id="aiMealText" placeholder="Ej: He comido 2 huevos y 100g de arroz" style="flex-grow: 1;">
-            <button id="analyzeMealBtn" class="btn-secondary">Analizar</button>
-        </div>
-      </div>
-      <div class="form-grid">
-        <input type="text" id="mealName" placeholder="Alimento manual">
-        <input type="number" id="mealCalories" placeholder="Kcal">
-        <input type="number" id="mealProtein" placeholder="Prot (g)">
-      </div>
-      <button id="addMealBtn">Añadir al Registro</button>
-      <h3 style="margin-top: 30px; color: var(--neon-blue);">Historial de Hoy</h3>
-      <ul id="mealList"></ul>
-    </section>
+<nav class="tabs" role="tablist">
+  <button class="tab active" data-target="dashboard">Dashboard</button>
+  <button class="tab" data-target="body">Cuerpo</button>
+  <button class="tab" data-target="meals">Comidas</button>
+  <button class="tab" data-target="workout-log">Entrenar</button> 
+  <button class="tab" data-target="ai-coach">IA Coach</button>
+  <button class="tab" data-target="ai-settings">Ajustes</button>
+  <button id="toggleCompact" class="tab">Compacto</button>
+</nav>
 
-    <section id="workout-log" class="section tab-panel">
-      <h2>Centro de Entrenamiento Evolutivo</h2>
-      <div class="card" style="border-color: var(--neon-purple); margin-bottom: 20px;">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Ejercicio</label>
-            <input type="text" id="exerciseName" placeholder="Flexiones, Sentadillas...">
-          </div>
-          <div class="form-group">
-            <label>Series x Reps</label>
-            <div style="display: flex; gap: 5px;">
-              <input type="number" id="workoutSets" placeholder="4">
-              <input type="number" id="workoutReps" placeholder="12">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Mochila / Lastre (kg)</label>
-            <input type="number" id="workoutWeight" placeholder="0">
-          </div>
-        </div>
-        <button id="addExerciseBtn" style="width: 100%; background: var(--neon-purple);">Registrar Serie</button>
-      </div>
-      <h3 style="color: var(--neon-purple);">Sesión Actual</h3>
-      <ul id="exerciseList"></ul>
-    </section>
+<div class="app-grid">
+  <main class="main-content">
 
-    <section id="ai-coach" class="section tab-panel">
-      <h2>Bio-Asistente de Emergencia</h2>
-      <div class="card ai-chat-container">
-        <div id="aiResponse" class="ai-bubble">
-          "¿No puedes entrenar o te falta una comida? Dímelo y ajustaré tus objetivos."
-        </div>
-        <div class="form-group">
-          <textarea id="aiEmergencyText" placeholder="Ej: No puedo ir al gym..."></textarea>
-          <button id="compensateBtn" class="btn-primary" style="width: 100%; margin-top: 10px;">Calcular Compensación</button>
-        </div>
-      </div>
-      <div id="adjustmentPlan" class="card" style="display:none; border-color: var(--neon-pink); margin-top: 20px;">
-        <h3 style="color: var(--neon-pink);">Plan de Ajuste Aplicado</h3>
-        <p id="planDetails"></p>
-      </div>
-    </section>
+<section id="dashboard" class="dashboard tab-panel active">
+  <div class="card">
+    <h3>Calorías</h3>
+    <p id="calories">0 kcal</p>
+    <small class="muted" id="calStatus">Cargando biometría...</small>
+  </div>
 
-    <section id="ai-settings" class="section tab-panel">
-      <h2>Configuración</h2>
-      <div class="form-group">
-        <label>Modo de Asistencia IA</label>
-        <select id="aiMode">
-          <option value="suggestions">Sugerencias Proactivas</option>
-          <option value="auto">Auto-Compensación</option>
-          <option value="off">Manual</option>
-        </select>
-      </div>
-      <button id="saveAiSettings">Guardar Cambios</button>
-    </section>
+  <div class="card">
+    <h3>Proteína</h3>
+    <p id="protein">0 g</p>
+    <small class="muted" id="protStatus">Meta: 150g</small>
+  </div>
 
-    <div id="toasts" class="toasts" aria-live="polite"></div>
+  <div class="card">
+    <h3>Meta Diaria</h3>
+    <p id="calorieGoalDisplay">3200</p>
+    <small class="muted">kcal objetivo</small>
+  </div>
+
+  <div class="card">
+    <h3>Estado IA</h3>
+    <p id="aiStatusText">Activa</p>
+    <small class="muted">Monitorizando plan</small>
+  </div>
+</section>
+
+<section id="body" class="section tab-panel">
+  <h2>Registro Biométrico</h2>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>Peso Actual (kg)</label>
+      <input type="number" id="bodyWeight" step="0.1">
+    </div>
+    <div class="form-group">
+      <label>Grasa Corporal (%)</label>
+      <input type="number" id="bodyFat" step="0.1">
+    </div>
+  </div>
+  <button id="saveBodyBtn">Sincronizar Datos</button>
+</section>
+
+<section id="meals" class="section tab-panel">
+  <h2>Log de Nutrientes</h2>
+
+  <div class="form-group">
+    <label>Análisis IA</label>
+    <div style="display:flex; gap:10px;">
+      <input id="aiMealText" placeholder="Ej: 2 huevos y arroz">
+      <button id="analyzeMealBtn">Analizar</button>
+    </div>
+  </div>
+
+  <div class="form-grid">
+    <input id="mealName" placeholder="Comida">
+    <input id="mealCalories" type="number" placeholder="Kcal">
+    <input id="mealProtein" type="number" placeholder="Prot">
+  </div>
+
+  <button id="addMealBtn">Añadir</button>
+  <ul id="mealList"></ul>
+</section>
+
+<section id="workout-log" class="section tab-panel">
+  <h2>Entrenamiento</h2>
+  <input id="exerciseName" placeholder="Ejercicio">
+  <input id="workoutSets" type="number" placeholder="Series">
+  <input id="workoutReps" type="number" placeholder="Reps">
+  <input id="workoutWeight" type="number" placeholder="Kg">
+  <button id="addExerciseBtn">Registrar</button>
+  <ul id="exerciseList"></ul>
+</section>
+
+<section id="ai-coach" class="section tab-panel">
+  <h2>IA Coach</h2>
+  <div id="aiResponse" class="ai-bubble">
+    "Dime qué ha pasado y ajustaré el plan"
+  </div>
+  <textarea id="aiEmergencyText"></textarea>
+  <button id="compensateBtn">Compensar</button>
+  <div id="adjustmentPlan" style="display:none;">
+    <p id="planDetails"></p>
+  </div>
+</section>
+
+<section id="ai-settings" class="section tab-panel">
+  <select id="aiMode">
+    <option value="suggestions">Sugerencias</option>
+    <option value="auto">Auto</option>
+    <option value="off">Manual</option>
+  </select>
+  <button id="saveAiSettings">Guardar</button>
+</section>
+
+<div id="toasts" aria-live="polite"></div>
+
+<!-- Confirm Modal -->
+<div id="confirmModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="confirmTitle">
+  <div class="modal-content">
+    <h3 id="confirmTitle">Confirmar acción</h3>
+    <p id="confirmMessage">¿Estás seguro?</p>
+    <div class="modal-actions">
+      <button id="confirmOk" class="confirm-ok">Confirmar</button>
+      <button id="confirmCancel" class="confirm-cancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+
   </main>
 
-  <script src="script.js"></script>
+  <aside id="sidebar" class="sidebar" aria-label="Panel lateral">
+    <div class="side-card side-top">
+      <div id="clock" class="clock" aria-hidden="true" title="Fecha y hora locales"></div>
+      <div id="clockJoke" class="clock-joke" title="Haz clic para otra broma" role="note" aria-live="polite"></div>
+      <button id="smileBtn" class="smile-btn" aria-label="Sácame una sonrisa">Sácame una sonrisa 😊</button>
+    </div>
+
+    <div class="side-card">
+      <h4>Resumen</h4>
+      <p><strong>Meta kcal:</strong> <span id="calorieGoalDisplay">3200</span> kcal</p>
+      <p><strong>Estado IA:</strong> <span id="aiStatusText">Activa</span></p>
+    </div>
+  </aside>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
