@@ -259,3 +259,74 @@ function init() {
 }
 
 window.onload = init;
+
+// --- 1. MOTOR MATRIX RAIN ---
+const canvas = document.getElementById('matrixCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
+
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
+const fontSize = 16;
+const columns = canvas.width / fontSize;
+const drops = Array(Math.floor(columns)).fill(1);
+
+function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#39ff14"; // Color Biohacker
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+    }
+}
+setInterval(drawMatrix, 33);
+
+// --- 2. EFECTO DE ESCRITURA IA ---
+function typeWriter(text, elementId, speed = 30) {
+    let i = 0;
+    const element = document.getElementById(elementId);
+    element.innerHTML = ""; // Limpiar antes de escribir
+    
+    function type() {
+        if (i < text.length) {
+            element.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(type, speed);
+        }
+    }
+    type();
+}
+
+// --- 3. MODIFICACIÓN DE LA FUNCIÓN DE COMPENSACIÓN (IA) ---
+// Busca tu función handleEmergencyCompensate y cambia el final por esto:
+function handleEmergencyCompensate() {
+    // ... (todo tu código anterior de lógica de IA) ...
+    
+    // En lugar de responseBox.textContent = advice, usamos:
+    typeWriter(advice, "aiResponse"); 
+    
+    // ¡LLAMATIVO!: Efecto visual de hackeo al calcular
+    document.body.classList.add("security-breach");
+    setTimeout(() => document.body.classList.remove("security-breach"), 500);
+}
+
+// --- 4. MODIFICACIÓN DE SINCRONIZACIÓN ---
+// Busca tu función saveBiometrics y añade esto:
+function saveBiometrics() {
+    userBiometrics.weight = document.getElementById("bodyWeight").value;
+    userBiometrics.fat = document.getElementById("bodyFat").value;
+    saveToDisk();
+    
+    // ¡LLAMATIVO!: Mensaje estilo terminal
+    showToast(">> UPLOADING_BIOMETRICS... DONE");
+    
+    // Aumentar la velocidad de la matriz por un momento
+    canvas.style.opacity = "0.8";
+    setTimeout(() => canvas.style.opacity = "0.15", 1000);
+}
