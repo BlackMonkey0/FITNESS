@@ -29,6 +29,9 @@ function initDOM() {
   DOM.clockJoke = document.getElementById('clockJoke');
     DOM.smileBtn = document.getElementById('smileBtn');
     DOM.smileOverlay = document.getElementById('smileOverlay');
+  DOM.toggleGym = document.getElementById('toggleGym');
+  DOM.calProgress = document.getElementById('calProgress');
+  DOM.protProgress = document.getElementById('protProgress');
 }
 
 // Clock: update visible date/time every second
@@ -434,6 +437,23 @@ function updateTotals() {
     statusEl.textContent = remaining > 0 ? `Faltan ${remaining} kcal` : "META SUPERADA";
     statusEl.style.color = remaining > 0 ? "var(--bio-green)" : "var(--system-red)";
   }
+
+  // Update progress bars if present
+  try {
+    const calPct = Math.min(100, Math.round((totalCalories / (calorieGoal || 1)) * 100));
+    const protPct = Math.min(100, Math.round((totalProtein / (proteinGoal || 1)) * 100));
+    if (DOM.calProgress) DOM.calProgress.style.width = `${calPct}%`;
+    if (DOM.protProgress) DOM.protProgress.style.width = `${protPct}%`;
+  } catch (e) { /* ignore */ }
+}
+
+// Toggle gym mode (apply class and persist)
+function toggleGymMode(fromClick = false) {
+  const el = DOM.toggleGym || document.getElementById('toggleGym');
+  const enabled = document.body.classList.toggle('gym-mode');
+  if (el) el.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+  localStorage.setItem('gymMode', enabled ? '1' : '0');
+  showToast(enabled ? '🏋️ Modo GYM activado' : '✨ Modo GYM desactivado');
 }
 
 function saveBiometrics() {
@@ -565,18 +585,53 @@ window.onload = () => {
     window.addEventListener('resize', resizeMatrix);
 
     // Navegación de pestañas
-    document.querySelectorAll('.tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (btn.id === 'toggleCompact') {
-                document.body.classList.toggle('compact');
-                return;
-            }
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById(btn.dataset.target).classList.add('active');
-        });
+    const tabs = Array.from(document.querySelectorAll('.tab'));
+    tabs.forEach((btn, idx) => {
+      btn.addEventListener('click', () => {
+        if (btn.id === 'toggleCompact') {
+          const compacted = document.body.classList.toggle('compact');
+          btn.setAttribute('aria-pressed', compacted ? 'true' : 'false');
+          return;
+        }
+        // activate
+        tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        const target = btn.dataset.target;
+        const panel = document.getElementById(target);
+        if (panel) panel.classList.add('active');
+        btn.focus();
+      });
+
+      // keyboard navigation: left/right arrow to move between tabs
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          const next = tabs[(idx + 1) % tabs.length]; next.focus();
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          const prev = tabs[(idx - 1 + tabs.length) % tabs.length]; prev.focus();
+        }
+      });
     });
+
+    // sidebar toggle
+    const sidebarToggle = document.getElementById('toggleSidebar');
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', () => {
+        const collapsed = document.body.classList.toggle('sidebar-collapsed');
+        sidebarToggle.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+        localStorage.setItem('sidebarCollapsed', collapsed ? '1' : '0');
+      });
+      // initialize from storage
+      const saved = localStorage.getItem('sidebarCollapsed');
+      if (saved === '1') { document.body.classList.add('sidebar-collapsed'); sidebarToggle.setAttribute('aria-pressed', 'true'); }
+    }
+
+      // Restore gym mode if previously set
+      const gymSaved = localStorage.getItem('gymMode');
+      if (gymSaved === '1') { document.body.classList.add('gym-mode'); if (DOM.toggleGym) DOM.toggleGym.setAttribute('aria-pressed', 'true'); }
 
     // Listeners
     if (DOM.analyzeMealBtn) DOM.analyzeMealBtn.onclick = handleAnalyze;
@@ -585,6 +640,7 @@ window.onload = () => {
     else document.getElementById("addMealBtn").onclick = addMeal;
     if (DOM.smileBtn) DOM.smileBtn.addEventListener('click', makeYouSmile);
     else if (document.getElementById('smileBtn')) document.getElementById('smileBtn').addEventListener('click', makeYouSmile);
+    if (DOM.toggleGym) DOM.toggleGym.addEventListener('click', () => toggleGymMode(true));
     document.getElementById("compensateBtn").onclick = handleEmergencyCompensate;
     document.getElementById("addExerciseBtn").onclick = addExercise;
     document.getElementById("saveBodyBtn").onclick = saveBiometrics;
