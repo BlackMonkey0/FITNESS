@@ -1,383 +1,253 @@
 /* =========================
-   VARIABLES CYBERPUNK
+   NEURAL-LINK V2: BIO-HACKER CORE
 ========================= */
 :root {
-  --bg-main: #03020a;
-  --bg-card: #0b0f1a;
-  --neon-pink: #ff00d0;
-  --neon-blue: #00f0ff;
-  --neon-purple: #9b4dff;
-  --text-main: #e6eefc;
-  --text-muted: #9aa3b8;
-  --border-neon: rgba(0, 240, 255, 0.3);
-  --glass: rgba(255, 255, 255, 0.03);
-  --vh: 1vh; /* Variable para corregir altura en móviles */
+  --bg-void: #020205;
+  --bio-green: #39ff14; /* Verde radioactivo / Biohazard */
+  --radon-blue: #00f3ff; /* Azul de plasma */
+  --system-red: #ff003c; /* Alerta de sistema */
+  --dark-glass: rgba(0, 0, 0, 0.85);
+  --border-tech: rgba(57, 255, 20, 0.2);
+  --font-data: 'Courier New', monospace;
+  --font-ui: 'Orbitron', sans-serif;
 }
 
 /* =========================
-   RESET & BASE
+   ATMÓSFERA: GRID & SCANLINES
 ========================= */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-}
-
 body {
-  background-color: var(--bg-main);
-  background-image: 
-    radial-gradient(circle at 50% 0%, rgba(155, 77, 255, 0.15), transparent),
-    radial-gradient(circle at 0% 100%, rgba(0, 240, 255, 0.05), transparent);
-  color: var(--text-main);
-  min-height: 100vh;
-  line-height: 1.6;
+  background-color: var(--bg-void);
+  color: var(--bio-green);
+  font-family: var(--font-data);
+  margin: 0;
   overflow-x: hidden;
+  /* Rejilla de datos sutil */
+  background-image: 
+    linear-gradient(var(--border-tech) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-tech) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
-h1, h2, h3 {
-  font-family: 'Orbitron', 'Audiowide', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+/* Efecto de ruido y parpadeo de monitor antiguo */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0.1) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 1000;
 }
 
 /* =========================
-   HEADER & NAV
+   HEADER: PROTOCOLO DE INICIO
 ========================= */
 header {
-  padding: 40px 20px 20px;
-  text-align: center;
-  border-bottom: 1px solid var(--border-neon);
+  padding: 40px;
+  border-bottom: 4px double var(--bio-green);
+  text-shadow: 0 0 10px var(--bio-green);
 }
 
 header h1 {
-  color: var(--neon-pink);
-  text-shadow: 0 0 15px var(--neon-pink);
-  font-size: 2rem;
-  margin-bottom: 10px;
+  font-family: var(--font-ui);
+  font-size: 2.2rem;
+  margin: 0;
+  letter-spacing: 4px;
 }
 
-header p {
-  color: var(--neon-blue);
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
+header h1::before { content: "[ "; opacity: 0.5; }
+header h1::after { content: " ]"; opacity: 0.5; }
 
+/* =========================
+   NAVEGACIÓN: TÁCTICA
+========================= */
 .tabs {
   display: flex;
-  overflow-x: auto;
-  background: rgba(0, 0, 0, 0.8);
-  padding: 10px;
+  background: #000;
+  border-bottom: 1px solid var(--bio-green);
+  padding: 5px 20px;
   gap: 10px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-neon);
 }
-
-/* Ocultar barra de desplazamiento en pestañas para estética limpia */
-.tabs::-webkit-scrollbar { display: none; }
 
 .tab {
   background: transparent;
   border: 1px solid transparent;
-  color: var(--text-muted);
-  padding: 10px 20px;
-  white-space: nowrap;
+  color: var(--bio-green);
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  padding: 10px;
   cursor: pointer;
-  transition: 0.3s;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 0.8rem;
+  transition: 0.2s;
   text-transform: uppercase;
 }
 
 .tab.active {
-  color: var(--neon-blue);
-  border: 1px solid var(--neon-blue);
-  box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.2);
-  background: rgba(0, 240, 255, 0.05);
+  background: var(--bio-green);
+  color: #000;
+  box-shadow: 0 0 15px var(--bio-green);
 }
 
 /* =========================
-   DASHBOARD & CARDS
+   DASHBOARD: MONITOR DE BIO-SIGNOS
 ========================= */
 .dashboard {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
   padding: 20px;
 }
 
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-neon);
+  background: var(--dark-glass);
+  border: 1px solid var(--bio-green);
   padding: 20px;
-  border-radius: 12px;
   position: relative;
-  transition: transform 0.3s;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  /* Esquina cortada tipo hacker */
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  border-color: var(--neon-blue);
+.card::before {
+  content: "DATA_NODE";
+  position: absolute;
+  top: 5px; right: 10px;
+  font-size: 0.5rem;
+  opacity: 0.5;
 }
 
 .card h3 {
   font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-  letter-spacing: 1px;
+  color: var(--radon-blue);
+  margin-top: 0;
 }
 
 .card p {
-  font-size: 1.8rem;
-  font-weight: bold;
-  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  font-family: var(--font-ui);
+  margin: 10px 0;
   color: #fff;
-}
-
-.card small {
-  display: block;
-  margin-top: 5px;
-  font-size: 0.75rem;
-  color: var(--neon-blue);
+  text-shadow: 0 0 10px var(--radon-blue);
 }
 
 /* =========================
-   FORMS & SECTIONS
+   SECCIONES Y FORMS
 ========================= */
 .section {
-  padding: 25px;
+  padding: 30px;
+  border-left: 2px solid var(--bio-green);
   margin: 20px;
-  background: var(--bg-card);
-  border-radius: 15px;
-  border: 1px solid var(--border-neon);
+  background: rgba(0, 255, 65, 0.02);
   display: none;
 }
 
-.section.active {
-  display: block;
-  animation: fadeIn 0.4s ease-out;
-}
+.section.active { display: block; animation: powerOn 0.3s ease-out; }
 
-.form-group {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--neon-blue);
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  font-family: 'Orbitron', sans-serif;
+@keyframes powerOn {
+  0% { opacity: 0; transform: scaleY(0.01); }
+  100% { opacity: 1; transform: scaleY(1); }
 }
 
 input, select, textarea {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--border-neon);
-  color: white;
+  background: #000;
+  border: 1px solid var(--bio-green);
+  color: var(--bio-green);
   padding: 12px;
-  border-radius: 8px;
+  font-family: var(--font-data);
+  margin-bottom: 10px;
+}
+
+input:focus {
   outline: none;
-  transition: 0.3s;
-}
-
-input:focus, textarea:focus {
-  border-color: var(--neon-pink);
-  box-shadow: 0 0 10px rgba(255, 0, 208, 0.2);
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 15px;
-  margin-bottom: 20px;
+  border-color: var(--radon-blue);
+  box-shadow: 0 0 10px var(--radon-blue);
 }
 
 /* =========================
-   BOTONES
+   BOTONES: EXECUTE COMMAND
 ========================= */
 button {
-  background: linear-gradient(45deg, var(--neon-purple), var(--neon-blue));
-  color: white;
-  border: none;
-  padding: 14px 20px;
-  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--bio-green);
+  color: var(--bio-green);
+  padding: 15px;
+  font-family: var(--font-ui);
   font-weight: bold;
-  text-transform: uppercase;
   cursor: pointer;
-  font-family: 'Orbitron', sans-serif;
-  transition: 0.3s;
-  letter-spacing: 1px;
+  width: 100%;
+  position: relative;
+  transition: 0.2s;
 }
 
 button:hover {
-  filter: brightness(1.2);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+  background: rgba(57, 255, 20, 0.1);
+  color: #fff;
+  letter-spacing: 2px;
+  box-shadow: inset 0 0 10px var(--bio-green);
 }
 
-.btn-secondary {
-  background: transparent;
-  border: 1px solid var(--neon-pink);
-  color: var(--neon-pink);
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 0, 208, 0.1);
+button:active {
+  background: var(--bio-green);
+  color: #000;
 }
 
 /* =========================
-   LISTAS (Comidas y Ejercicios)
+   IA COACH: BIO-MOD INTERFACE
 ========================= */
-ul {
-  list-style: none;
-  max-height: 400px;
-  overflow-y: auto;
-  margin-top: 15px;
-}
-
-li {
-  background: rgba(255, 255, 255, 0.03);
-  margin-bottom: 12px;
-  padding: 15px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: 0.3s;
-  border: 1px solid transparent;
-}
-
-/* Estilo específico para comidas */
-#mealList li {
-  border-left: 4px solid var(--neon-pink);
-}
-
-/* Estilo específico para entrenamientos (Púrpura) */
-#exerciseList li {
-  border-left: 4px solid var(--neon-purple);
-}
-
-li:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.delete-btn {
-  background: rgba(255, 0, 0, 0.2);
-  color: #ff4d4d;
-  border: 1px solid #ff4d4d;
-  padding: 5px 12px;
-  font-size: 0.8rem;
-  border-radius: 5px;
-  min-width: auto;
-}
-
-.delete-btn:hover {
-  background: #ff4d4d;
-  color: white;
-}
-
-/* =========================
-   IA COACH (CHAT)
-========================= */
-.ai-chat-container {
-  background: linear-gradient(145deg, #0b0f1a, #161b2e);
-  border-left: 4px solid var(--neon-blue);
-}
-
 .ai-bubble {
-  background: rgba(0, 240, 255, 0.08);
-  border: 1px solid rgba(0, 240, 255, 0.2);
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  font-style: italic;
-  color: var(--neon-blue);
+  border: 1px double var(--bio-green);
+  background: rgba(0, 0, 0, 0.9);
+  padding: 25px;
+  line-height: 1.5;
   position: relative;
 }
 
 .ai-bubble::before {
-  content: "BIO-SYSTEM AI:";
-  display: block;
+  content: ">> NEURAL_ASSIST_ACTIVE";
+  position: absolute;
+  top: -10px; left: 10px;
+  background: var(--bg-void);
+  padding: 0 5px;
   font-size: 0.6rem;
-  font-weight: bold;
-  margin-bottom: 5px;
-  letter-spacing: 2px;
-  color: var(--neon-blue);
-  opacity: 0.7;
-}
-
-textarea {
-  min-height: 100px;
-  resize: vertical;
 }
 
 /* =========================
-   TOASTS (Notificaciones)
+   TOASTS: SYSTEM ALERTS
 ========================= */
-.toasts {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .toast {
-  background: var(--bg-card);
-  border: 1px solid var(--neon-blue);
-  color: white;
-  padding: 12px 25px;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-  animation: slideIn 0.3s ease-out forwards;
-  font-size: 0.9rem;
+  background: var(--bg-void);
+  border: 2px solid var(--system-red);
+  color: var(--system-red);
+  padding: 10px 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  animation: alertGlitch 0.2s infinite;
 }
 
-/* =========================
-   ANIMACIONES
-========================= */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes alertGlitch {
+  0% { transform: translate(0); }
+  50% { transform: translate(-2px, 2px); }
+  100% { transform: translate(0); }
+}
+/* Efecto de parpadeo de emergencia (Brecha de seguridad) */
+.security-breach {
+    animation: breach 0.1s infinite;
 }
 
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+@keyframes breach {
+    0% { background-color: rgba(255, 0, 0, 0.2); }
+    100% { background-color: transparent; }
 }
 
-/* =========================
-   MODO COMPACTO
-========================= */
-body.compact header { padding: 20px 10px; }
-body.compact .dashboard { gap: 10px; padding: 10px; }
-body.compact .card { padding: 12px; }
-body.compact .card p { font-size: 1.3rem; }
-body.compact .section { margin: 10px; padding: 15px; }
+/* Cursor de escritura para la IA */
+#aiResponse::after {
+    content: "|";
+    animation: blink 0.7s infinite;
+}
 
-/* =========================
-   RESPONSIVE
-========================= */
-@media (max-width: 600px) {
-  .form-grid { grid-template-columns: 1fr; }
-  header { padding: 25px 15px; }
-  header h1 { font-size: 1.6rem; }
-  .tabs { padding: 5px; }
-  .tab { padding: 10px 14px; font-size: 0.7rem; }
-  
-  .dashboard {
-    grid-template-columns: 1fr 1fr; /* Dos columnas en móvil */
-    gap: 12px;
-    padding: 12px;
-  }
-  
-  button { width: 100%; }
+@keyframes blink {
+    50% { opacity: 0; }
 }
