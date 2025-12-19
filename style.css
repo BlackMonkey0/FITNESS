@@ -9,7 +9,325 @@
   --neon-pink: #ff008c;
   --system-red: #ff003c;
   --dark-glass: rgba(0, 0, 0, 0.85);
-  --border-tech: rgba(57, 255, 20, 0.2);
+  --border-tech: rgba(57, 255, 20, 0.2);/* =========================
+   MIL-SYS CORE VARIABLES
+========================= */
+:root {
+  --bg-main: #0b0f0c;
+  --bg-panel: #111613;
+  --bg-panel-soft: #141a16;
+
+  --mil-green: #6b8e23;      /* Olive drab */
+  --mil-green-soft: #4f6b1f;
+  --mil-sand: #c2b280;
+  --mil-red: #8b0000;
+  --mil-gray: #8a8f8c;
+
+  --border-hard: rgba(107, 142, 35, 0.35);
+  --border-soft: rgba(107, 142, 35, 0.15);
+
+  --font-main: 'Orbitron', sans-serif;
+  --font-mono: 'Courier New', monospace;
+}
+
+/* =========================
+   BASE
+========================= */
+body {
+  background-color: var(--bg-main);
+  color: var(--mil-green);
+  font-family: var(--font-mono);
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Ruido táctico muy sutil */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.015),
+      rgba(255,255,255,0.015) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* =========================
+   HEADER – COMMAND UNIT
+========================= */
+header {
+  padding: 18px 26px;
+  border-bottom: 2px solid var(--mil-green);
+  background: linear-gradient(180deg, #0f140f, #0b0f0c);
+}
+
+header h1 {
+  font-family: var(--font-main);
+  letter-spacing: 3px;
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+header h1::before { content: "⟦ "; }
+header h1::after  { content: " ⟧"; }
+
+header p {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  color: var(--mil-gray);
+}
+
+/* =========================
+   NAV – TACTICAL TABS
+========================= */
+.tabs {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #0e1310;
+  border-bottom: 1px solid var(--border-hard);
+}
+
+.tab {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--mil-green);
+  font-family: var(--font-main);
+  font-size: 0.65rem;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.tab:hover {
+  border-color: var(--border-soft);
+  background: rgba(107,142,35,0.05);
+}
+
+.tab.active {
+  background: var(--mil-green);
+  color: #0b0f0c;
+  border-color: var(--mil-green);
+}
+
+/* =========================
+   TAB PANELS
+========================= */
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+  animation: deploy 0.25s ease-out;
+}
+
+@keyframes deploy {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================
+   DASHBOARD – STATUS GRID
+========================= */
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  padding: 20px;
+}
+
+.card {
+  background: linear-gradient(180deg, var(--bg-panel), var(--bg-panel-soft));
+  border: 1px solid var(--border-hard);
+  padding: 18px;
+  position: relative;
+}
+
+.card::before {
+  content: "STATUS";
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: 0.55rem;
+  color: var(--mil-gray);
+}
+
+.card h3 {
+  font-size: 0.7rem;
+  margin: 0;
+  color: var(--mil-sand);
+}
+
+.card p {
+  font-family: var(--font-main);
+  font-size: 2rem;
+  margin: 8px 0;
+  color: #e6e6e6;
+}
+
+.muted {
+  font-size: 0.65rem;
+  color: var(--mil-gray);
+}
+
+/* =========================
+   SECTIONS
+========================= */
+.section {
+  padding: 22px;
+  margin: 16px;
+  border-left: 3px solid var(--mil-green);
+  background: rgba(17,22,19,0.8);
+}
+
+/* =========================
+   FORMS
+========================= */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 0.65rem;
+  margin-bottom: 4px;
+  color: var(--mil-sand);
+}
+
+input, select, textarea {
+  background: #0b0f0c;
+  border: 1px solid var(--border-hard);
+  color: var(--mil-green);
+  padding: 10px;
+  font-family: var(--font-mono);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--mil-green);
+  box-shadow: 0 0 6px rgba(107,142,35,0.3);
+}
+
+/* =========================
+   BUTTONS – COMMAND ACTIONS
+========================= */
+button {
+  background: transparent;
+  border: 1px solid var(--mil-green);
+  color: var(--mil-green);
+  padding: 12px;
+  font-family: var(--font-main);
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+button:hover {
+  background: rgba(107,142,35,0.1);
+}
+
+button:active {
+  background: var(--mil-green);
+  color: #0b0f0c;
+}
+
+/* =========================
+   LISTS
+========================= */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: #0e1310;
+  border: 1px solid var(--border-soft);
+  padding: 10px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Delete */
+.delete-btn {
+  border: 1px solid var(--mil-red);
+  color: var(--mil-red);
+  background: transparent;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+/* =========================
+   IA COACH – COMMAND CONSOLE
+========================= */
+.ai-bubble {
+  border: 1px solid var(--mil-green);
+  background: #0b0f0c;
+  padding: 20px;
+  font-size: 0.85rem;
+}
+
+.ai-bubble::before {
+  content: "AI_COMMAND_CHANNEL";
+  display: block;
+  font-size: 0.6rem;
+  color: var(--mil-gray);
+  margin-bottom: 6px;
+}
+
+/* Cursor */
+#aiResponse::after {
+  content: "▮";
+  animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* =========================
+   TOASTS – ALERT SYSTEM
+========================= */
+.toasts {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+.toast {
+  background: #0b0f0c;
+  border: 2px solid var(--mil-red);
+  color: var(--mil-red);
+  padding: 10px 14px;
+  font-size: 0.7rem;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
+/* =========================
+   COMPACT MODE
+========================= */
+body.compact .card p {
+  font-size: 1.4rem;
+}
+
+body.compact .section {
+  padding: 14px;
+}
+
   --font-data: 'Courier New', monospace;
   --font-ui: 'Orbitron', sans-serif;
 }
@@ -517,4 +835,5 @@ body.compact .sidebar { display: none; }
 .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top: 15px; }
 .confirm-ok { background: var(--system-red); border-color: var(--system-red); color:#fff; }
 .confirm-cancel { background: transparent; }
+
 
