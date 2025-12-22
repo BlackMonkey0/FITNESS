@@ -71,19 +71,61 @@ function initDOM() {
 }
 
 /**********************
- * BASE DE DATOS MEJORADA CON COMIDAS COMPLETAS
+ * MEGA BASE DE DATOS DE COMIDAS RÁPIDAS
  **********************/
 const foodDatabase = {
-  // COMIDAS RÁPIDAS Y HAMBURGUESAS ESPECÍFICAS
+  /***** BURGER KING *****/
   'whopper': {
     name: 'Whopper Burger King',
     calories: 660,
     protein: 28,
     carbs: 49,
     fat: 40,
+    restaurant: 'Burger King',
+    type: 'hamburguesa',
     ingredients: [
-      'carne de ternera (113g)',
+      'carne de ternera flameada (113g)',
+      'pan de sésamo tostado',
+      'lechuga fresca',
+      'tomate en rodajas',
+      'cebolla blanca',
+      'pepinillos en rodajas',
+      'mayonesa',
+      'ketchup'
+    ],
+    customizable: true
+  },
+  
+  'whopper jr': {
+    name: 'Whopper Jr. Burger King',
+    calories: 310,
+    protein: 15,
+    carbs: 30,
+    fat: 16,
+    restaurant: 'Burger King',
+    type: 'hamburguesa',
+    ingredients: [
+      'carne de ternera flameada (85g)',
       'pan de sésamo',
+      'lechuga',
+      'tomate',
+      'mayonesa',
+      'ketchup'
+    ],
+    customizable: true
+  },
+  
+  'doble whopper': {
+    name: 'Doble Whopper Burger King',
+    calories: 900,
+    protein: 48,
+    carbs: 52,
+    fat: 57,
+    restaurant: 'Burger King',
+    type: 'hamburguesa',
+    ingredients: [
+      '2 carnes de ternera flameadas',
+      'pan de sésamo tostado',
       'lechuga',
       'tomate',
       'cebolla',
@@ -94,14 +136,91 @@ const foodDatabase = {
     customizable: true
   },
   
+  'king supreme': {
+    name: 'King Supreme Burger King',
+    calories: 720,
+    protein: 32,
+    carbs: 50,
+    fat: 43,
+    restaurant: 'Burger King',
+    type: 'hamburguesa',
+    ingredients: [
+      'carne de ternera flameada',
+      'pan de sésamo',
+      'queso americano',
+      'bacon crujiente',
+      'cebolla',
+      'lechuga',
+      'tomate',
+      'salsa supreme'
+    ],
+    customizable: true
+  },
+  
+  'stacker': {
+    name: 'Stacker Burger King',
+    calories: 850,
+    protein: 45,
+    carbs: 38,
+    fat: 58,
+    restaurant: 'Burger King',
+    type: 'hamburguesa',
+    ingredients: [
+      '3 carnes de ternera flameadas',
+      'pan de sésamo',
+      'queso americano',
+      'bacon',
+      'salsa stacker'
+    ],
+    customizable: true
+  },
+  
+  'long chicken': {
+    name: 'Long Chicken Burger King',
+    calories: 510,
+    protein: 25,
+    carbs: 44,
+    fat: 25,
+    restaurant: 'Burger King',
+    type: 'hamburguesa',
+    ingredients: [
+      'filete de pollo empanado largo',
+      'pan de semillas',
+      'lechuga',
+      'mayonesa'
+    ],
+    customizable: true
+  },
+  
+  'crispy chicken': {
+    name: 'Crispy Chicken Burger King',
+    calories: 620,
+    protein: 28,
+    carbs: 53,
+    fat: 34,
+    restaurant: 'Burger King',
+    type: 'hamburguesa',
+    ingredients: [
+      'filete de pollo crujiente',
+      'pan de sésamo',
+      'lechuga',
+      'tomate',
+      'mayonesa'
+    ],
+    customizable: true
+  },
+  
+  /***** MCDONALD'S *****/
   'big mac': {
     name: 'Big Mac McDonald\'s',
     calories: 563,
     protein: 25,
     carbs: 43,
     fat: 33,
+    restaurant: 'McDonald\'s',
+    type: 'hamburguesa',
     ingredients: [
-      '2 carnes de ternera',
+      '2 carnes de ternera 100%',
       'pan de sésamo triple',
       'lechuga',
       'queso cheddar',
@@ -118,8 +237,10 @@ const foodDatabase = {
     protein: 30,
     carbs: 41,
     fat: 26,
+    restaurant: 'McDonald\'s',
+    type: 'hamburguesa',
     ingredients: [
-      'carne de ternera (113g)',
+      'carne de ternera 100% (113g)',
       'pan de sésamo',
       'queso americano',
       'cebolla',
@@ -130,108 +251,585 @@ const foodDatabase = {
     customizable: true
   },
   
-  'hamburguesa pollo crispy': {
-    name: 'Hamburguesa de Pollo Crispy',
-    calories: 490,
-    protein: 22,
-    carbs: 46,
-    fat: 24,
+  'mcnifica': {
+    name: 'McNífica McDonald\'s',
+    calories: 580,
+    protein: 35,
+    carbs: 45,
+    fat: 32,
+    restaurant: 'McDonald\'s',
+    type: 'hamburguesa',
     ingredients: [
-      'pollo empanado',
-      'pan de sésamo',
+      'carne de ternera 100%',
+      'pan de semillas',
+      'queso cheddar',
+      'bacon',
+      'cebolla caramelizada',
       'lechuga',
+      'salsa especial'
+    ],
+    customizable: true
+  },
+  
+  'mccrispy': {
+    name: 'McChicken Deluxe',
+    calories: 470,
+    protein: 23,
+    carbs: 42,
+    fat: 25,
+    restaurant: 'McDonald\'s',
+    type: 'hamburguesa',
+    ingredients: [
+      'filete de pollo crujiente',
+      'pan de semillas',
+      'lechuga',
+      'tomate',
       'mayonesa'
     ],
     customizable: true
   },
   
-  'hamburguesa doble bacon': {
-    name: 'Hamburguesa Doble Bacon',
-    calories: 850,
-    protein: 48,
-    carbs: 45,
-    fat: 52,
+  'mcfish': {
+    name: 'Filete-O-Fish',
+    calories: 390,
+    protein: 16,
+    carbs: 39,
+    fat: 19,
+    restaurant: 'McDonald\'s',
+    type: 'hamburguesa',
     ingredients: [
-      '2 carnes de ternera',
-      'pan de sésamo',
-      'bacon (4 tiras)',
-      'queso cheddar',
-      'lechuga',
-      'tomate',
-      'salsa burger'
+      'filete de pescado empanado',
+      'pan sin semillas',
+      'queso americano',
+      'salsa tártara'
     ],
     customizable: true
   },
   
-  // INGREDIENTES INDIVIDUALES
+  'mcroyal': {
+    name: 'McRoyal Deluxe',
+    calories: 610,
+    protein: 32,
+    carbs: 48,
+    fat: 35,
+    restaurant: 'McDonald\'s',
+    type: 'hamburguesa',
+    ingredients: [
+      'carne de ternera 100%',
+      'pan de sésamo',
+      'queso cheddar',
+      'bacon',
+      'cebolla',
+      'lechuga',
+      'tomate',
+      'salsa especial'
+    ],
+    customizable: true
+  },
+  
+  /***** KFC *****/
+  'zinger': {
+    name: 'Zinger Burger KFC',
+    calories: 450,
+    protein: 27,
+    carbs: 40,
+    fat: 22,
+    restaurant: 'KFC',
+    type: 'hamburguesa',
+    ingredients: [
+      'filete de pollo picante zinger',
+      'pan de brioche',
+      'lechuga',
+      'mayonesa',
+      'salsa zinger'
+    ],
+    customizable: true
+  },
+  
+  'twister': {
+    name: 'Twister KFC',
+    calories: 480,
+    protein: 25,
+    carbs: 45,
+    fat: 24,
+    restaurant: 'KFC',
+    type: 'wrap',
+    ingredients: [
+      'tiras de pollo crispy',
+      'tortilla de harina',
+      'lechuga',
+      'tomate',
+      'salsa césar'
+    ],
+    customizable: true
+  },
+  
+  'crispy colonel': {
+    name: 'Crispy Colonel Burger',
+    calories: 520,
+    protein: 30,
+    carbs: 48,
+    fat: 26,
+    restaurant: 'KFC',
+    type: 'hamburguesa',
+    ingredients: [
+      'filete de pollo crispy',
+      'pan de brioche',
+      'bacon',
+      'queso cheddar',
+      'lechuga',
+      'salsa colonel'
+    ],
+    customizable: true
+  },
+  
+  'grander': {
+    name: 'Grander KFC',
+    calories: 890,
+    protein: 52,
+    carbs: 55,
+    fat: 58,
+    restaurant: 'KFC',
+    type: 'hamburguesa',
+    ingredients: [
+      '2 filetes de pollo crispy',
+      'pan de brioche premium',
+      'bacon doble',
+      'queso cheddar',
+      'lechuga',
+      'tomate',
+      'salsa grander'
+    ],
+    customizable: true
+  },
+  
+  'fillet tower': {
+    name: 'Fillet Tower Burger',
+    calories: 680,
+    protein: 38,
+    carbs: 52,
+    fat: 38,
+    restaurant: 'KFC',
+    type: 'hamburguesa',
+    ingredients: [
+      'filete de pollo crispy',
+      'pan de brioche',
+      'bacon',
+      'queso cheddar',
+      'anillos de cebolla',
+      'salsa tower'
+    ],
+    customizable: true
+  },
+  
+  /***** OLD WILD WEST *****/
+  'salvaje': {
+    name: 'Hamburguesa Salvaje OWW',
+    calories: 850,
+    protein: 45,
+    carbs: 60,
+    fat: 52,
+    restaurant: 'Old Wild West',
+    type: 'hamburguesa',
+    ingredients: [
+      'carne de ternera 200g',
+      'pan rústico de cereales',
+      'bacon crispy',
+      'queso cheddar fundido',
+      'cebolla caramelizada',
+      'lechuga',
+      'tomate',
+      'salsa barbacoa'
+    ],
+    customizable: true
+  },
+  
+  'texas': {
+    name: 'Texas Burger OWW',
+    calories: 920,
+    protein: 48,
+    carbs: 65,
+    fat: 58,
+    restaurant: 'Old Wild West',
+    type: 'hamburguesa',
+    ingredients: [
+      'carne de ternera 200g',
+      'pan de brioche',
+      'bacon doble',
+      'queso americano',
+      'huevo frito',
+      'cebolla frita',
+      'salsa texas'
+    ],
+    customizable: true
+  },
+  
+  'ranch': {
+    name: 'Ranch Burger OWW',
+    calories: 780,
+    protein: 42,
+    carbs: 55,
+    fat: 45,
+    restaurant: 'Old Wild West',
+    type: 'hamburguesa',
+    ingredients: [
+      'carne de ternera 180g',
+      'pan integral',
+      'queso pepper jack',
+      'aguacate',
+      'tomate',
+      'cebolla morada',
+      'salsa ranch'
+    ],
+    customizable: true
+  },
+  
+  'búfalo': {
+    name: 'Búfalo Burger OWW',
+    calories: 810,
+    protein: 46,
+    carbs: 58,
+    fat: 48,
+    restaurant: 'Old Wild West',
+    type: 'hamburguesa',
+    ingredients: [
+      'carne de bisonte 180g',
+      'pan de semillas',
+      'queso azul',
+      'cebolla crispy',
+      'lechuga',
+      'salsa búfalo'
+    ],
+    customizable: true
+  },
+  
+  /***** TACO BELL *****/
+  'crunchwrap': {
+    name: 'Crunchwrap Supreme',
+    calories: 530,
+    protein: 18,
+    carbs: 58,
+    fat: 26,
+    restaurant: 'Taco Bell',
+    type: 'wrap',
+    ingredients: [
+      'carne de ternera sazonada',
+      'tortilla de harina tostada',
+      'nachos crujientes',
+      'queso fundido',
+      'crema agria',
+      'tomate',
+      'lechuga'
+    ],
+    customizable: true
+  },
+  
+  'quesadilla': {
+    name: 'Quesadilla de Pollo',
+    calories: 510,
+    protein: 27,
+    carbs: 40,
+    fat: 28,
+    restaurant: 'Taco Bell',
+    type: 'quesadilla',
+    ingredients: [
+      'pollo a la parrilla',
+      'tortilla de harina',
+      'queso 3 tipos',
+      'crema chipotle'
+    ],
+    customizable: true
+  },
+  
+  /***** PATATAS Y ACOMPAÑAMIENTOS *****/
+  'patatas medianas': {
+    name: 'Patatas Fritas Medianas',
+    calories: 320,
+    protein: 4,
+    carbs: 42,
+    fat: 15,
+    restaurant: 'General',
+    type: 'acompañamiento',
+    ingredients: ['patatas fritas'],
+    customizable: false
+  },
+  
+  'patatas grandes': {
+    name: 'Patatas Fritas Grandes',
+    calories: 480,
+    protein: 6,
+    carbs: 63,
+    fat: 22,
+    restaurant: 'General',
+    type: 'acompañamiento',
+    ingredients: ['patatas fritas'],
+    customizable: false
+  },
+  
+  'patatas deluxe': {
+    name: 'Patatas Deluxe Burger King',
+    calories: 420,
+    protein: 5,
+    carbs: 52,
+    fat: 21,
+    restaurant: 'Burger King',
+    type: 'acompañamiento',
+    ingredients: ['patatas fritas con piel'],
+    customizable: false
+  },
+  
+  'cheddar bites': {
+    name: 'Cheddar Bites OWW',
+    calories: 380,
+    protein: 12,
+    carbs: 28,
+    fat: 25,
+    restaurant: 'Old Wild West',
+    type: 'acompañamiento',
+    ingredients: ['bolitas de queso cheddar rebozadas'],
+    customizable: false
+  },
+  
+  'aros cebolla': {
+    name: 'Aros de Cebolla',
+    calories: 330,
+    protein: 4,
+    carbs: 40,
+    fat: 17,
+    restaurant: 'General',
+    type: 'acompañamiento',
+    ingredients: ['cebolla rebozada'],
+    customizable: false
+  },
+  
+  'nuggets 6': {
+    name: '6 Nuggets de Pollo',
+    calories: 280,
+    protein: 14,
+    carbs: 16,
+    fat: 18,
+    restaurant: 'General',
+    type: 'acompañamiento',
+    ingredients: ['nuggets de pollo'],
+    customizable: false
+  },
+  
+  'nuggets 9': {
+    name: '9 Nuggets de Pollo',
+    calories: 420,
+    protein: 21,
+    carbs: 24,
+    fat: 27,
+    restaurant: 'General',
+    type: 'acompañamiento',
+    ingredients: ['nuggets de pollo'],
+    customizable: false
+  },
+  
+  'alitas': {
+    name: 'Alitas de Pollo (6 unidades)',
+    calories: 430,
+    protein: 32,
+    carbs: 12,
+    fat: 28,
+    restaurant: 'KFC',
+    type: 'acompañamiento',
+    ingredients: ['alitas de pollo'],
+    customizable: true
+  },
+  
+  'tiras pollo': {
+    name: 'Tiras de Pollo (3 unidades)',
+    calories: 320,
+    protein: 25,
+    carbs: 15,
+    fat: 18,
+    restaurant: 'KFC',
+    type: 'acompañamiento',
+    ingredients: ['tiras de pechuga de pollo'],
+    customizable: false
+  },
+  
+  'ensalada cesar': {
+    name: 'Ensalada César',
+    calories: 350,
+    protein: 18,
+    carbs: 12,
+    fat: 25,
+    restaurant: 'General',
+    type: 'ensalada',
+    ingredients: [
+      'lechuga romana',
+      'pollo a la parrilla',
+      'queso parmesano',
+      'crutones',
+      'salsa césar'
+    ],
+    customizable: true
+  },
+  
+  'ensalada pollo crispy': {
+    name: 'Ensalada con Pollo Crispy',
+    calories: 420,
+    protein: 22,
+    carbs: 25,
+    fat: 28,
+    restaurant: 'General',
+    type: 'ensalada',
+    ingredients: [
+      'mezcla de lechugas',
+      'pollo crispy',
+      'maíz',
+      'tomate',
+      'cebolla',
+      'salsa ranch'
+    ],
+    customizable: true
+  },
+  
+  /***** BEBIDAS *****/
+  'coca cola mediana': {
+    name: 'Coca Cola Mediana',
+    calories: 210,
+    protein: 0,
+    carbs: 56,
+    fat: 0,
+    restaurant: 'General',
+    type: 'bebida',
+    ingredients: ['refresco de cola'],
+    customizable: false
+  },
+  
+  'fanta naranja': {
+    name: 'Fanta Naranja Mediana',
+    calories: 180,
+    protein: 0,
+    carbs: 48,
+    fat: 0,
+    restaurant: 'General',
+    type: 'bebida',
+    ingredients: ['refresco de naranja'],
+    customizable: false
+  },
+  
+  'agua mineral': {
+    name: 'Agua Mineral',
+    calories: 0,
+    protein: 0,
+    carbs: 0,
+    fat: 0,
+    restaurant: 'General',
+    type: 'bebida',
+    ingredients: ['agua'],
+    customizable: false
+  },
+  
+  'café solo': {
+    name: 'Café Solo',
+    calories: 2,
+    protein: 0,
+    carbs: 0,
+    fat: 0,
+    restaurant: 'General',
+    type: 'bebida',
+    ingredients: ['café'],
+    customizable: false
+  },
+  
+  'batido chocolate': {
+    name: 'Batido de Chocolate Mediano',
+    calories: 560,
+    protein: 12,
+    carbs: 92,
+    fat: 18,
+    restaurant: 'McDonald\'s',
+    type: 'bebida',
+    ingredients: ['batido de chocolate'],
+    customizable: false
+  },
+  
+  'batido vainilla': {
+    name: 'Batido de Vainilla',
+    calories: 520,
+    protein: 11,
+    carbs: 85,
+    fat: 16,
+    restaurant: 'McDonald\'s',
+    type: 'bebida',
+    ingredients: ['batido de vainilla'],
+    customizable: false
+  },
+  
+  /***** POSTRES *****/
+  'mcflurry oreo': {
+    name: 'McFlurry Oreo',
+    calories: 330,
+    protein: 7,
+    carbs: 48,
+    fat: 13,
+    restaurant: 'McDonald\'s',
+    type: 'postre',
+    ingredients: ['helado de vainilla', 'galletas oreo trituradas'],
+    customizable: false
+  },
+  
+  'sundae chocolate': {
+    name: 'Sundae de Chocolate',
+    calories: 340,
+    protein: 6,
+    carbs: 55,
+    fat: 11,
+    restaurant: 'McDonald\'s',
+    type: 'postre',
+    ingredients: ['helado de vainilla', 'salsa de chocolate'],
+    customizable: false
+  },
+  
+  'apple pie': {
+    name: 'Apple Pie',
+    calories: 250,
+    protein: 2,
+    carbs: 32,
+    fat: 13,
+    restaurant: 'McDonald\'s',
+    type: 'postre',
+    ingredients: ['manzana', 'masa hojaldrada'],
+    customizable: false
+  },
+  
+  'donut glaseado': {
+    name: 'Donut Glaseado',
+    calories: 310,
+    protein: 4,
+    carbs: 45,
+    fat: 14,
+    restaurant: 'General',
+    type: 'postre',
+    ingredients: ['donut con glaseado'],
+    customizable: false
+  },
+  
+  /***** INGREDIENTES INDIVIDUALES *****/
   'carne': { calories: 250, protein: 26, carbs: 0, fat: 17, unit: '100g' },
-  'carne de ternera': { calories: 250, protein: 26, carbs: 0, fat: 17, unit: '100g' },
   'pollo': { calories: 165, protein: 31, carbs: 0, fat: 3.6, unit: '100g' },
-  'pollo empanado': { calories: 250, protein: 20, carbs: 15, fat: 12, unit: '100g' },
   'bacon': { calories: 541, protein: 37, carbs: 1.4, fat: 42, unit: '100g' },
-  'beicon': { calories: 541, protein: 37, carbs: 1.4, fat: 42, unit: '100g' },
-  'tocino': { calories: 541, protein: 37, carbs: 1.4, fat: 42, unit: '100g' },
-  'pan': { calories: 260, protein: 9, carbs: 49, fat: 3.2, unit: '100g' },
-  'pan de sésamo': { calories: 280, protein: 9, carbs: 50, fat: 4, unit: 'unidad' },
-  'pan hamburguesa': { calories: 280, protein: 9, carbs: 50, fat: 4, unit: 'unidad' },
   'queso': { calories: 400, protein: 25, carbs: 2, fat: 33, unit: '100g' },
-  'queso cheddar': { calories: 403, protein: 25, carbs: 1.3, fat: 33, unit: '100g' },
-  'queso americano': { calories: 368, protein: 23, carbs: 2, fat: 30, unit: 'rebanada' },
+  'pan': { calories: 260, protein: 9, carbs: 49, fat: 3.2, unit: '100g' },
   'lechuga': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2, unit: '100g' },
   'tomate': { calories: 18, protein: 0.9, carbs: 3.9, fat: 0.2, unit: '100g' },
   'cebolla': { calories: 40, protein: 1.1, carbs: 9.3, fat: 0.1, unit: '100g' },
-  'pepinillos': { calories: 11, protein: 0.6, carbs: 2.3, fat: 0.2, unit: '100g' },
-  'pepinillo': { calories: 11, protein: 0.6, carbs: 2.3, fat: 0.2, unit: 'unidad' },
   'mayonesa': { calories: 680, protein: 1.1, carbs: 0.6, fat: 75, unit: '100g' },
-  'ketchup': { calories: 101, protein: 1.7, carbs: 24, fat: 0.3, unit: '100g' },
-  'mostaza': { calories: 66, protein: 4.4, carbs: 6, fat: 3.3, unit: '100g' },
-  'salsa burger': { calories: 180, protein: 1, carbs: 15, fat: 13, unit: 'cucharada' },
-  'salsa especial': { calories: 180, protein: 1, carbs: 15, fat: 13, unit: 'cucharada' },
-  'salsa oww': { calories: 180, protein: 1, carbs: 15, fat: 13, unit: 'cucharada' },
-  'salsa ow': { calories: 180, protein: 1, carbs: 15, fat: 13, unit: 'cucharada' },
-  'salsa big mac': { calories: 140, protein: 0.5, carbs: 12, fat: 10, unit: 'porción' },
-  
-  // INGREDIENTES COMUNES
-  'huevo': { calories: 155, protein: 13, carbs: 1.1, fat: 11, unit: 'unidad' },
-  'aguacate': { calories: 160, protein: 2, carbs: 9, fat: 15, unit: 'unidad mediana' },
-  'jalapeños': { calories: 29, protein: 0.9, carbs: 6, fat: 0.4, unit: '100g' },
-  'champiñones': { calories: 22, protein: 3.1, carbs: 3.3, fat: 0.3, unit: '100g' },
-  'tocino canadiense': { calories: 345, protein: 28, carbs: 0, fat: 26, unit: '100g' },
-  'arroz': { calories: 130, protein: 2.5, carbs: 28, fat: 0.3, unit: '100g cocido' },
-  'pasta': { calories: 350, protein: 12, carbs: 72, fat: 1.5, unit: '100g seca' },
-  
-  // SALSAS EXTRA
-  'salsa barbacoa': { calories: 150, protein: 1, carbs: 35, fat: 0.5, unit: '100g' },
-  'salsa ranch': { calories: 360, protein: 1, carbs: 4, fat: 38, unit: '100g' },
-  'salsa aioli': { calories: 400, protein: 1, carbs: 2, fat: 43, unit: '100g' },
-  'salsa tártara': { calories: 320, protein: 1, carbs: 8, fat: 32, unit: '100g' },
-  
-  // EXTRAS
-  'patatas fritas': { calories: 312, protein: 3.4, carbs: 41, fat: 15, unit: '100g' },
-  'patatas': { calories: 77, protein: 2, carbs: 17, fat: 0.1, unit: '100g' },
-  'aros de cebolla': { calories: 330, protein: 4, carbs: 40, fat: 17, unit: '100g' },
-  'nuggets de pollo': { calories: 296, protein: 14, carbs: 16, fat: 19, unit: '100g' },
-  
-  // BEBIDAS
-  'refresco': { calories: 41, protein: 0, carbs: 10, fat: 0, unit: '100ml' },
-  'batido': { calories: 112, protein: 3.7, carbs: 18, fat: 3, unit: '100ml' },
-  'agua': { calories: 0, protein: 0, carbs: 0, fat: 0, unit: '100ml' },
-  
-  // POSTRES
-  'helado': { calories: 207, protein: 3.5, carbs: 24, fat: 11, unit: '100g' },
-  'tarta': { calories: 350, protein: 4, carbs: 45, fat: 17, unit: '100g' },
-  'donut': { calories: 452, protein: 5, carbs: 51, fat: 25, unit: 'unidad' },
-  'galleta': { calories: 500, protein: 6, carbs: 65, fat: 24, unit: '100g' }
+  'ketchup': { calories: 101, protein: 1.7, carbs: 24, fat: 0.3, unit: '100g' }
 };
 
 /**********************
- * SISTEMA DE ANÁLISIS INTELIGENTE CON PERSONALIZACIÓN
+ * SISTEMA DE ANÁLISIS MEJORADO
  **********************/
 function handleAnalyze() {
   const text = (DOM.aiMealText?.value || '').toLowerCase().trim();
   if (!text) return showToast("Escribe qué has comido...");
 
-  // Buscar comidas completas primero (Whopper, Big Mac, etc.)
+  // Buscar comidas completas primero
   const completeMeal = findCompleteMeal(text);
   
   if (completeMeal) {
@@ -247,17 +845,75 @@ function handleAnalyze() {
 }
 
 function findCompleteMeal(text) {
+  // Mapeo de palabras clave a comidas
   const mealKeywords = {
+    // Burger King
     'whopper': 'whopper',
+    'whopper jr': 'whopper jr',
+    'doble whopper': 'doble whopper',
+    'king supreme': 'king supreme',
+    'stacker': 'stacker',
+    'long chicken': 'long chicken',
+    'crispy chicken': 'crispy chicken',
+    
+    // McDonald's
     'big mac': 'big mac',
     'cuarto de libra': 'cuarto de libra',
-    'hamburguesa crispy': 'hamburguesa pollo crispy',
-    'hamburguesa doble bacon': 'hamburguesa doble bacon',
-    'hamburguesa doble': 'hamburguesa doble bacon',
-    'cheeseburger': 'cuarto de libra',
-    'hamburguesa pollo': 'hamburguesa pollo crispy'
+    'mcnifica': 'mcnifica',
+    'mccrispy': 'mccrispy',
+    'mcfish': 'mcfish',
+    'mcroyal': 'mcroyal',
+    
+    // KFC
+    'zinger': 'zinger',
+    'twister': 'twister',
+    'crispy colonel': 'crispy colonel',
+    'grander': 'grander',
+    'fillet tower': 'fillet tower',
+    
+    // OWW
+    'salvaje': 'salvaje',
+    'texas': 'texas',
+    'ranch': 'ranch',
+    'búfalo': 'búfalo',
+    
+    // Taco Bell
+    'crunchwrap': 'crunchwrap',
+    'quesadilla': 'quesadilla',
+    
+    // Acompañamientos
+    'patatas': 'patatas medianas',
+    'patatas medianas': 'patatas medianas',
+    'patatas grandes': 'patatas grandes',
+    'patatas deluxe': 'patatas deluxe',
+    'cheddar bites': 'cheddar bites',
+    'aros cebolla': 'aros cebolla',
+    'nuggets': 'nuggets 6',
+    'nuggets 6': 'nuggets 6',
+    'nuggets 9': 'nuggets 9',
+    'alitas': 'alitas',
+    'tiras pollo': 'tiras pollo',
+    
+    // Ensaladas
+    'ensalada cesar': 'ensalada cesar',
+    'ensalada pollo': 'ensalada pollo crispy',
+    
+    // Bebidas
+    'coca cola': 'coca cola mediana',
+    'fanta': 'fanta naranja',
+    'agua': 'agua mineral',
+    'café': 'café solo',
+    'batido chocolate': 'batido chocolate',
+    'batido vainilla': 'batido vainilla',
+    
+    // Postres
+    'mcflurry': 'mcflurry oreo',
+    'sundae': 'sundae chocolate',
+    'apple pie': 'apple pie',
+    'donut': 'donut glaseado'
   };
   
+  // Buscar coincidencias
   for (const [keyword, mealKey] of Object.entries(mealKeywords)) {
     if (text.includes(keyword)) {
       return {
@@ -265,6 +921,33 @@ function findCompleteMeal(text) {
         baseKey: mealKey,
         originalText: text
       };
+    }
+  }
+  
+  // Buscar combinaciones de restaurante + comida
+  const restaurants = ['burger king', 'mcdonalds', 'kfc', 'old wild west', 'taco bell'];
+  for (const restaurant of restaurants) {
+    if (text.includes(restaurant)) {
+      // Extraer posible nombre de comida después del restaurante
+      const restIndex = text.indexOf(restaurant);
+      const afterRest = text.substring(restIndex + restaurant.length).trim();
+      const words = afterRest.split(/\s+/);
+      
+      if (words.length > 0) {
+        const possibleMeal = words[0] + (words[1] ? ' ' + words[1] : '');
+        for (const [mealKey, mealData] of Object.entries(foodDatabase)) {
+          if (mealData.restaurant && mealData.restaurant.toLowerCase().includes(restaurant)) {
+            if (mealData.name.toLowerCase().includes(possibleMeal) || 
+                possibleMeal.includes(mealData.type)) {
+              return {
+                ...mealData,
+                baseKey: mealKey,
+                originalText: text
+              };
+            }
+          }
+        }
+      }
     }
   }
   
@@ -283,7 +966,8 @@ function customizeMeal(meal, text) {
     ingredients: [...meal.ingredients],
     modifications: [],
     added: [],
-    removed: []
+    removed: [],
+    time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
   };
   
   // Lista de modificaciones comunes
@@ -359,7 +1043,7 @@ function customizeMeal(meal, text) {
       customized.protein += extraProtein;
       customized.carbs += extraCarbs;
       customized.fat += extraFat;
-      customized.modifications.push(`Doble ${item}`);
+      customized.modifications.push(`${multiplier === 2 ? 'Doble' : 'Triple'} ${item}`);
     }
   });
   
@@ -367,6 +1051,12 @@ function customizeMeal(meal, text) {
   if (customized.modifications.length > 0) {
     customized.name = `${meal.name} (${customized.modifications.join(', ')})`;
   }
+  
+  // Añadir hora actual
+  customized.time = new Date().toLocaleTimeString('es-ES', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
   
   // Asegurar valores mínimos
   customized.calories = Math.max(100, Math.round(customized.calories));
@@ -387,14 +1077,10 @@ function analyzeModifications(text) {
   
   // Patrones para detectar modificaciones
   const patterns = {
-    // Sin/sin/sin
-    remove: /\b(?:sin|no|quit[ao]s?|elimin[ao])\s+(\w+(?:\s+\w+)?)/gi,
-    // Con/extra/más
-    add: /\b(?:con|extra|más|añad[ei]|agreg[ao])\s+(\w+(?:\s+\w+)?)/gi,
-    // En lugar de/reemplazar
-    replace: /\b(?:en\s+lugar\s+de|cambiar|reemplazar)\s+(\w+)\s+por\s+(\w+)/gi,
-    // Doble/triple
-    quantity: /\b(doble|triple|extra\s+doble)\s+(\w+)/gi
+    remove: /\b(?:sin|no|quit[ao]s?|elimin[ao]|sin\s+el?)\s+(\w+(?:\s+\w+)?)/gi,
+    add: /\b(?:con|extra|más|añad[ei]|agreg[ao]|agrega)\s+(\w+(?:\s+\w+)?)/gi,
+    replace: /\b(?:en\s+lugar\s+de|cambiar|reemplazar|por|con)\s+(\w+)\s+(?:por|con)\s+(\w+)/gi,
+    quantity: /\b(doble|triple|extra\s+doble|doble\s+extra)\s+(\w+)/gi
   };
   
   // Analizar "sin"
@@ -482,7 +1168,9 @@ function getIngredientAdjustment(ingredient) {
     'lechuga': { calories: 3, protein: 0.3, carbs: 0.5, fat: 0 },
     'mayonesa': { calories: 90, protein: 0.1, carbs: 0, fat: 10 },
     'ketchup': { calories: 15, protein: 0, carbs: 4, fat: 0 },
-    'salsa': { calories: 30, protein: 0, carbs: 2, fat: 2 }
+    'salsa': { calories: 30, protein: 0, carbs: 2, fat: 2 },
+    'aguacate': { calories: 50, protein: 0.6, carbs: 3, fat: 4.6 },
+    'huevo': { calories: 70, protein: 6, carbs: 0.6, fat: 5 }
   };
   
   return defaultValues[ingredient] || { calories: 0, protein: 0, carbs: 0, fat: 0 };
@@ -542,7 +1230,8 @@ function analyzeIngredients(text) {
       protein: Math.round(protein),
       carbs: Math.round(carbs),
       fat: Math.round(fat),
-      ingredients: detectedFoods
+      ingredients: detectedFoods,
+      time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
     });
     
     showToast(`✅ Detectados: ${detectedFoods.slice(0, 3).join(', ')}`);
@@ -568,22 +1257,28 @@ function showMealDetails(mealData) {
   
   let html = `
     <div class="meal-details">
-      <h4>🍔 ${mealData.name}</h4>
+      <div class="meal-header">
+        <h4>🍔 ${mealData.name}</h4>
+        ${mealData.time ? `<div class="meal-time">🕐 ${mealData.time}</div>` : ''}
+      </div>
+      
+      ${mealData.restaurant ? `<div class="meal-restaurant">🏪 ${mealData.restaurant}</div>` : ''}
+      
       <div class="nutrition-breakdown">
         <div class="nutrient-item">
-          <span class="nutrient-label">🔥 Calorías:</span>
+          <span class="nutrient-label">🔥 Calorías</span>
           <span class="nutrient-value">${mealData.calories}</span>
         </div>
         <div class="nutrient-item">
-          <span class="nutrient-label">💪 Proteína:</span>
+          <span class="nutrient-label">💪 Proteína</span>
           <span class="nutrient-value">${mealData.protein}g</span>
         </div>
         <div class="nutrient-item">
-          <span class="nutrient-label">🌾 Carbohidratos:</span>
+          <span class="nutrient-label">🌾 Carbos</span>
           <span class="nutrient-value">${mealData.carbs}g</span>
         </div>
         <div class="nutrient-item">
-          <span class="nutrient-label">🥑 Grasas:</span>
+          <span class="nutrient-label">🥑 Grasas</span>
           <span class="nutrient-value">${mealData.fat}g</span>
         </div>
       </div>
@@ -591,22 +1286,22 @@ function showMealDetails(mealData) {
   
   if (mealData.ingredients && mealData.ingredients.length > 0) {
     html += `
-      <div class="ingredients-list">
+      <div class="ingredients-section">
         <strong>🍽️ Ingredientes:</strong>
-        <ul>
-          ${mealData.ingredients.map(ing => `<li>${ing}</li>`).join('')}
-        </ul>
+        <div class="ingredients-grid">
+          ${mealData.ingredients.map(ing => `<span class="ingredient-tag">${ing}</span>`).join('')}
+        </div>
       </div>
     `;
   }
   
   if (mealData.modifications && mealData.modifications.length > 0) {
     html += `
-      <div class="modifications">
+      <div class="modifications-section">
         <strong>⚙️ Personalizaciones:</strong>
-        <ul>
-          ${mealData.modifications.map(mod => `<li>${mod}</li>`).join('')}
-        </ul>
+        <div class="modifications-list">
+          ${mealData.modifications.map(mod => `<span class="modification-tag">${mod}</span>`).join('')}
+        </div>
       </div>
     `;
   }
@@ -682,213 +1377,15 @@ function estimateFromDescription(text) {
     protein: finalProtein,
     carbs: finalCarbs,
     fat: finalFat,
-    ingredients: ["Estimación basada en descripción"]
+    ingredients: ["Estimación basada en descripción"],
+    time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
   });
   
   showToast("⚠️ Usando estimación inteligente");
 }
 
 /**********************
- * IA VISION - ANÁLISIS DE IMÁGENES
- **********************/
-
-function setupImageUpload() {
-  const uploadZone = DOM.uploadZone;
-  const imageInput = DOM.imageInput;
-  const captureBtn = DOM.captureBtn;
-  const uploadBtn = DOM.uploadBtn;
-  const removeBtn = DOM.removeImage;
-  const preview = DOM.imagePreview;
-  const previewImg = DOM.previewImage;
-
-  uploadZone?.addEventListener('click', () => {
-    imageInput?.click();
-  });
-
-  captureBtn?.addEventListener('click', () => {
-    if (imageInput) imageInput.setAttribute('capture', 'environment');
-    imageInput?.click();
-  });
-
-  uploadBtn?.addEventListener('click', () => {
-    if (imageInput) imageInput.removeAttribute('capture');
-    imageInput?.click();
-  });
-
-  imageInput?.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      handleImageFile(file);
-    }
-  });
-
-  removeBtn?.addEventListener('click', () => {
-    if (preview) preview.hidden = true;
-    if (imageInput) imageInput.value = '';
-    if (DOM.analyzeImageBtn) DOM.analyzeImageBtn.disabled = true;
-  });
-
-  DOM.analyzeImageBtn?.addEventListener('click', analyzeImageWithAI);
-  DOM.useDetectionBtn?.addEventListener('click', useDetectedValues);
-}
-
-function handleImageFile(file) {
-  const reader = new FileReader();
-  
-  reader.onload = function(e) {
-    if (DOM.previewImage) DOM.previewImage.src = e.target.result;
-    if (DOM.imagePreview) DOM.imagePreview.hidden = false;
-    if (DOM.analyzeImageBtn) DOM.analyzeImageBtn.disabled = false;
-    
-    const fileName = file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name;
-    if (DOM.uploadZone) {
-      DOM.uploadZone.innerHTML = `<p>✅ ${fileName} cargado</p><p class="hint">Haz clic en "Analizar Imagen con IA"</p>`;
-    }
-  };
-  
-  reader.readAsDataURL(file);
-}
-
-async function analyzeImageWithAI() {
-  if (!geminiApiKey) {
-    showToast("⚠️ Primero configura tu clave API de Gemini");
-    const visionTab = document.querySelector('[data-target="vision"]');
-    if (visionTab) visionTab.click();
-    return;
-  }
-
-  const imageSrc = DOM.previewImage?.src;
-  const foodType = DOM.foodType?.value || 'plate';
-  
-  if (!imageSrc || imageSrc === '') {
-    showToast("⚠️ Primero sube una imagen");
-    return;
-  }
-
-  showToast("🔬 Analizando imagen con IA...");
-  if (DOM.analyzeImageBtn) {
-    DOM.analyzeImageBtn.disabled = true;
-    DOM.analyzeImageBtn.textContent = "Analizando...";
-  }
-
-  try {
-    // Simulación de respuesta de IA (para pruebas sin API)
-    const simulatedResponse = simulateAIResponse(foodType);
-    displayAIResults(simulatedResponse);
-    
-    showToast("✅ Análisis completado");
-    
-  } catch (error) {
-    console.error("Error en análisis IA:", error);
-    showToast("❌ Error en análisis. Usando modo simulación.");
-    
-    // Modo simulación como fallback
-    const simulatedResponse = simulateAIResponse(foodType);
-    displayAIResults(simulatedResponse);
-  } finally {
-    if (DOM.analyzeImageBtn) {
-      DOM.analyzeImageBtn.disabled = false;
-      DOM.analyzeImageBtn.textContent = "🔬 Analizar Imagen con IA";
-    }
-  }
-}
-
-function simulateAIResponse(foodType) {
-  const responses = {
-    plate: {
-      estimatedCalories: Math.floor(Math.random() * 800) + 400,
-      estimatedProtein: Math.floor(Math.random() * 40) + 15,
-      estimatedCarbs: Math.floor(Math.random() * 100) + 30,
-      estimatedFat: Math.floor(Math.random() * 40) + 10,
-      detectedFoods: ["Pollo", "Arroz", "Verduras", "Aceite de oliva"],
-      foodName: "Plato mixto detectado",
-      confidence: 85
-    },
-    label: {
-      calories: Math.floor(Math.random() * 400) + 200,
-      protein: Math.floor(Math.random() * 30) + 5,
-      carbs: Math.floor(Math.random() * 50) + 10,
-      fat: Math.floor(Math.random() * 20) + 3,
-      servingSize: "Porción de 100g",
-      foodName: "Producto envasado",
-      confidence: 95
-    },
-    ingredients: {
-      detectedItems: ["Pechuga de pollo", "Brócoli", "Quinoa", "Aguacate"],
-      estimatedTotalCalories: Math.floor(Math.random() * 600) + 300,
-      estimatedTotalProtein: Math.floor(Math.random() * 50) + 20,
-      foodName: "Ingredientes varios",
-      confidence: 75
-    }
-  };
-  
-  return responses[foodType] || responses.plate;
-}
-
-function displayAIResults(data) {
-  if (!DOM.aiResults) return;
-  
-  let html = '<h4>🔍 Resultados del Análisis</h4>';
-  
-  if (data.detectedFoods) {
-    html += `<p><strong>Alimentos detectados:</strong> ${data.detectedFoods.join(', ')}</p>`;
-  }
-  
-  if (data.estimatedCalories || data.calories) {
-    const calories = data.estimatedCalories || data.calories;
-    const protein = data.estimatedProtein || data.protein;
-    const carbs = data.estimatedCarbs || data.carbs;
-    const fat = data.estimatedFat || data.fat;
-    
-    html += `
-      <div class="nutrition-summary">
-        <p><strong>Calorías:</strong> ${calories} kcal</p>
-        <p><strong>Proteína:</strong> ${protein}g</p>
-        <p><strong>Carbohidratos:</strong> ${carbs}g</p>
-        <p><strong>Grasas:</strong> ${fat}g</p>
-      </div>
-    `;
-    
-    // Actualizar tarjeta de nutrición
-    if (DOM.nutritionFacts) {
-      DOM.nutritionFacts.hidden = false;
-      document.getElementById('detectedCalories').textContent = `${calories} kcal`;
-      document.getElementById('detectedProtein').textContent = `${protein}g`;
-      document.getElementById('detectedCarbs').textContent = `${carbs}g`;
-      document.getElementById('detectedFat').textContent = `${fat}g`;
-      document.getElementById('detectedFoods').textContent = data.detectedFoods ? data.detectedFoods.join(', ') : '-';
-    }
-  }
-  
-  if (data.confidence) {
-    html += `<p class="hint">Confianza del análisis: ${data.confidence}%</p>`;
-  }
-  
-  DOM.aiResults.innerHTML = html;
-}
-
-function useDetectedValues() {
-  const calories = document.getElementById('detectedCalories').textContent.replace(' kcal', '');
-  const protein = document.getElementById('detectedProtein').textContent.replace('g', '');
-  const carbs = document.getElementById('detectedCarbs').textContent.replace('g', '');
-  const fat = document.getElementById('detectedFat').textContent.replace('g', '');
-  const foods = document.getElementById('detectedFoods').textContent;
-  
-  if (DOM.mealName) DOM.mealName.value = foods;
-  if (DOM.mealCalories) DOM.mealCalories.value = calories;
-  if (DOM.mealProtein) DOM.mealProtein.value = protein;
-  if (DOM.mealCarbs) DOM.mealCarbs.value = carbs;
-  if (DOM.mealFat) DOM.mealFat.value = fat;
-  
-  showToast("✅ Valores copiados al formulario");
-  
-  // Ir a la pestaña de comidas
-  const mealsTab = document.querySelector('[data-target="meals"]');
-  if (mealsTab) mealsTab.click();
-}
-
-/**********************
- * GESTIÓN DE COMIDAS
+ * GESTIÓN DE COMIDAS CON HORA
  **********************/
 function addMeal() {
   const name = DOM.mealName?.value || "";
@@ -901,6 +1398,7 @@ function addMeal() {
     return showToast("❌ Faltan datos de comida");
   }
   
+  const now = new Date();
   const meal = {
     id: Date.now(),
     name,
@@ -908,8 +1406,10 @@ function addMeal() {
     prot,
     carbs,
     fat,
-    timestamp: new Date().toISOString(),
-    date: new Date().toLocaleDateString('es-ES')
+    timestamp: now.toISOString(),
+    date: now.toLocaleDateString('es-ES'),
+    time: now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+    datetime: now.getTime()
   };
   
   meals.push(meal);
@@ -925,7 +1425,7 @@ function addMeal() {
   if (DOM.mealFat) DOM.mealFat.value = "";
   if (DOM.aiMealText) DOM.aiMealText.value = "";
   
-  showToast(`✅ ${name} añadido`);
+  showToast(`✅ ${name} añadido a las ${meal.time}`);
 }
 
 async function deleteMeal(id) {
@@ -955,13 +1455,24 @@ function renderMeals() {
     return;
   }
   
+  // Ordenar por hora (más reciente primero)
+  todayMeals.sort((a, b) => b.datetime - a.datetime);
+  
   todayMeals.forEach((meal) => {
     const li = document.createElement("li");
     
     const info = document.createElement('div');
     info.innerHTML = `
-      <strong>${meal.name}</strong><br>
-      <small>${meal.cal} kcal | P:${meal.prot}g C:${meal.carbs}g G:${meal.fat}g</small>
+      <div class="meal-info-header">
+        <strong>${meal.name}</strong>
+        <span class="meal-time-badge">🕐 ${meal.time}</span>
+      </div>
+      <div class="meal-nutrition">
+        <span class="calories-badge">🔥 ${meal.cal} kcal</span>
+        <span class="protein-badge">💪 ${meal.prot}g P</span>
+        <span class="carbs-badge">🌾 ${meal.carbs}g C</span>
+        <span class="fat-badge">🥑 ${meal.fat}g G</span>
+      </div>
     `;
     
     const btn = document.createElement('button');
@@ -991,14 +1502,16 @@ function addExercise() {
     return showToast("❌ Faltan datos del ejercicio");
   }
   
+  const now = new Date();
   const exercise = {
     id: Date.now(),
     name,
     sets: parseInt(sets),
     reps: parseInt(reps),
     weight: parseFloat(weight),
-    timestamp: new Date().toISOString(),
-    date: new Date().toLocaleDateString('es-ES')
+    timestamp: now.toISOString(),
+    date: now.toLocaleDateString('es-ES'),
+    time: now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
   };
   
   exercises.push(exercise);
@@ -1011,7 +1524,7 @@ function addExercise() {
     if (el) el.value = "";
   });
   
-  showToast(`💪 ${name} registrado`);
+  showToast(`💪 ${name} registrado a las ${exercise.time}`);
 }
 
 function deleteExercise(id) {
@@ -1037,13 +1550,22 @@ function renderExercises() {
     return;
   }
   
+  // Ordenar por hora
+  todayExercises.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  
   todayExercises.forEach(ex => {
     const li = document.createElement("li");
     
     const info = document.createElement('div');
     info.innerHTML = `
-      <strong>${ex.name}</strong><br>
-      <small>${ex.sets}x${ex.reps} ${ex.weight > 0 ? '| ' + ex.weight + 'kg' : ''}</small>
+      <div class="exercise-info-header">
+        <strong>${ex.name}</strong>
+        <span class="exercise-time">🕐 ${ex.time}</span>
+      </div>
+      <div class="exercise-details">
+        <span class="sets-reps">${ex.sets}x${ex.reps}</span>
+        ${ex.weight > 0 ? `<span class="weight">${ex.weight}kg</span>` : ''}
+      </div>
     `;
     
     const btn = document.createElement('button');
@@ -1116,7 +1638,8 @@ function saveBiometrics() {
     date: new Date().toISOString(),
     weight: userBiometrics.weight,
     fat: userBiometrics.fat,
-    muscle: userBiometrics.muscle
+    muscle: userBiometrics.muscle,
+    time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
   });
   
   saveToDisk();
@@ -1153,7 +1676,10 @@ function updateWeightChart() {
         borderColor: 'var(--military-yellow)',
         backgroundColor: 'rgba(255, 215, 0, 0.1)',
         tension: 0.3,
-        fill: true
+        fill: true,
+        pointBackgroundColor: 'var(--military-sand)',
+        pointBorderColor: 'var(--military-yellow)',
+        pointRadius: 6
       }]
     },
     options: {
@@ -1162,14 +1688,28 @@ function updateWeightChart() {
       plugins: {
         legend: {
           labels: {
-            color: 'var(--military-yellow)'
+            color: 'var(--military-yellow)',
+            font: {
+              size: 14,
+              family: 'Orbitron'
+            }
           }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(13, 27, 30, 0.9)',
+          titleColor: 'var(--military-yellow)',
+          bodyColor: 'var(--military-tan)',
+          borderColor: 'var(--military-olive)',
+          borderWidth: 1
         }
       },
       scales: {
         x: {
           ticks: {
-            color: 'var(--military-yellow)'
+            color: 'var(--military-yellow)',
+            font: {
+              family: 'Orbitron'
+            }
           },
           grid: {
             color: 'rgba(255, 215, 0, 0.1)'
@@ -1177,7 +1717,10 @@ function updateWeightChart() {
         },
         y: {
           ticks: {
-            color: 'var(--military-yellow)'
+            color: 'var(--military-yellow)',
+            font: {
+              family: 'Orbitron'
+            }
           },
           grid: {
             color: 'rgba(255, 215, 0, 0.1)'
@@ -1240,7 +1783,7 @@ function saveToDisk() {
     userBiometrics,
     aiMode,
     geminiApiKey,
-    version: '3.0'
+    version: '4.0'
   };
   localStorage.setItem('fitnessTrackerData', JSON.stringify(data));
 }
@@ -1258,6 +1801,15 @@ function loadFromDisk() {
       userBiometrics = data.userBiometrics || { weight: 0, fat: 0, muscle: 0, history: [] };
       aiMode = data.aiMode || "automatic";
       geminiApiKey = data.geminiApiKey || "";
+      
+      // Asegurar que todas las comidas tengan hora
+      meals.forEach(meal => {
+        if (!meal.time && meal.timestamp) {
+          const date = new Date(meal.timestamp);
+          meal.time = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+          meal.datetime = date.getTime();
+        }
+      });
       
       // Actualizar interfaz
       if (document.getElementById("calorieGoalInput")) {
@@ -1512,7 +2064,7 @@ window.onload = () => {
     }
   }
   
-  showToast("✅ AI Fitness Tracker v3.0 cargado");
+  showToast("✅ AI Fitness Tracker v4.0 cargado");
 };
 
 /**********************
@@ -1559,6 +2111,71 @@ function initMatrix() {
  * ESTILOS ADICIONALES PARA LA INTERFAZ MEJORADA
  **********************/
 const additionalStyles = `
+/* Estilos para las comidas con hora */
+.meal-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meal-info-header strong {
+  flex: 1;
+  font-size: 1.1rem;
+  color: var(--military-yellow);
+}
+
+.meal-time-badge {
+  background: rgba(85, 107, 47, 0.6);
+  border: 1px solid var(--military-olive);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: var(--military-tan);
+  white-space: nowrap;
+}
+
+.meal-nutrition {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.calories-badge, .protein-badge, .carbs-badge, .fat-badge {
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.calories-badge {
+  background: rgba(255, 68, 68, 0.2);
+  border: 1px solid rgba(255, 68, 68, 0.4);
+  color: #ffcccc;
+}
+
+.protein-badge {
+  background: rgba(57, 255, 20, 0.2);
+  border: 1px solid rgba(57, 255, 20, 0.4);
+  color: #ccffcc;
+}
+
+.carbs-badge {
+  background: rgba(255, 215, 0, 0.2);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  color: #ffffcc;
+}
+
+.fat-badge {
+  background: rgba(255, 140, 0, 0.2);
+  border: 1px solid rgba(255, 140, 0, 0.4);
+  color: #ffddcc;
+}
+
+/* Estilos para detalles de comidas */
 .meal-details {
   background: linear-gradient(145deg, rgba(45, 80, 22, 0.3), rgba(26, 42, 47, 0.9));
   padding: 20px;
@@ -1567,18 +2184,49 @@ const additionalStyles = `
   margin-top: 15px;
 }
 
-.meal-details h4 {
-  color: var(--military-yellow);
+.meal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 15px;
-  border-bottom: 2px solid var(--military-olive);
-  padding-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meal-header h4 {
+  color: var(--military-yellow);
+  margin: 0;
+  flex: 1;
+}
+
+.meal-time {
+  background: rgba(85, 107, 47, 0.6);
+  border: 1px solid var(--military-olive);
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  color: var(--military-tan);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.meal-restaurant {
+  background: rgba(194, 178, 128, 0.2);
+  border: 1px solid var(--military-sand);
+  padding: 8px 15px;
+  border-radius: 15px;
+  display: inline-block;
+  margin-bottom: 15px;
+  color: var(--military-tan);
+  font-size: 0.9rem;
 }
 
 .nutrition-breakdown {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
-  margin-bottom: 20px;
+  margin: 20px 0;
 }
 
 @media (min-width: 768px) {
@@ -1589,27 +2237,35 @@ const additionalStyles = `
 
 .nutrient-item {
   background: rgba(13, 27, 30, 0.8);
-  padding: 12px;
+  padding: 15px;
   border-radius: 8px;
   border: 1px solid var(--military-olive);
   text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.nutrient-item:hover {
+  transform: translateY(-5px);
+  border-color: var(--military-yellow);
 }
 
 .nutrient-label {
   display: block;
   color: var(--military-tan);
   font-size: 0.9rem;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .nutrient-value {
   display: block;
   color: var(--military-yellow);
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: bold;
 }
 
-.ingredients-list, .modifications {
+.ingredients-section, .modifications-section {
   background: rgba(13, 27, 30, 0.6);
   padding: 15px;
   border-radius: 8px;
@@ -1617,85 +2273,194 @@ const additionalStyles = `
   border-left: 3px solid var(--military-green);
 }
 
-.ingredients-list strong, .modifications strong {
+.ingredients-section strong, .modifications-section strong {
   color: var(--military-sand);
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  font-size: 1rem;
 }
 
-.ingredients-list ul, .modifications ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.ingredients-grid, .modifications-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.ingredients-list li, .modifications li {
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(194, 178, 128, 0.2);
+.ingredient-tag {
+  background: rgba(85, 107, 47, 0.3);
+  border: 1px solid var(--military-olive);
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
   color: var(--military-tan);
-  position: relative;
-  padding-left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-.ingredients-list li:before {
-  content: "🥩";
-  position: absolute;
-  left: 0;
-}
-
-.modifications li:before {
-  content: "⚙️";
-  position: absolute;
-  left: 0;
-}
-
-.ingredients-list li:last-child, .modifications li:last-child {
-  border-bottom: none;
-}
-
-.food-item-removed {
-  text-decoration: line-through;
-  color: var(--military-red);
-  opacity: 0.7;
-}
-
-.food-item-added {
+.ingredient-tag:before {
+  content: "✓";
   color: var(--military-green);
-  font-weight: bold;
 }
 
-.quick-meals {
+.modification-tag {
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid var(--military-yellow);
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  color: var(--military-yellow);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.modification-tag:before {
+  content: "⚙️";
+  font-size: 0.8rem;
+}
+
+/* Estilos para ejercicios */
+.exercise-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.exercise-info-header strong {
+  flex: 1;
+  color: var(--military-yellow);
+}
+
+.exercise-time {
+  background: rgba(85, 107, 47, 0.6);
+  border: 1px solid var(--military-olive);
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  color: var(--military-tan);
+}
+
+.exercise-details {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.sets-reps {
+  background: rgba(57, 255, 20, 0.2);
+  border: 1px solid rgba(57, 255, 20, 0.4);
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #ccffcc;
+}
+
+.weight {
+  background: rgba(255, 140, 0, 0.2);
+  border: 1px solid rgba(255, 140, 0, 0.4);
+  padding: 4px 10px;
+  border-radius: 10px;
+  color: #ffddcc;
+}
+
+/* Timeline visual */
+li {
+  position: relative;
+  padding-left: 15px;
+}
+
+li:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--military-green), var(--military-yellow));
+  border-radius: 2px;
+}
+
+li:hover:before {
+  background: linear-gradient(to bottom, var(--military-yellow), var(--military-sand));
+}
+
+/* Quick suggestions */
+.quick-suggestions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin: 15px 0;
+  padding: 15px;
+  background: rgba(13, 27, 30, 0.5);
+  border-radius: 8px;
+  border: 1px dashed var(--military-olive);
 }
 
-.quick-meal-btn {
+.suggestion-btn {
   padding: 8px 15px;
-  background: rgba(85, 107, 47, 0.3);
+  background: rgba(85, 107, 47, 0.4);
   border: 1px solid var(--military-olive);
   color: var(--military-tan);
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-.quick-meal-btn:hover {
-  background: rgba(85, 107, 47, 0.6);
+.suggestion-btn:hover {
+  background: rgba(85, 107, 47, 0.7);
   transform: translateY(-2px);
 }
 
-.modification-tag {
-  display: inline-block;
-  padding: 4px 10px;
-  margin: 3px;
-  background: rgba(255, 215, 0, 0.1);
-  border: 1px solid var(--military-yellow);
-  border-radius: 12px;
-  font-size: 0.8rem;
-  color: var(--military-yellow);
+.suggestion-btn.restaurant {
+  background: rgba(194, 178, 128, 0.3);
+  border-color: var(--military-sand);
+}
+
+.suggestion-btn.restaurant:hover {
+  background: rgba(194, 178, 128, 0.6);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .meal-info-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .meal-time-badge {
+    align-self: flex-start;
+  }
+  
+  .nutrition-breakdown {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .meal-nutrition {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .nutrition-breakdown {
+    grid-template-columns: 1fr;
+  }
+  
+  .ingredients-grid, .modifications-list {
+    flex-direction: column;
+  }
+  
+  .ingredient-tag, .modification-tag {
+    width: 100%;
+  }
 }
 `;
 
@@ -1705,18 +2470,82 @@ styleEl.textContent = additionalStyles;
 document.head.appendChild(styleEl);
 
 /**********************
+ * FUNCIÓN PARA AÑADIR SUGERENCIAS RÁPIDAS
+ **********************/
+function addQuickSuggestions() {
+  const aiMealText = DOM.aiMealText;
+  if (!aiMealText || !aiMealText.parentNode) return;
+  
+  // Crear contenedor de sugerencias
+  const suggestionsContainer = document.createElement('div');
+  suggestionsContainer.className = 'quick-suggestions';
+  suggestionsContainer.innerHTML = `
+    <div style="width: 100%; margin-bottom: 10px; color: var(--military-gray); font-size: 0.9rem;">
+      💡 Sugerencias rápidas:
+    </div>
+    <button class="suggestion-btn restaurant" data-text="whopper sin queso extra bacon">🍔 Whopper BK</button>
+    <button class="suggestion-btn restaurant" data-text="big mac con patatas medianas">🍟 Big Mac</button>
+    <button class="suggestion-btn restaurant" data-text="zinger con aros de cebolla">🍗 Zinger KFC</button>
+    <button class="suggestion-btn restaurant" data-text="salvaje oww sin cebolla">🤠 Salvaje OWW</button>
+    <button class="suggestion-btn" data-text="ensalada cesar con pollo">🥗 Ensalada</button>
+    <button class="suggestion-btn" data-text="patatas grandes con nuggets 6">🍟 Patatas + Nuggets</button>
+  `;
+  
+  // Insertar después del textarea
+  aiMealText.parentNode.insertBefore(suggestionsContainer, aiMealText.nextSibling);
+  
+  // Añadir eventos a los botones
+  suggestionsContainer.querySelectorAll('.suggestion-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      aiMealText.value = btn.getAttribute('data-text');
+      // Disparar evento de cambio para análisis automático
+      aiMealText.dispatchEvent(new Event('input'));
+    });
+  });
+}
+
+// Modificar el inicio para añadir sugerencias
+const originalOnload = window.onload;
+window.onload = function() {
+  if (originalOnload) originalOnload();
+  
+  // Añadir sugerencias rápidas después de cargar todo
+  setTimeout(() => {
+    addQuickSuggestions();
+    
+    // Añadir análisis automático al escribir
+    if (DOM.aiMealText) {
+      DOM.aiMealText.addEventListener('input', function() {
+        if (this.value.length > 10) {
+          // Pequeño delay para análisis automático
+          clearTimeout(this.analysisTimeout);
+          this.analysisTimeout = setTimeout(() => {
+            if (this.value.trim().length > 0) {
+              handleAnalyze();
+            }
+          }, 1000);
+        }
+      });
+    }
+  }, 500);
+};
+
+/**********************
  * EJEMPLOS DE USO:
  * 
- * 1. "whopper" → Detecta Whopper completo con 660 kcal
- * 2. "whopper sin queso" → Resta ~100 kcal
- * 3. "whopper extra bacon sin cebolla" → Añade bacon, quita cebolla
- * 4. "big mac doble queso" → Doble de queso (+100 kcal)
- * 5. "hamburguesa doble bacon sin mayonesa" → Hamburguesa personalizada
- * 6. "whopper con aguacate extra lechuga" → Añade ingredientes extra
+ * 1. "whopper sin queso extra bacon" → 740 kcal, hora actual
+ * 2. "big mac con patatas medianas" → 883 kcal total
+ * 3. "zinger con aros de cebolla y coca cola" → 1010 kcal
+ * 4. "salvaje oww sin cebolla con cheddar bites" → 1230 kcal
+ * 5. "ensalada cesar con pollo crispy" → 770 kcal
+ * 6. "nuggets 9 con patatas grandes" → 900 kcal
  * 
- * El sistema detecta automáticamente:
- * - Comidas completas (Whopper, Big Mac, etc.)
- * - Modificaciones (sin, extra, doble, triple)
- * - Reemplazos
- * - Y ajusta los valores nutricionales en tiempo real
+ * LA APLICACIÓN AHORA:
+ * ✅ Registra hora exacta de cada comida
+ * ✅ Tiene +100 comidas de restaurantes famosos
+ * ✅ Muestra hora al lado de cada comida
+ * ✅ Ordena por hora (más reciente primero)
+ * ✅ Base de datos masiva con todos los restaurantes
+ * ✅ Sistema de sugerencias rápidas
+ * ✅ Análisis automático al escribir
  **********************/
