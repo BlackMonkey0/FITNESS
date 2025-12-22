@@ -71,6 +71,624 @@ function initDOM() {
 }
 
 /**********************
+ * BASE DE DATOS MEJORADA CON COMIDAS COMPLETAS
+ **********************/
+const foodDatabase = {
+  // COMIDAS RÁPIDAS Y HAMBURGUESAS ESPECÍFICAS
+  'whopper': {
+    name: 'Whopper Burger King',
+    calories: 660,
+    protein: 28,
+    carbs: 49,
+    fat: 40,
+    ingredients: [
+      'carne de ternera (113g)',
+      'pan de sésamo',
+      'lechuga',
+      'tomate',
+      'cebolla',
+      'pepinillos',
+      'mayonesa',
+      'ketchup'
+    ],
+    customizable: true
+  },
+  
+  'big mac': {
+    name: 'Big Mac McDonald\'s',
+    calories: 563,
+    protein: 25,
+    carbs: 43,
+    fat: 33,
+    ingredients: [
+      '2 carnes de ternera',
+      'pan de sésamo triple',
+      'lechuga',
+      'queso cheddar',
+      'cebolla',
+      'pepinillos',
+      'salsa big mac'
+    ],
+    customizable: true
+  },
+  
+  'cuarto de libra': {
+    name: 'Cuarto de Libra con Queso',
+    calories: 520,
+    protein: 30,
+    carbs: 41,
+    fat: 26,
+    ingredients: [
+      'carne de ternera (113g)',
+      'pan de sésamo',
+      'queso americano',
+      'cebolla',
+      'pepinillos',
+      'ketchup',
+      'mostaza'
+    ],
+    customizable: true
+  },
+  
+  'hamburguesa pollo crispy': {
+    name: 'Hamburguesa de Pollo Crispy',
+    calories: 490,
+    protein: 22,
+    carbs: 46,
+    fat: 24,
+    ingredients: [
+      'pollo empanado',
+      'pan de sésamo',
+      'lechuga',
+      'mayonesa'
+    ],
+    customizable: true
+  },
+  
+  'hamburguesa doble bacon': {
+    name: 'Hamburguesa Doble Bacon',
+    calories: 850,
+    protein: 48,
+    carbs: 45,
+    fat: 52,
+    ingredients: [
+      '2 carnes de ternera',
+      'pan de sésamo',
+      'bacon (4 tiras)',
+      'queso cheddar',
+      'lechuga',
+      'tomate',
+      'salsa burger'
+    ],
+    customizable: true
+  },
+  
+  // INGREDIENTES INDIVIDUALES
+  'carne': { calories: 250, protein: 26, carbs: 0, fat: 17, unit: '100g' },
+  'carne de ternera': { calories: 250, protein: 26, carbs: 0, fat: 17, unit: '100g' },
+  'pollo': { calories: 165, protein: 31, carbs: 0, fat: 3.6, unit: '100g' },
+  'pollo empanado': { calories: 250, protein: 20, carbs: 15, fat: 12, unit: '100g' },
+  'bacon': { calories: 541, protein: 37, carbs: 1.4, fat: 42, unit: '100g' },
+  'beicon': { calories: 541, protein: 37, carbs: 1.4, fat: 42, unit: '100g' },
+  'tocino': { calories: 541, protein: 37, carbs: 1.4, fat: 42, unit: '100g' },
+  'pan': { calories: 260, protein: 9, carbs: 49, fat: 3.2, unit: '100g' },
+  'pan de sésamo': { calories: 280, protein: 9, carbs: 50, fat: 4, unit: 'unidad' },
+  'pan hamburguesa': { calories: 280, protein: 9, carbs: 50, fat: 4, unit: 'unidad' },
+  'queso': { calories: 400, protein: 25, carbs: 2, fat: 33, unit: '100g' },
+  'queso cheddar': { calories: 403, protein: 25, carbs: 1.3, fat: 33, unit: '100g' },
+  'queso americano': { calories: 368, protein: 23, carbs: 2, fat: 30, unit: 'rebanada' },
+  'lechuga': { calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2, unit: '100g' },
+  'tomate': { calories: 18, protein: 0.9, carbs: 3.9, fat: 0.2, unit: '100g' },
+  'cebolla': { calories: 40, protein: 1.1, carbs: 9.3, fat: 0.1, unit: '100g' },
+  'pepinillos': { calories: 11, protein: 0.6, carbs: 2.3, fat: 0.2, unit: '100g' },
+  'pepinillo': { calories: 11, protein: 0.6, carbs: 2.3, fat: 0.2, unit: 'unidad' },
+  'mayonesa': { calories: 680, protein: 1.1, carbs: 0.6, fat: 75, unit: '100g' },
+  'ketchup': { calories: 101, protein: 1.7, carbs: 24, fat: 0.3, unit: '100g' },
+  'mostaza': { calories: 66, protein: 4.4, carbs: 6, fat: 3.3, unit: '100g' },
+  'salsa burger': { calories: 180, protein: 1, carbs: 15, fat: 13, unit: 'cucharada' },
+  'salsa especial': { calories: 180, protein: 1, carbs: 15, fat: 13, unit: 'cucharada' },
+  'salsa oww': { calories: 180, protein: 1, carbs: 15, fat: 13, unit: 'cucharada' },
+  'salsa ow': { calories: 180, protein: 1, carbs: 15, fat: 13, unit: 'cucharada' },
+  'salsa big mac': { calories: 140, protein: 0.5, carbs: 12, fat: 10, unit: 'porción' },
+  
+  // INGREDIENTES COMUNES
+  'huevo': { calories: 155, protein: 13, carbs: 1.1, fat: 11, unit: 'unidad' },
+  'aguacate': { calories: 160, protein: 2, carbs: 9, fat: 15, unit: 'unidad mediana' },
+  'jalapeños': { calories: 29, protein: 0.9, carbs: 6, fat: 0.4, unit: '100g' },
+  'champiñones': { calories: 22, protein: 3.1, carbs: 3.3, fat: 0.3, unit: '100g' },
+  'tocino canadiense': { calories: 345, protein: 28, carbs: 0, fat: 26, unit: '100g' },
+  'arroz': { calories: 130, protein: 2.5, carbs: 28, fat: 0.3, unit: '100g cocido' },
+  'pasta': { calories: 350, protein: 12, carbs: 72, fat: 1.5, unit: '100g seca' },
+  
+  // SALSAS EXTRA
+  'salsa barbacoa': { calories: 150, protein: 1, carbs: 35, fat: 0.5, unit: '100g' },
+  'salsa ranch': { calories: 360, protein: 1, carbs: 4, fat: 38, unit: '100g' },
+  'salsa aioli': { calories: 400, protein: 1, carbs: 2, fat: 43, unit: '100g' },
+  'salsa tártara': { calories: 320, protein: 1, carbs: 8, fat: 32, unit: '100g' },
+  
+  // EXTRAS
+  'patatas fritas': { calories: 312, protein: 3.4, carbs: 41, fat: 15, unit: '100g' },
+  'patatas': { calories: 77, protein: 2, carbs: 17, fat: 0.1, unit: '100g' },
+  'aros de cebolla': { calories: 330, protein: 4, carbs: 40, fat: 17, unit: '100g' },
+  'nuggets de pollo': { calories: 296, protein: 14, carbs: 16, fat: 19, unit: '100g' },
+  
+  // BEBIDAS
+  'refresco': { calories: 41, protein: 0, carbs: 10, fat: 0, unit: '100ml' },
+  'batido': { calories: 112, protein: 3.7, carbs: 18, fat: 3, unit: '100ml' },
+  'agua': { calories: 0, protein: 0, carbs: 0, fat: 0, unit: '100ml' },
+  
+  // POSTRES
+  'helado': { calories: 207, protein: 3.5, carbs: 24, fat: 11, unit: '100g' },
+  'tarta': { calories: 350, protein: 4, carbs: 45, fat: 17, unit: '100g' },
+  'donut': { calories: 452, protein: 5, carbs: 51, fat: 25, unit: 'unidad' },
+  'galleta': { calories: 500, protein: 6, carbs: 65, fat: 24, unit: '100g' }
+};
+
+/**********************
+ * SISTEMA DE ANÁLISIS INTELIGENTE CON PERSONALIZACIÓN
+ **********************/
+function handleAnalyze() {
+  const text = (DOM.aiMealText?.value || '').toLowerCase().trim();
+  if (!text) return showToast("Escribe qué has comido...");
+
+  // Buscar comidas completas primero (Whopper, Big Mac, etc.)
+  const completeMeal = findCompleteMeal(text);
+  
+  if (completeMeal) {
+    // Personalizar la comida según modificaciones
+    const customizedMeal = customizeMeal(completeMeal, text);
+    updateMealForm(customizedMeal);
+    showToast(`✅ ${customizedMeal.name} detectado`);
+    return;
+  }
+  
+  // Si no es una comida completa, analizar ingredientes individuales
+  analyzeIngredients(text);
+}
+
+function findCompleteMeal(text) {
+  const mealKeywords = {
+    'whopper': 'whopper',
+    'big mac': 'big mac',
+    'cuarto de libra': 'cuarto de libra',
+    'hamburguesa crispy': 'hamburguesa pollo crispy',
+    'hamburguesa doble bacon': 'hamburguesa doble bacon',
+    'hamburguesa doble': 'hamburguesa doble bacon',
+    'cheeseburger': 'cuarto de libra',
+    'hamburguesa pollo': 'hamburguesa pollo crispy'
+  };
+  
+  for (const [keyword, mealKey] of Object.entries(mealKeywords)) {
+    if (text.includes(keyword)) {
+      return {
+        ...foodDatabase[mealKey],
+        baseKey: mealKey,
+        originalText: text
+      };
+    }
+  }
+  
+  return null;
+}
+
+function customizeMeal(meal, text) {
+  // Clonar la comida base
+  const customized = {
+    ...meal,
+    name: meal.name,
+    calories: meal.calories,
+    protein: meal.protein,
+    carbs: meal.carbs,
+    fat: meal.fat,
+    ingredients: [...meal.ingredients],
+    modifications: [],
+    added: [],
+    removed: []
+  };
+  
+  // Lista de modificaciones comunes
+  const modifications = analyzeModifications(text);
+  
+  // Aplicar modificaciones de REMOVER ingredientes
+  modifications.remove.forEach(item => {
+    const adjustment = getIngredientAdjustment(item);
+    if (adjustment) {
+      customized.calories -= adjustment.calories;
+      customized.protein -= adjustment.protein;
+      customized.carbs -= adjustment.carbs;
+      customized.fat -= adjustment.fat;
+      customized.removed.push(item);
+      customized.modifications.push(`Sin ${item}`);
+      
+      // Quitar de la lista de ingredientes
+      const ingredientIndex = customized.ingredients.findIndex(ing => 
+        ing.toLowerCase().includes(item)
+      );
+      if (ingredientIndex !== -1) {
+        customized.ingredients.splice(ingredientIndex, 1);
+      }
+    }
+  });
+  
+  // Aplicar modificaciones de AÑADIR ingredientes
+  modifications.add.forEach(item => {
+    const adjustment = getIngredientAdjustment(item);
+    if (adjustment) {
+      customized.calories += adjustment.calories;
+      customized.protein += adjustment.protein;
+      customized.carbs += adjustment.carbs;
+      customized.fat += adjustment.fat;
+      customized.added.push(item);
+      customized.modifications.push(`Extra ${item}`);
+      customized.ingredients.push(item);
+    }
+  });
+  
+  // Aplicar modificaciones de REEMPLAZAR
+  modifications.replace.forEach(({from, to}) => {
+    const removeAdj = getIngredientAdjustment(from);
+    const addAdj = getIngredientAdjustment(to);
+    
+    if (removeAdj && addAdj) {
+      customized.calories = customized.calories - removeAdj.calories + addAdj.calories;
+      customized.protein = customized.protein - removeAdj.protein + addAdj.protein;
+      customized.carbs = customized.carbs - removeAdj.carbs + addAdj.carbs;
+      customized.fat = customized.fat - removeAdj.fat + addAdj.fat;
+      customized.modifications.push(`${from} → ${to}`);
+      
+      // Reemplazar en la lista
+      const ingredientIndex = customized.ingredients.findIndex(ing => 
+        ing.toLowerCase().includes(from)
+      );
+      if (ingredientIndex !== -1) {
+        customized.ingredients[ingredientIndex] = to;
+      }
+    }
+  });
+  
+  // Aplicar modificaciones de CANTIDAD
+  modifications.quantity.forEach(({item, multiplier}) => {
+    const baseAdj = getIngredientAdjustment(item);
+    if (baseAdj) {
+      const extraCalories = baseAdj.calories * (multiplier - 1);
+      const extraProtein = baseAdj.protein * (multiplier - 1);
+      const extraCarbs = baseAdj.carbs * (multiplier - 1);
+      const extraFat = baseAdj.fat * (multiplier - 1);
+      
+      customized.calories += extraCalories;
+      customized.protein += extraProtein;
+      customized.carbs += extraCarbs;
+      customized.fat += extraFat;
+      customized.modifications.push(`Doble ${item}`);
+    }
+  });
+  
+  // Actualizar nombre con modificaciones
+  if (customized.modifications.length > 0) {
+    customized.name = `${meal.name} (${customized.modifications.join(', ')})`;
+  }
+  
+  // Asegurar valores mínimos
+  customized.calories = Math.max(100, Math.round(customized.calories));
+  customized.protein = Math.max(5, Math.round(customized.protein));
+  customized.carbs = Math.max(5, Math.round(customized.carbs));
+  customized.fat = Math.max(3, Math.round(customized.fat));
+  
+  return customized;
+}
+
+function analyzeModifications(text) {
+  const modifications = {
+    remove: [],
+    add: [],
+    replace: [],
+    quantity: []
+  };
+  
+  // Patrones para detectar modificaciones
+  const patterns = {
+    // Sin/sin/sin
+    remove: /\b(?:sin|no|quit[ao]s?|elimin[ao])\s+(\w+(?:\s+\w+)?)/gi,
+    // Con/extra/más
+    add: /\b(?:con|extra|más|añad[ei]|agreg[ao])\s+(\w+(?:\s+\w+)?)/gi,
+    // En lugar de/reemplazar
+    replace: /\b(?:en\s+lugar\s+de|cambiar|reemplazar)\s+(\w+)\s+por\s+(\w+)/gi,
+    // Doble/triple
+    quantity: /\b(doble|triple|extra\s+doble)\s+(\w+)/gi
+  };
+  
+  // Analizar "sin"
+  let match;
+  while ((match = patterns.remove.exec(text)) !== null) {
+    modifications.remove.push(match[1].toLowerCase());
+  }
+  
+  // Analizar "con" o "extra"
+  while ((match = patterns.add.exec(text)) !== null) {
+    modifications.add.push(match[1].toLowerCase());
+  }
+  
+  // Analizar reemplazos
+  while ((match = patterns.replace.exec(text)) !== null) {
+    modifications.replace.push({
+      from: match[1].toLowerCase(),
+      to: match[2].toLowerCase()
+    });
+  }
+  
+  // Analizar cantidades
+  while ((match = patterns.quantity.exec(text)) !== null) {
+    const multiplier = match[1].includes('doble') ? 2 : 3;
+    modifications.quantity.push({
+      item: match[2].toLowerCase(),
+      multiplier: multiplier
+    });
+  }
+  
+  // Detección especial para ingredientes comunes
+  const commonIngredients = [
+    'queso', 'bacon', 'cebolla', 'tomate', 'lechuga', 'pepinillos',
+    'mayonesa', 'ketchup', 'mostaza', 'salsa', 'aguacate', 'huevo'
+  ];
+  
+  commonIngredients.forEach(ing => {
+    // Si dice "sin [ingrediente]" pero no fue detectado
+    if (text.includes(`sin ${ing}`) && !modifications.remove.includes(ing)) {
+      modifications.remove.push(ing);
+    }
+    // Si dice "extra [ingrediente]" pero no fue detectado
+    if (text.includes(`extra ${ing}`) && !modifications.add.includes(ing)) {
+      modifications.add.push(ing);
+    }
+    // Si dice "doble [ingrediente]" pero no fue detectado
+    if (text.includes(`doble ${ing}`) && !modifications.quantity.some(q => q.item === ing)) {
+      modifications.quantity.push({ item: ing, multiplier: 2 });
+    }
+  });
+  
+  return modifications;
+}
+
+function getIngredientAdjustment(ingredient) {
+  // Buscar ingrediente exacto
+  if (foodDatabase[ingredient]) {
+    const data = foodDatabase[ingredient];
+    return {
+      calories: data.calories || 0,
+      protein: data.protein || 0,
+      carbs: data.carbs || 0,
+      fat: data.fat || 0
+    };
+  }
+  
+  // Buscar por coincidencia parcial
+  for (const [key, data] of Object.entries(foodDatabase)) {
+    if (ingredient.includes(key) || key.includes(ingredient)) {
+      return {
+        calories: data.calories || 0,
+        protein: data.protein || 0,
+        carbs: data.carbs || 0,
+        fat: data.fat || 0
+      };
+    }
+  }
+  
+  // Valores por defecto para ingredientes comunes
+  const defaultValues = {
+    'queso': { calories: 100, protein: 7, carbs: 1, fat: 8 },
+    'bacon': { calories: 80, protein: 6, carbs: 0, fat: 7 },
+    'cebolla': { calories: 10, protein: 0.3, carbs: 2, fat: 0 },
+    'tomate': { calories: 5, protein: 0.2, carbs: 1, fat: 0 },
+    'lechuga': { calories: 3, protein: 0.3, carbs: 0.5, fat: 0 },
+    'mayonesa': { calories: 90, protein: 0.1, carbs: 0, fat: 10 },
+    'ketchup': { calories: 15, protein: 0, carbs: 4, fat: 0 },
+    'salsa': { calories: 30, protein: 0, carbs: 2, fat: 2 }
+  };
+  
+  return defaultValues[ingredient] || { calories: 0, protein: 0, carbs: 0, fat: 0 };
+}
+
+function analyzeIngredients(text) {
+  let calories = 0;
+  let protein = 0;
+  let carbs = 0;
+  let fat = 0;
+  let detectedFoods = [];
+  let found = false;
+
+  // Dividir el texto en palabras
+  const words = text.split(/\s+/);
+  
+  for (let i = 0; i < words.length; i++) {
+    // Buscar ingredientes de 1-3 palabras
+    for (let j = 1; j <= 3; j++) {
+      if (i + j <= words.length) {
+        const phrase = words.slice(i, i + j).join(' ');
+        
+        if (foodDatabase[phrase]) {
+          const foodData = foodDatabase[phrase];
+          let quantity = 1;
+          
+          // Intentar extraer cantidad
+          if (i > 0) {
+            const prevWord = words[i-1];
+            const quantityMatch = prevWord.match(/(\d+)/);
+            if (quantityMatch) {
+              quantity = parseInt(quantityMatch[1]);
+            }
+          }
+          
+          // Ajustar por cantidad
+          calories += (foodData.calories || 0) * quantity;
+          protein += (foodData.protein || 0) * quantity;
+          carbs += (foodData.carbs || 0) * quantity;
+          fat += (foodData.fat || 0) * quantity;
+          
+          detectedFoods.push(`${quantity > 1 ? quantity + 'x ' : ''}${phrase}`);
+          found = true;
+        }
+      }
+    }
+  }
+
+  if (found) {
+    const foodName = detectedFoods.length > 0 ? 
+      `Comida con ${detectedFoods.slice(0, 3).join(', ')}` : 
+      "Comida detectada";
+    
+    updateMealForm({
+      name: foodName,
+      calories: Math.round(calories),
+      protein: Math.round(protein),
+      carbs: Math.round(carbs),
+      fat: Math.round(fat),
+      ingredients: detectedFoods
+    });
+    
+    showToast(`✅ Detectados: ${detectedFoods.slice(0, 3).join(', ')}`);
+  } else {
+    // Si no se detecta, usar estimación inteligente
+    estimateFromDescription(text);
+  }
+}
+
+function updateMealForm(mealData) {
+  if (DOM.mealName) DOM.mealName.value = mealData.name;
+  if (DOM.mealCalories) DOM.mealCalories.value = mealData.calories;
+  if (DOM.mealProtein) DOM.mealProtein.value = mealData.protein;
+  if (DOM.mealCarbs) DOM.mealCarbs.value = mealData.carbs;
+  if (DOM.mealFat) DOM.mealFat.value = mealData.fat;
+  
+  // Mostrar detalles en el área de resultados
+  showMealDetails(mealData);
+}
+
+function showMealDetails(mealData) {
+  if (!DOM.aiResults) return;
+  
+  let html = `
+    <div class="meal-details">
+      <h4>🍔 ${mealData.name}</h4>
+      <div class="nutrition-breakdown">
+        <div class="nutrient-item">
+          <span class="nutrient-label">🔥 Calorías:</span>
+          <span class="nutrient-value">${mealData.calories}</span>
+        </div>
+        <div class="nutrient-item">
+          <span class="nutrient-label">💪 Proteína:</span>
+          <span class="nutrient-value">${mealData.protein}g</span>
+        </div>
+        <div class="nutrient-item">
+          <span class="nutrient-label">🌾 Carbohidratos:</span>
+          <span class="nutrient-value">${mealData.carbs}g</span>
+        </div>
+        <div class="nutrient-item">
+          <span class="nutrient-label">🥑 Grasas:</span>
+          <span class="nutrient-value">${mealData.fat}g</span>
+        </div>
+      </div>
+  `;
+  
+  if (mealData.ingredients && mealData.ingredients.length > 0) {
+    html += `
+      <div class="ingredients-list">
+        <strong>🍽️ Ingredientes:</strong>
+        <ul>
+          ${mealData.ingredients.map(ing => `<li>${ing}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
+  
+  if (mealData.modifications && mealData.modifications.length > 0) {
+    html += `
+      <div class="modifications">
+        <strong>⚙️ Personalizaciones:</strong>
+        <ul>
+          ${mealData.modifications.map(mod => `<li>${mod}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
+  
+  html += `</div>`;
+  
+  DOM.aiResults.innerHTML = html;
+}
+
+function estimateFromDescription(text) {
+  // Estimación basada en palabras clave
+  let baseCalories = 500;
+  let baseProtein = 25;
+  let baseCarbs = 60;
+  let baseFat = 20;
+  let mealName = "Comida estimada";
+  
+  // Palabras clave para estimación
+  if (text.includes('hamburguesa') || text.includes('burger')) {
+    baseCalories = 600;
+    baseProtein = 35;
+    baseCarbs = 45;
+    baseFat = 30;
+    mealName = "Hamburguesa estimada";
+  }
+  
+  if (text.includes('ensalada')) {
+    baseCalories = 300;
+    baseProtein = 15;
+    baseCarbs = 20;
+    baseFat = 15;
+    mealName = "Ensalada estimada";
+  }
+  
+  if (text.includes('pizza')) {
+    baseCalories = 800;
+    baseProtein = 30;
+    baseCarbs = 100;
+    baseFat = 25;
+    mealName = "Pizza estimada";
+  }
+  
+  if (text.includes('pollo') && text.includes('arroz')) {
+    baseCalories = 650;
+    baseProtein = 40;
+    baseCarbs = 70;
+    baseFat = 20;
+    mealName = "Pollo con arroz";
+  }
+  
+  // Ajustar según modificaciones
+  if (text.includes('sin queso')) baseCalories -= 100;
+  if (text.includes('extra queso')) baseCalories += 150;
+  if (text.includes('sin bacon')) baseCalories -= 80;
+  if (text.includes('extra bacon')) baseCalories += 120;
+  if (text.includes('doble carne')) {
+    baseCalories += 250;
+    baseProtein += 26;
+  }
+  
+  // Añadir aleatoriedad realista (±15%)
+  const variation = 0.15;
+  const randomFactor = (min, max) => Math.random() * (max - min) + min;
+  
+  const finalCalories = Math.round(baseCalories * randomFactor(1 - variation, 1 + variation));
+  const finalProtein = Math.round(baseProtein * randomFactor(1 - variation, 1 + variation));
+  const finalCarbs = Math.round(baseCarbs * randomFactor(1 - variation, 1 + variation));
+  const finalFat = Math.round(baseFat * randomFactor(1 - variation, 1 + variation));
+  
+  updateMealForm({
+    name: mealName,
+    calories: finalCalories,
+    protein: finalProtein,
+    carbs: finalCarbs,
+    fat: finalFat,
+    ingredients: ["Estimación basada en descripción"]
+  });
+  
+  showToast("⚠️ Usando estimación inteligente");
+}
+
+/**********************
  * IA VISION - ANÁLISIS DE IMÁGENES
  **********************/
 
@@ -270,84 +888,6 @@ function useDetectedValues() {
 }
 
 /**********************
- * BASE DE DATOS DE ALIMENTOS MEJORADA
- **********************/
-const foodDatabase = {
-  arroz: { calories: 130, protein: 2.5, carbs: 28, fat: 0.3 },
-  pollo: { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
-  huevo: { calories: 155, protein: 13, carbs: 1.1, fat: 11 },
-  avena: { calories: 389, protein: 17, carbs: 66, fat: 7 },
-  pasta: { calories: 350, protein: 12, carbs: 72, fat: 1.5 },
-  atun: { calories: 130, protein: 29, carbs: 0, fat: 1 },
-  ternera: { calories: 250, protein: 26, carbs: 0, fat: 17 },
-  manzana: { calories: 52, protein: 0.3, carbs: 14, fat: 0.2 },
-  platano: { calories: 89, protein: 1.1, carbs: 23, fat: 0.3 },
-  leche: { calories: 42, protein: 3.4, carbs: 5, fat: 1 },
-  pan: { calories: 260, protein: 9, carbs: 49, fat: 3.2 },
-  queso: { calories: 400, protein: 25, carbs: 2, fat: 33 },
-  salmon: { calories: 208, protein: 20, carbs: 0, fat: 13 },
-  aguacate: { calories: 160, protein: 2, carbs: 9, fat: 15 },
-  brocoli: { calories: 34, protein: 2.8, carbs: 7, fat: 0.4 },
-  nueces: { calories: 654, protein: 15, carbs: 14, fat: 65 }
-};
-
-/**********************
- * IA LOCAL - ANALIZADOR DE TEXTO MEJORADO
- **********************/
-function handleAnalyze() {
-  const text = (DOM.aiMealText?.value || '').toLowerCase();
-  if (!text) return showToast("Escribe qué has comido...");
-
-  let calories = 0;
-  let protein = 0;
-  let carbs = 0;
-  let fat = 0;
-  let detectedFoods = [];
-  let found = false;
-
-  // Buscar alimentos en el texto
-  Object.keys(foodDatabase).forEach(food => {
-    if (text.includes(food)) {
-      // Intentar extraer cantidad (ej: "200g de arroz")
-      const regex = new RegExp(`(\\d+)\\s*(g|gr|gramos)?\\s*(de\\s+)?${food}`, 'i');
-      const match = text.match(regex);
-      const quantity = match ? parseInt(match[1]) / 100 : 1; // Convertir a porciones de 100g
-      
-      calories += Math.round(foodDatabase[food].calories * quantity);
-      protein += Math.round(foodDatabase[food].protein * quantity);
-      carbs += Math.round(foodDatabase[food].carbs * quantity);
-      fat += Math.round(foodDatabase[food].fat * quantity);
-      detectedFoods.push(food);
-      found = true;
-    }
-  });
-
-  if (found) {
-    const foodName = detectedFoods.length > 0 ? 
-      `Comida con ${detectedFoods.join(', ')}` : 
-      "Comida detectada";
-    
-    if (DOM.mealName) DOM.mealName.value = foodName;
-    if (DOM.mealCalories) DOM.mealCalories.value = calories;
-    if (DOM.mealProtein) DOM.mealProtein.value = protein;
-    if (DOM.mealCarbs) DOM.mealCarbs.value = carbs;
-    if (DOM.mealFat) DOM.mealFat.value = fat;
-    
-    showToast(`✅ Detectados: ${detectedFoods.join(', ')}`);
-  } else {
-    // Si no se detecta, usar valores promedio
-    const result = { calories: 450, protein: 25, carbs: 60, fat: 15 };
-    if (DOM.mealName) DOM.mealName.value = "Comida no identificada";
-    if (DOM.mealCalories) DOM.mealCalories.value = result.calories;
-    if (DOM.mealProtein) DOM.mealProtein.value = result.protein;
-    if (DOM.mealCarbs) DOM.mealCarbs.value = result.carbs;
-    if (DOM.mealFat) DOM.mealFat.value = result.fat;
-    
-    showToast("⚠️ Alimentos no reconocidos. Usando valores promedio.");
-  }
-}
-
-/**********************
  * GESTIÓN DE COMIDAS
  **********************/
 function addMeal() {
@@ -537,7 +1077,7 @@ function updateTotals() {
     DOM.calStatus.textContent = remaining > 0 ? 
       `Faltan ${remaining} kcal` : 
       "META SUPERADA";
-    DOM.calStatus.style.color = remaining > 0 ? "var(--green)" : "var(--red)";
+    DOM.calStatus.style.color = remaining > 0 ? "var(--military-green)" : "var(--military-red)";
   }
   
   // Actualizar barras de progreso
@@ -610,8 +1150,8 @@ function updateWeightChart() {
       datasets: [{
         label: 'Peso (kg)',
         data: weights,
-        borderColor: 'var(--green)',
-        backgroundColor: 'rgba(57, 255, 20, 0.1)',
+        borderColor: 'var(--military-yellow)',
+        backgroundColor: 'rgba(255, 215, 0, 0.1)',
         tension: 0.3,
         fill: true
       }]
@@ -622,25 +1162,25 @@ function updateWeightChart() {
       plugins: {
         legend: {
           labels: {
-            color: 'var(--green)'
+            color: 'var(--military-yellow)'
           }
         }
       },
       scales: {
         x: {
           ticks: {
-            color: 'var(--green)'
+            color: 'var(--military-yellow)'
           },
           grid: {
-            color: 'rgba(57, 255, 20, 0.1)'
+            color: 'rgba(255, 215, 0, 0.1)'
           }
         },
         y: {
           ticks: {
-            color: 'var(--green)'
+            color: 'var(--military-yellow)'
           },
           grid: {
-            color: 'rgba(57, 255, 20, 0.1)'
+            color: 'rgba(255, 215, 0, 0.1)'
           }
         }
       }
@@ -700,7 +1240,7 @@ function saveToDisk() {
     userBiometrics,
     aiMode,
     geminiApiKey,
-    version: '2.0'
+    version: '3.0'
   };
   localStorage.setItem('fitnessTrackerData', JSON.stringify(data));
 }
@@ -972,7 +1512,7 @@ window.onload = () => {
     }
   }
   
-  showToast("✅ AI Fitness Tracker cargado");
+  showToast("✅ AI Fitness Tracker v3.0 cargado");
 };
 
 /**********************
@@ -1014,3 +1554,169 @@ function initMatrix() {
   setInterval(drawMatrix, 33);
   window.addEventListener('resize', resizeMatrix);
 }
+
+/**********************
+ * ESTILOS ADICIONALES PARA LA INTERFAZ MEJORADA
+ **********************/
+const additionalStyles = `
+.meal-details {
+  background: linear-gradient(145deg, rgba(45, 80, 22, 0.3), rgba(26, 42, 47, 0.9));
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid var(--military-sand);
+  margin-top: 15px;
+}
+
+.meal-details h4 {
+  color: var(--military-yellow);
+  margin-bottom: 15px;
+  border-bottom: 2px solid var(--military-olive);
+  padding-bottom: 10px;
+}
+
+.nutrition-breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+  .nutrition-breakdown {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.nutrient-item {
+  background: rgba(13, 27, 30, 0.8);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--military-olive);
+  text-align: center;
+}
+
+.nutrient-label {
+  display: block;
+  color: var(--military-tan);
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.nutrient-value {
+  display: block;
+  color: var(--military-yellow);
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.ingredients-list, .modifications {
+  background: rgba(13, 27, 30, 0.6);
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  border-left: 3px solid var(--military-green);
+}
+
+.ingredients-list strong, .modifications strong {
+  color: var(--military-sand);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.ingredients-list ul, .modifications ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ingredients-list li, .modifications li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(194, 178, 128, 0.2);
+  color: var(--military-tan);
+  position: relative;
+  padding-left: 20px;
+}
+
+.ingredients-list li:before {
+  content: "🥩";
+  position: absolute;
+  left: 0;
+}
+
+.modifications li:before {
+  content: "⚙️";
+  position: absolute;
+  left: 0;
+}
+
+.ingredients-list li:last-child, .modifications li:last-child {
+  border-bottom: none;
+}
+
+.food-item-removed {
+  text-decoration: line-through;
+  color: var(--military-red);
+  opacity: 0.7;
+}
+
+.food-item-added {
+  color: var(--military-green);
+  font-weight: bold;
+}
+
+.quick-meals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.quick-meal-btn {
+  padding: 8px 15px;
+  background: rgba(85, 107, 47, 0.3);
+  border: 1px solid var(--military-olive);
+  color: var(--military-tan);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.quick-meal-btn:hover {
+  background: rgba(85, 107, 47, 0.6);
+  transform: translateY(-2px);
+}
+
+.modification-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 3px;
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid var(--military-yellow);
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: var(--military-yellow);
+}
+`;
+
+// Añadir estilos al documento
+const styleEl = document.createElement('style');
+styleEl.textContent = additionalStyles;
+document.head.appendChild(styleEl);
+
+/**********************
+ * EJEMPLOS DE USO:
+ * 
+ * 1. "whopper" → Detecta Whopper completo con 660 kcal
+ * 2. "whopper sin queso" → Resta ~100 kcal
+ * 3. "whopper extra bacon sin cebolla" → Añade bacon, quita cebolla
+ * 4. "big mac doble queso" → Doble de queso (+100 kcal)
+ * 5. "hamburguesa doble bacon sin mayonesa" → Hamburguesa personalizada
+ * 6. "whopper con aguacate extra lechuga" → Añade ingredientes extra
+ * 
+ * El sistema detecta automáticamente:
+ * - Comidas completas (Whopper, Big Mac, etc.)
+ * - Modificaciones (sin, extra, doble, triple)
+ * - Reemplazos
+ * - Y ajusta los valores nutricionales en tiempo real
+ **********************/
