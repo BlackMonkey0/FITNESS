@@ -202,7 +202,7 @@
                     <i class="fas fa-apple-alt"></i>
                     <span>Comida rápida</span>
                 </button>
-                <button id="addQuickWorkoutBtn" class="action-btn">
+                <button id="addQuickWorkoutBtn" class="action-btn" onclick="addQuickWorkout()">
                     <i class="fas fa-running"></i>
                     <span>Ejercicio rápido</span>
                 </button>
@@ -214,11 +214,43 @@
         </div>
     </section>
     
-    <!-- GESTIÓN DE COMIDAS -->
+    <!-- GESTIÓN DE COMIDAS (CON CALENDARIO) -->
     <section id="meals" class="content-section" role="tabpanel" aria-labelledby="meals-tab" hidden>
         <div class="section-header">
             <h2><i class="fas fa-utensils"></i> Gestión de Comidas</h2>
             <p class="section-subtitle">Registra y analiza tu consumo nutricional</p>
+        </div>
+        
+        <!-- CALENDARIO PARA SELECCIONAR FECHA -->
+        <div class="calendar-section">
+            <h3><i class="fas fa-calendar-alt"></i> Seleccionar Fecha</h3>
+            <div class="calendar-controls">
+                <button id="prevMonth" class="calendar-nav-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h4 id="currentMonthYear">Enero 2024</h4>
+                <button id="nextMonth" class="calendar-nav-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="calendar-container">
+                <div class="calendar-weekdays">
+                    <div>Lun</div>
+                    <div>Mar</div>
+                    <div>Mié</div>
+                    <div>Jue</div>
+                    <div>Vie</div>
+                    <div>Sáb</div>
+                    <div>Dom</div>
+                </div>
+                <div id="calendarDays" class="calendar-days">
+                    <!-- Días se generan dinámicamente -->
+                </div>
+            </div>
+            <div class="selected-date-info">
+                <h4><i class="fas fa-calendar-day"></i> Fecha seleccionada: <span id="selectedDateText">Hoy</span></h4>
+                <p id="selectedDateStats">Cargando datos...</p>
+            </div>
         </div>
         
         <div class="meals-container">
@@ -233,11 +265,37 @@
                     <input type="text" id="mealNameInput" placeholder="Ej: Desayuno, Almuerzo, Cena...">
                 </div>
                 
+                <!-- Formulario con análisis IA -->
                 <div class="form-group">
                     <label for="mealDescription">
                         <i class="fas fa-edit"></i> Descripción
+                        <button type="button" id="analyzeMealBtn" class="analyze-btn" title="Analizar con IA">
+                            <i class="fas fa-robot"></i> Analizar
+                        </button>
                     </label>
-                    <textarea id="mealDescription" rows="3" placeholder="Describe lo que comiste..."></textarea>
+                    <textarea id="mealDescription" rows="3" placeholder="Describe lo que comiste (ej: 'Un sándwich de jamón y queso con lechuga y tomate, una manzana y un vaso de leche')"></textarea>
+                </div>
+                
+                <!-- Resultado del análisis IA -->
+                <div id="aiAnalysisResult" class="ai-analysis-result" style="display: none;">
+                    <h4><i class="fas fa-brain"></i> Análisis IA</h4>
+                    <div class="ai-suggestions">
+                        <p>Valores sugeridos basados en tu descripción:</p>
+                        <div class="ai-values">
+                            <span>Calorías: <strong id="aiCalories">0</strong> kcal</span>
+                            <span>Proteína: <strong id="aiProtein">0</strong> g</span>
+                            <span>Carbs: <strong id="aiCarbs">0</strong> g</span>
+                            <span>Grasas: <strong id="aiFat">0</strong> g</span>
+                        </div>
+                        <div class="ai-actions">
+                            <button id="applyAiValues" class="secondary-btn small-btn">
+                                <i class="fas fa-check"></i> Aplicar valores
+                            </button>
+                            <button id="retryAnalysis" class="secondary-btn small-btn">
+                                <i class="fas fa-redo"></i> Re-analizar
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="nutrition-inputs">
@@ -272,6 +330,14 @@
                     </div>
                 </div>
                 
+                <!-- Selector de fecha para la comida -->
+                <div class="form-group">
+                    <label for="mealDateInput">
+                        <i class="fas fa-calendar"></i> Fecha de la comida
+                    </label>
+                    <input type="date" id="mealDateInput" value="">
+                </div>
+                
                 <div class="form-actions">
                     <button id="saveMealBtn" class="primary-btn">
                         <i class="fas fa-save"></i> Guardar Comida
@@ -282,13 +348,13 @@
                 </div>
             </div>
             
-            <!-- Lista de comidas de hoy -->
+            <!-- Lista de comidas del día seleccionado -->
             <div class="meals-list">
                 <div class="list-header">
-                    <h3><i class="fas fa-history"></i> Comidas de Hoy</h3>
+                    <h3><i class="fas fa-history"></i> Comidas del Día</h3>
                     <div class="list-summary">
-                        <span id="todayTotalCalories">0 kcal</span>
-                        <span id="todayTotalProtein">0g proteína</span>
+                        <span id="dayTotalCalories">0 kcal</span>
+                        <span id="dayTotalProtein">0g proteína</span>
                     </div>
                 </div>
                 
@@ -296,8 +362,8 @@
                     <div id="mealsListContainer" class="meals-items">
                         <div class="empty-state">
                             <i class="fas fa-utensils"></i>
-                            <p>No hay comidas registradas hoy</p>
-                            <small>¡Comienza agregando tu primera comida!</small>
+                            <p>No hay comidas registradas</p>
+                            <small>Selecciona una fecha o añade una nueva comida</small>
                         </div>
                     </div>
                 </div>
@@ -306,19 +372,30 @@
                 <div class="daily-totals">
                     <div class="total-item">
                         <span class="total-label">Calorías totales:</span>
-                        <span class="total-value" id="totalCaloriesToday">0</span>
+                        <span class="total-value" id="totalCaloriesDay">0</span>
                     </div>
                     <div class="total-item">
                         <span class="total-label">Proteína total:</span>
-                        <span class="total-value" id="totalProteinToday">0g</span>
+                        <span class="total-value" id="totalProteinDay">0g</span>
                     </div>
                     <div class="total-item">
                         <span class="total-label">Carbohidratos:</span>
-                        <span class="total-value" id="totalCarbsToday">0g</span>
+                        <span class="total-value" id="totalCarbsDay">0g</span>
                     </div>
                     <div class="total-item">
                         <span class="total-label">Grasas totales:</span>
-                        <span class="total-value" id="totalFatToday">0g</span>
+                        <span class="total-value" id="totalFatDay">0g</span>
+                    </div>
+                </div>
+                
+                <!-- Ejercicios del día -->
+                <div class="day-exercises">
+                    <h4><i class="fas fa-dumbbell"></i> Ejercicios del Día</h4>
+                    <div id="dayExercisesContainer" class="exercises-items">
+                        <div class="empty-state small">
+                            <i class="fas fa-dumbbell"></i>
+                            <p>No hay ejercicios registrados</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -326,7 +403,7 @@
         
         <!-- Historial de días anteriores -->
         <div class="history-section">
-            <h3><i class="fas fa-calendar-alt"></i> Historial de Comidas</h3>
+            <h3><i class="fas fa-calendar-alt"></i> Resumen Mensual</h3>
             <div class="history-filters">
                 <button class="filter-btn active" data-period="7">Últimos 7 días</button>
                 <button class="filter-btn" data-period="30">Últimos 30 días</button>
@@ -348,18 +425,735 @@
     <section id="workout" class="content-section" role="tabpanel" aria-labelledby="workout-tab" hidden>
         <div class="section-header">
             <h2><i class="fas fa-dumbbell"></i> Registro de Entrenamiento</h2>
-            <p class="section-subtitle">Lleva el control de tus ejercicios y progreso</p>
+            <p class="section-subtitle">Lleva el control de tus ejercicios y progreso hacia los 80kg</p>
         </div>
         
-        <!-- Contenido similar estructurado para entrenamiento -->
-        <!-- ... -->
+        <!-- Progreso hacia el objetivo -->
+        <div class="workout-goal-card">
+            <div class="goal-header">
+                <h3><i class="fas fa-bullseye"></i> Objetivo: 80kg de Músculo</h3>
+                <div class="goal-deadline">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span id="daysRemaining">Loading...</span> días restantes
+                </div>
+            </div>
+            <div class="goal-progress">
+                <div class="progress-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Peso Actual</span>
+                        <span class="stat-value" id="currentWeightGoal">58.0 kg</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Objetivo</span>
+                        <span class="stat-value">80.0 kg</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Restante</span>
+                        <span class="stat-value" id="weightRemaining">22.0 kg</span>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="goalProgressBar" style="width: 0%"></div>
+                </div>
+                <div class="progress-percentage" id="goalProgressPercent">0% completado</div>
+            </div>
+        </div>
         
+        <div class="workout-container">
+            <!-- Formulario de nuevo entrenamiento -->
+            <div class="workout-form">
+                <h3><i class="fas fa-plus-circle"></i> Registrar Entrenamiento</h3>
+                
+                <div class="form-group">
+                    <label for="workoutType">
+                        <i class="fas fa-list"></i> Tipo de Entrenamiento
+                    </label>
+                    <select id="workoutType" class="month-select">
+                        <option value="">Seleccionar rutina...</option>
+                        <option value="upper">Tren Superior</option>
+                        <option value="lower">Tren Inferior</option>
+                        <option value="push">Push (Empuje)</option>
+                        <option value="pull">Pull (Jalón)</option>
+                        <option value="legs">Piernas</option>
+                        <option value="core">Core/Abdomen</option>
+                        <option value="fullbody">Cuerpo Completo</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="exerciseName">
+                        <i class="fas fa-dumbbell"></i> Ejercicio
+                    </label>
+                    <input type="text" id="exerciseName" placeholder="Ej: Press de banca, Sentadillas...">
+                </div>
+                
+                <div class="exercise-details">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="exerciseSets">
+                                <i class="fas fa-layer-group"></i> Series
+                            </label>
+                            <input type="number" id="exerciseSets" min="1" max="10" value="3" placeholder="3">
+                        </div>
+                        <div class="input-group">
+                            <label for="exerciseReps">
+                                <i class="fas fa-redo"></i> Repeticiones
+                            </label>
+                            <input type="number" id="exerciseReps" min="1" max="100" value="10" placeholder="10">
+                        </div>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="exerciseWeight">
+                                <i class="fas fa-weight-hanging"></i> Peso (kg)
+                            </label>
+                            <input type="number" id="exerciseWeight" min="0" step="0.5" value="0" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="exerciseRest">
+                                <i class="fas fa-clock"></i> Descanso (seg)
+                            </label>
+                            <input type="number" id="exerciseRest" min="0" max="300" value="60" placeholder="60">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="exerciseNotes">
+                        <i class="fas fa-sticky-note"></i> Notas
+                    </label>
+                    <textarea id="exerciseNotes" rows="2" placeholder="Sensaciones, progreso, modificaciones..."></textarea>
+                </div>
+                
+                <!-- Selector de fecha para el ejercicio -->
+                <div class="form-group">
+                    <label for="exerciseDateInput">
+                        <i class="fas fa-calendar"></i> Fecha del ejercicio
+                    </label>
+                    <input type="date" id="exerciseDateInput" value="">
+                </div>
+                
+                <div class="form-actions">
+                    <button id="addExerciseBtn" class="primary-btn" onclick="addExercise()">
+                        <i class="fas fa-plus"></i> Añadir Ejercicio
+                    </button>
+                    <button id="finishWorkoutBtn" class="secondary-btn" onclick="finishWorkout()">
+                        <i class="fas fa-check"></i> Finalizar Entrenamiento
+                    </button>
+                </div>
+                
+                <!-- Ejercicios en sesión actual -->
+                <div id="currentSessionExercises" class="current-session">
+                    <h4><i class="fas fa-play-circle"></i> Sesión Actual</h4>
+                    <div id="exercisesListContainer" class="session-exercises-list"></div>
+                </div>
+            </div>
+            
+            <!-- Rutinas rápidas -->
+            <div class="workout-routines">
+                <h3><i class="fas fa-bolt"></i> Rutinas Rápidas</h3>
+                <p class="routine-subtitle">Entrenamientos predefinidos para casa</p>
+                
+                <div class="routine-cards">
+                    <div class="routine-card" data-routine="upper">
+                        <div class="routine-icon">💪</div>
+                        <h4>Tren Superior</h4>
+                        <p>Pecho, espalda, hombros y brazos</p>
+                        <span class="routine-duration">~45 min</span>
+                        <button onclick="loadQuickRoutine('upper')" class="routine-btn">
+                            <i class="fas fa-play"></i> Iniciar
+                        </button>
+                    </div>
+                    
+                    <div class="routine-card" data-routine="lower">
+                        <div class="routine-icon">🦵</div>
+                        <h4>Tren Inferior</h4>
+                        <p>Piernas, glúteos y pantorrillas</p>
+                        <span class="routine-duration">~40 min</span>
+                        <button onclick="loadQuickRoutine('lower')" class="routine-btn">
+                            <i class="fas fa-play"></i> Iniciar
+                        </button>
+                    </div>
+                    
+                    <div class="routine-card" data-routine="fullbody">
+                        <div class="routine-icon">🔥</div>
+                        <h4>Cuerpo Completo</h4>
+                        <p>Entrenamiento total</p>
+                        <span class="routine-duration">~60 min</span>
+                        <button onclick="loadQuickRoutine('fullbody')" class="routine-btn">
+                            <i class="fas fa-play"></i> Iniciar
+                        </button>
+                    </div>
+                    
+                    <div class="routine-card" data-routine="core">
+                        <div class="routine-icon">💥</div>
+                        <h4>Core Intenso</h4>
+                        <p>Abdominales y estabilidad</p>
+                        <span class="routine-duration">~25 min</span>
+                        <button onclick="loadQuickRoutine('core')" class="routine-btn">
+                            <i class="fas fa-play"></i> Iniciar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historial de entrenamientos -->
+        <div class="workout-history">
+            <div class="history-header">
+                <h3><i class="fas fa-history"></i> Historial de Entrenamientos</h3>
+                <div class="history-stats">
+                    <span><i class="fas fa-calendar-check"></i> <span id="totalWorkouts">0</span> entrenamientos</span>
+                    <span><i class="fas fa-dumbbell"></i> <span id="totalExercises">0</span> ejercicios</span>
+                    <span><i class="fas fa-fire"></i> <span id="weekStreak">0</span> días seguidos</span>
+                </div>
+            </div>
+            
+            <div class="workout-calendar">
+                <div id="workoutCalendar" class="calendar-grid"></div>
+            </div>
+            
+            <div class="workout-list">
+                <div id="workoutHistoryList" class="workout-history-items">
+                    <div class="empty-state">
+                        <i class="fas fa-dumbbell"></i>
+                        <p>No hay entrenamientos registrados</p>
+                        <small>¡Comienza tu primera sesión!</small>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
     
-    <!-- Otras secciones (Biometría, IA Coach, Configuración) -->
-    <!-- ... -->
+    <!-- BIOMETRÍA EXPANDIDA -->
+    <section id="body" class="content-section" role="tabpanel" aria-labelledby="body-tab" hidden>
+        <div class="section-header">
+            <h2><i class="fas fa-user"></i> Seguimiento Biométrico</h2>
+            <p class="section-subtitle">Registra y monitoriza tus mediciones corporales</p>
+        </div>
+        
+        <div class="meals-container">
+            <!-- Formulario de entrada -->
+            <div class="meals-form">
+                <h3><i class="fas fa-edit"></i> Nueva Medición</h3>
+                
+                <div class="form-group">
+                    <label for="bodyWeight">
+                        <i class="fas fa-weight"></i> Peso (kg)
+                    </label>
+                    <input type="number" id="bodyWeight" step="0.1" placeholder="Ej: 75.5">
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="bodyFat">
+                            <i class="fas fa-percentage"></i> Grasa Corporal (%)
+                        </label>
+                        <input type="number" id="bodyFat" step="0.1" placeholder="Ej: 18.5">
+                    </div>
+                    <div class="input-group">
+                        <label for="bodyMusclePercent">
+                            <i class="fas fa-dumbbell"></i> Masa Muscular (%)
+                        </label>
+                        <input type="number" id="bodyMusclePercent" step="0.1" placeholder="Ej: 45.2">
+                    </div>
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="bodyWater">
+                            <i class="fas fa-tint"></i> Agua Corporal (%)
+                        </label>
+                        <input type="number" id="bodyWater" step="0.1" placeholder="Ej: 55.0">
+                    </div>
+                    <div class="input-group">
+                        <label for="bodyBone">
+                            <i class="fas fa-bone"></i> Masa Ósea (kg)
+                        </label>
+                        <input type="number" id="bodyBone" step="0.1" placeholder="Ej: 3.2">
+                    </div>
+                </div>
+                
+                <!-- Selector de fecha para la medición -->
+                <div class="form-group">
+                    <label for="bodyDateInput">
+                        <i class="fas fa-calendar"></i> Fecha de medición
+                    </label>
+                    <input type="date" id="bodyDateInput" value="">
+                </div>
+                
+                <button id="saveBodyBtn" class="primary-btn">
+                    <i class="fas fa-save"></i> Guardar Medición
+                </button>
+                
+                <!-- Botón de cálculo automático -->
+                <button id="calculateBodyBtn" class="secondary-btn" style="margin-top: 10px;">
+                    <i class="fas fa-calculator"></i> Calcular automáticamente
+                </button>
+            </div>
+            
+            <!-- Estadísticas actuales EXPANDIDAS -->
+            <div class="meals-list">
+                <h3><i class="fas fa-chart-line"></i> Estadísticas Actuales</h3>
+                
+                <div class="current-stats-expanded">
+                    <div class="current-stat">
+                        <div class="stat-name">Peso Actual</div>
+                        <div class="stat-value" id="currentWeight">-- kg</div>
+                        <div class="stat-change" id="weightChange">--</div>
+                    </div>
+                    
+                    <div class="current-stat">
+                        <div class="stat-name">IMC</div>
+                        <div class="stat-value" id="currentBMI">--</div>
+                        <div class="stat-category" id="bmiCategory">--</div>
+                    </div>
+                    
+                    <div class="current-stat">
+                        <div class="stat-name">Grasa Corporal</div>
+                        <div class="stat-value" id="currentFat">--%</div>
+                        <div class="stat-change" id="fatChange">--</div>
+                    </div>
+                    
+                    <div class="current-stat">
+                        <div class="stat-name">Masa Muscular</div>
+                        <div class="stat-value" id="currentMusclePercent">--%</div>
+                        <div class="stat-change" id="muscleChange">--</div>
+                    </div>
+                    
+                    <div class="current-stat">
+                        <div class="stat-name">Agua Corporal</div>
+                        <div class="stat-value" id="currentWater">--%</div>
+                        <div class="stat-change" id="waterChange">--</div>
+                    </div>
+                    
+                    <div class="current-stat">
+                        <div class="stat-name">Masa Ósea</div>
+                        <div class="stat-value" id="currentBone">-- kg</div>
+                        <div class="stat-change" id="boneChange">--</div>
+                    </div>
+                </div>
+                
+                <!-- Gráfico de composición corporal -->
+                <div class="body-composition-chart">
+                    <h4><i class="fas fa-chart-pie"></i> Composición Corporal</h4>
+                    <div class="chart-container">
+                        <canvas id="bodyCompositionChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="biometry-actions">
+                    <button class="history-btn" onclick="showBiometryHistory()">
+                        <i class="fas fa-history"></i> Ver Historial
+                    </button>
+                    <button class="export-btn" onclick="exportBiometryData()">
+                        <i class="fas fa-download"></i> Exportar Datos
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historial de mediciones -->
+        <div class="history-section">
+            <h3><i class="fas fa-history"></i> Historial de Mediciones</h3>
+            <div id="biometryHistoryContainer" class="history-container">
+                <p class="empty-history">No hay mediciones registradas</p>
+            </div>
+        </div>
+    </section>
     
+    <!-- IA COACH FUNCIONAL -->
+    <section id="coach" class="content-section" role="tabpanel" aria-labelledby="coach-tab" hidden>
+        <div class="section-header">
+            <h2><i class="fas fa-robot"></i> Asistente de IA</h2>
+            <p class="section-subtitle">Obtén recomendaciones personalizadas basadas en tus datos</p>
+        </div>
+        
+        <div class="coach-container">
+            <!-- Panel de opciones -->
+            <div class="coach-options">
+                <h3><i class="fas fa-list"></i> ¿En qué necesitas ayuda?</h3>
+                <div class="option-cards">
+                    <div class="option-card" data-option="diet">
+                        <div class="option-icon">🍽️</div>
+                        <h4>Dieta</h4>
+                        <p>Planificación de comidas, recetas, ajustes nutricionales</p>
+                    </div>
+                    <div class="option-card" data-option="exercise">
+                        <div class="option-icon">💪</div>
+                        <h4>Ejercicio</h4>
+                        <p>Rutinas, técnica, progresión, recuperación</p>
+                    </div>
+                    <div class="option-card" data-option="supplements">
+                        <div class="option-icon">💊</div>
+                        <h4>Suplementos</h4>
+                        <p>Recomendaciones, dosis, marcas, seguridad</p>
+                    </div>
+                    <div class="option-card" data-option="motivation">
+                        <div class="option-icon">🔥</div>
+                        <h4>Motivación</h4>
+                        <p>Mantener consistencia, superar obstáculos</p>
+                    </div>
+                    <div class="option-card" data-option="planning">
+                        <div class="option-icon">📅</div>
+                        <h4>Planificación</h4>
+                        <p>Objetivos realistas, calendario de entrenamiento</p>
+                    </div>
+                    <div class="option-card" data-option="recovery">
+                        <div class="option-icon">🛌</div>
+                        <h4>Recuperación</h4>
+                        <p>Sueño, descanso, prevención de lesiones</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat con el coach -->
+            <div class="coach-chat">
+                <div class="chat-header">
+                    <h3><i class="fas fa-comments"></i> Coach AI</h3>
+                    <div class="chat-status">
+                        <span class="status-indicator online"></span>
+                        <span>En línea</span>
+                    </div>
+                </div>
+                
+                <div id="chatMessages" class="chat-messages">
+                    <div class="message ai">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <div class="message-text">
+                                ¡Hola! Soy tu entrenador personal de IA. Estoy aquí para ayudarte a alcanzar tus objetivos fitness. 
+                                ¿En qué puedo asistirte hoy?
+                            </div>
+                            <div class="message-time">Ahora</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-area">
+                    <div class="quick-questions">
+                        <button class="quick-question" data-question="¿Cómo aumentar masa muscular?">
+                            💪 Aumentar masa muscular
+                        </button>
+                        <button class="quick-question" data-question="¿Qué comer para perder grasa?">
+                            🍎 Perder grasa
+                        </button>
+                        <button class="quick-question" data-question="¿Rutina para principiantes?">
+                            🏋️‍♂️ Rutina principiante
+                        </button>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <textarea id="chatInput" placeholder="Escribe tu pregunta o describe lo que necesitas..." rows="2"></textarea>
+                        <button id="sendMessageBtn" class="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="chat-actions">
+                        <button id="clearChatBtn" class="secondary-btn small-btn">
+                            <i class="fas fa-trash"></i> Limpiar chat
+                        </button>
+                        <button id="saveChatBtn" class="secondary-btn small-btn">
+                            <i class="fas fa-save"></i> Guardar conversación
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Panel de recomendaciones -->
+            <div class="coach-recommendations">
+                <h3><i class="fas fa-lightbulb"></i> Recomendaciones Personalizadas</h3>
+                <div id="recommendationsList" class="recommendations-list">
+                    <div class="recommendation">
+                        <div class="recommendation-icon">📊</div>
+                        <div class="recommendation-content">
+                            <h4>Análisis de tu progreso</h4>
+                            <p>Basado en tus datos, estás progresando bien hacia tu objetivo.</p>
+                        </div>
+                    </div>
+                    <div class="recommendation">
+                        <div class="recommendation-icon">💧</div>
+                        <div class="recommendation-content">
+                            <h4>Hidratación</h4>
+                            <p>Recuerda beber al menos 8 vasos de agua hoy.</p>
+                        </div>
+                    </div>
+                    <div class="recommendation">
+                        <div class="recommendation-icon">🍗</div>
+                        <div class="recommendation-content">
+                            <h4>Proteína</h4>
+                            <p>Intenta consumir 30g de proteína en cada comida principal.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Generar plan personalizado -->
+                <div class="personalized-plan">
+                    <h4><i class="fas fa-magic"></i> Generar Plan Personalizado</h4>
+                    <p>Basado en tus objetivos y datos, puedo crear un plan específico para ti.</p>
+                    <button id="generatePlanBtn" class="primary-btn">
+                        <i class="fas fa-bolt"></i> Generar Plan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONFIGURACIÓN (CON TEST) -->
+    <section id="settings" class="content-section" role="tabpanel" aria-labelledby="settings-tab" hidden>
+        <div class="section-header">
+            <h2><i class="fas fa-cog"></i> Configuración</h2>
+            <p class="section-subtitle">Personaliza tus metas y preferencias</p>
+        </div>
+        
+        <div class="meals-container">
+            <!-- Metas diarias -->
+            <div class="meals-form">
+                <h3><i class="fas fa-bullseye"></i> Metas Diarias</h3>
+                
+                <div class="goal-setting">
+                    <div class="form-group">
+                        <label for="calorieGoalInput">
+                            <i class="fas fa-fire"></i> Calorías Diarias
+                        </label>
+                        <input type="number" id="calorieGoalInput" value="2500" min="1000" max="10000">
+                        <div class="goal-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Recomendado: 2000-2500 kcal
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="proteinGoalInput">
+                            <i class="fas fa-dna"></i> Proteína Diaria (g)
+                        </label>
+                        <input type="number" id="proteinGoalInput" value="120" min="50" max="300">
+                        <div class="goal-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Recomendado: 1.6-2.2g por kg de peso
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="waterGoalInput">
+                            <i class="fas fa-tint"></i> Agua Diaria (ml)
+                        </label>
+                        <input type="number" id="waterGoalInput" value="3000" min="1000" max="10000">
+                        <div class="goal-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Recomendado: 30-35ml por kg de peso
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="saveGoalsBtn" class="primary-btn" style="width: 100%; margin-top: var(--space-lg);">
+                    <i class="fas fa-save"></i> Guardar Metas
+                </button>
+                
+                <!-- TEST DE PERSONALIZACIÓN -->
+                <div class="test-section">
+                    <h3><i class="fas fa-clipboard-check"></i> Test de Personalización</h3>
+                    <p>Responde estas preguntas para que podamos crear un plan perfectamente adaptado a ti.</p>
+                    
+                    <button id="startTestBtn" class="primary-btn" style="width: 100%; margin-top: var(--space-md);">
+                        <i class="fas fa-play"></i> Comenzar Test
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Otras configuraciones -->
+            <div class="meals-list">
+                <h3><i class="fas fa-sliders-h"></i> Preferencias</h3>
+                
+                <div class="form-group" style="margin-bottom: var(--space-lg);">
+                    <label>
+                        <input type="checkbox" id="darkModeToggle" checked>
+                        <span>Modo Oscuro</span>
+                    </label>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: var(--space-lg);">
+                    <label>
+                        <input type="checkbox" id="notificationsToggle" checked>
+                        <span>Notificaciones</span>
+                    </label>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: var(--space-lg);">
+                    <label for="languageSelect">
+                        <i class="fas fa-language"></i> Idioma
+                    </label>
+                    <select id="languageSelect" class="month-select">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+                
+                <!-- Perfil del usuario -->
+                <div class="user-profile">
+                    <h3><i class="fas fa-user"></i> Tu Perfil</h3>
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <span class="info-label">Edad:</span>
+                            <span id="userAge">-- años</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Altura:</span>
+                            <span id="userHeight">-- cm</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Objetivo principal:</span>
+                            <span id="userGoal">--</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Nivel:</span>
+                            <span id="userLevel">--</span>
+                        </div>
+                    </div>
+                    <button id="editProfileBtn" class="secondary-btn" style="width: 100%; margin-top: var(--space-md);">
+                        <i class="fas fa-edit"></i> Editar Perfil
+                    </button>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="secondary-btn" onclick="clearAllData()">
+                        <i class="fas fa-trash"></i> Limpiar Datos
+                    </button>
+                    <button class="primary-btn" onclick="backupData()">
+                        <i class="fas fa-cloud-upload-alt"></i> Respaldar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
 </main>
+
+<!-- MODAL PARA TEST DE PERSONALIZACIÓN -->
+<div id="testModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="testModalTitle" hidden>
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h3 id="testModalTitle"><i class="fas fa-clipboard-check"></i> Test de Personalización</h3>
+            <button class="modal-close" onclick="closeTestModal()" aria-label="Cerrar modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="testProgress" class="test-progress">
+                <div class="progress-bar">
+                    <div id="testProgressFill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">Pregunta <span id="currentQuestion">1</span> de <span id="totalQuestions">10</span></div>
+            </div>
+            
+            <div id="testContent" class="test-content">
+                <!-- Las preguntas se cargan dinámicamente -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="testPrevBtn" class="btn-secondary" disabled>
+                <i class="fas fa-arrow-left"></i> Anterior
+            </button>
+            <button id="testNextBtn" class="btn-primary">
+                Siguiente <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA EDITAR PERFIL -->
+<div id="profileModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle" hidden>
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3 id="profileModalTitle"><i class="fas fa-user-edit"></i> Editar Perfil</h3>
+            <button class="modal-close" onclick="closeProfileModal()" aria-label="Cerrar modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="editAge">
+                    <i class="fas fa-birthday-cake"></i> Edad (años)
+                </label>
+                <input type="number" id="editAge" min="15" max="100" placeholder="Ej: 25">
+            </div>
+            
+            <div class="form-group">
+                <label for="editHeight">
+                    <i class="fas fa-ruler-vertical"></i> Altura (cm)
+                </label>
+                <input type="number" id="editHeight" min="100" max="250" placeholder="Ej: 175">
+            </div>
+            
+            <div class="form-group">
+                <label for="editGender">
+                    <i class="fas fa-venus-mars"></i> Género
+                </label>
+                <select id="editGender" class="month-select">
+                    <option value="male">Hombre</option>
+                    <option value="female">Mujer</option>
+                    <option value="other">Otro</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="editGoal">
+                    <i class="fas fa-bullseye"></i> Objetivo principal
+                </label>
+                <select id="editGoal" class="month-select">
+                    <option value="lose">Perder grasa</option>
+                    <option value="gain">Ganar músculo</option>
+                    <option value="maintain">Mantenerse</option>
+                    <option value="strength">Aumentar fuerza</option>
+                    <option value="endurance">Mejorar resistencia</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="editLevel">
+                    <i class="fas fa-signal"></i> Nivel de experiencia
+                </label>
+                <select id="editLevel" class="month-select">
+                    <option value="beginner">Principiante</option>
+                    <option value="intermediate">Intermedio</option>
+                    <option value="advanced">Avanzado</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="editActivity">
+                    <i class="fas fa-running"></i> Nivel de actividad
+                </label>
+                <select id="editActivity" class="month-select">
+                    <option value="sedentary">Sedentario</option>
+                    <option value="light">Ligero</option>
+                    <option value="moderate">Moderado</option>
+                    <option value="active">Activo</option>
+                    <option value="very_active">Muy activo</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="editDiet">
+                    <i class="fas fa-utensils"></i> Tipo de dieta preferida
+                </label>
+                <select id="editDiet" class="month-select">
+                    <option value="balanced">Balanceada</option>
+                    <option value="vegetarian">Vegetariana</option>
+                    <option value="vegan">Vegana</option>
+                    <option value="lowcarb">Baja en carbohidratos</option>
+                    <option value="highprotein">Alta en proteína</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeProfileModal()" class="btn-secondary">Cancelar</button>
+            <button onclick="saveProfile()" class="btn-primary">Guardar Perfil</button>
+        </div>
+    </div>
+</div>
 
 <!-- Modal para confirmaciones -->
 <div id="confirmModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
@@ -385,7 +1179,6 @@
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
-<script src="app.js"></script>
-
+<script src="script.js"></script>
 </body>
 </html>
