@@ -214,42 +214,157 @@
         </div>
     </section>
     
-    <!-- GESTIÓN DE COMIDAS (CON CALENDARIO) -->
+    <!-- GESTIÓN DE COMIDAS (CON CALENDARIO COMPLETO) -->
     <section id="meals" class="content-section" role="tabpanel" aria-labelledby="meals-tab" hidden>
         <div class="section-header">
             <h2><i class="fas fa-utensils"></i> Gestión de Comidas</h2>
             <p class="section-subtitle">Registra y analiza tu consumo nutricional</p>
         </div>
         
-        <!-- CALENDARIO PARA SELECCIONAR FECHA -->
+        <!-- CALENDARIO COMPLETO PARA SELECCIONAR FECHA -->
         <div class="calendar-section">
-            <h3><i class="fas fa-calendar-alt"></i> Seleccionar Fecha</h3>
-            <div class="calendar-controls">
-                <button id="prevMonth" class="calendar-nav-btn">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <h4 id="currentMonthYear">Enero 2024</h4>
-                <button id="nextMonth" class="calendar-nav-btn">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-            <div class="calendar-container">
-                <div class="calendar-weekdays">
-                    <div>Lun</div>
-                    <div>Mar</div>
-                    <div>Mié</div>
-                    <div>Jue</div>
-                    <div>Vie</div>
-                    <div>Sáb</div>
-                    <div>Dom</div>
-                </div>
-                <div id="calendarDays" class="calendar-days">
-                    <!-- Días se generan dinámicamente -->
+            <div class="calendar-header">
+                <h3><i class="fas fa-calendar-alt"></i> Calendario Nutricional</h3>
+                <div class="calendar-summary">
+                    <div class="summary-item">
+                        <i class="fas fa-fire"></i>
+                        <span id="monthCalories">0 kcal</span>
+                        <small>Mes actual</small>
+                    </div>
+                    <div class="summary-item">
+                        <i class="fas fa-dna"></i>
+                        <span id="monthProtein">0g</span>
+                        <small>Proteína total</small>
+                    </div>
+                    <div class="summary-item">
+                        <i class="fas fa-utensils"></i>
+                        <span id="monthMeals">0</span>
+                        <small>Comidas</small>
+                    </div>
                 </div>
             </div>
+            
+            <div class="calendar-wrapper">
+                <!-- Controles del calendario -->
+                <div class="calendar-controls">
+                    <button id="prevYear" class="calendar-nav-btn" title="Año anterior">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button id="prevMonth" class="calendar-nav-btn" title="Mes anterior">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    
+                    <div class="calendar-title">
+                        <select id="monthSelect" class="month-select" title="Seleccionar mes">
+                            <option value="0">Enero</option>
+                            <option value="1">Febrero</option>
+                            <option value="2">Marzo</option>
+                            <option value="3">Abril</option>
+                            <option value="4">Mayo</option>
+                            <option value="5">Junio</option>
+                            <option value="6">Julio</option>
+                            <option value="7">Agosto</option>
+                            <option value="8">Septiembre</option>
+                            <option value="9">Octubre</option>
+                            <option value="10">Noviembre</option>
+                            <option value="11">Diciembre</option>
+                        </select>
+                        <input type="number" id="yearSelect" class="year-input" min="2020" max="2030" value="2024" title="Seleccionar año">
+                    </div>
+                    
+                    <button id="nextMonth" class="calendar-nav-btn" title="Mes siguiente">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button id="nextYear" class="calendar-nav-btn" title="Año siguiente">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                    
+                    <button id="todayBtn" class="today-btn" title="Ir a hoy">
+                        <i class="fas fa-calendar-day"></i> Hoy
+                    </button>
+                </div>
+                
+                <!-- Calendario -->
+                <div class="calendar-container">
+                    <div class="calendar-weekdays">
+                        <div class="weekday">Lun</div>
+                        <div class="weekday">Mar</div>
+                        <div class="weekday">Mié</div>
+                        <div class="weekday">Jue</div>
+                        <div class="weekday">Vie</div>
+                        <div class="weekday">Sáb</div>
+                        <div class="weekday">Dom</div>
+                    </div>
+                    
+                    <div id="calendarDays" class="calendar-days">
+                        <!-- Los días se generan dinámicamente con JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Leyenda del calendario -->
+                <div class="calendar-legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: var(--color-success);"></span>
+                        <span>Alta actividad</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: var(--color-warning);"></span>
+                        <span>Meta calorías</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: var(--color-danger);"></span>
+                        <span>Exceso calorías</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: var(--color-primary);"></span>
+                        <span>Comidas registradas</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información de la fecha seleccionada -->
             <div class="selected-date-info">
-                <h4><i class="fas fa-calendar-day"></i> Fecha seleccionada: <span id="selectedDateText">Hoy</span></h4>
-                <p id="selectedDateStats">Cargando datos...</p>
+                <div class="date-header">
+                    <h4><i class="fas fa-calendar-day"></i> Fecha seleccionada</h4>
+                    <span id="selectedDateText" class="selected-date">Hoy</span>
+                </div>
+                
+                <div id="selectedDateStats" class="date-stats">
+                    <div class="stat-row">
+                        <div class="stat-box">
+                            <div class="stat-label">Calorías</div>
+                            <div class="stat-value" id="dayCalories">0</div>
+                            <div class="stat-unit">kcal</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Proteína</div>
+                            <div class="stat-value" id="dayProtein">0</div>
+                            <div class="stat-unit">g</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Comidas</div>
+                            <div class="stat-value" id="dayMeals">0</div>
+                            <div class="stat-unit">registros</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Ejercicios</div>
+                            <div class="stat-value" id="dayExercises">0</div>
+                            <div class="stat-unit">sesiones</div>
+                        </div>
+                    </div>
+                    
+                    <div class="date-actions">
+                        <button id="addMealToDate" class="action-btn small-btn">
+                            <i class="fas fa-plus"></i> Añadir comida
+                        </button>
+                        <button id="viewDayDetails" class="action-btn small-btn">
+                            <i class="fas fa-chart-bar"></i> Ver detalle
+                        </button>
+                        <button id="copyDayPlan" class="action-btn small-btn">
+                            <i class="fas fa-copy"></i> Copiar plan
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -335,7 +450,20 @@
                     <label for="mealDateInput">
                         <i class="fas fa-calendar"></i> Fecha de la comida
                     </label>
-                    <input type="date" id="mealDateInput" value="">
+                    <div class="date-input-group">
+                        <input type="date" id="mealDateInput" value="">
+                        <button id="useSelectedDate" class="secondary-btn small-btn" title="Usar fecha seleccionada en calendario">
+                            <i class="fas fa-calendar-check"></i> Usar fecha seleccionada
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Notas adicionales -->
+                <div class="form-group">
+                    <label for="mealNotes">
+                        <i class="fas fa-sticky-note"></i> Notas adicionales
+                    </label>
+                    <textarea id="mealNotes" rows="2" placeholder="Horario, sensaciones, alimentos específicos..."></textarea>
                 </div>
                 
                 <div class="form-actions">
@@ -344,6 +472,9 @@
                     </button>
                     <button id="clearMealForm" class="secondary-btn">
                         <i class="fas fa-times"></i> Limpiar
+                    </button>
+                    <button id="quickSaveMeal" class="secondary-btn">
+                        <i class="fas fa-bolt"></i> Guardar rápido
                     </button>
                 </div>
             </div>
@@ -355,6 +486,9 @@
                     <div class="list-summary">
                         <span id="dayTotalCalories">0 kcal</span>
                         <span id="dayTotalProtein">0g proteína</span>
+                        <button id="sortMealsBtn" class="sort-btn" title="Ordenar comidas">
+                            <i class="fas fa-sort-amount-down"></i>
+                        </button>
                     </div>
                 </div>
                 
@@ -370,27 +504,62 @@
                 
                 <!-- Totales del día -->
                 <div class="daily-totals">
-                    <div class="total-item">
-                        <span class="total-label">Calorías totales:</span>
-                        <span class="total-value" id="totalCaloriesDay">0</span>
+                    <div class="total-header">
+                        <h4><i class="fas fa-calculator"></i> Totales del Día</h4>
+                        <div class="total-progress">
+                            <div class="progress-circle">
+                                <svg width="40" height="40">
+                                    <circle class="progress-bg" cx="20" cy="20" r="18"></circle>
+                                    <circle class="progress-fill" cx="20" cy="20" r="18" 
+                                            style="stroke-dasharray: 113.097; stroke-dashoffset: 56.5485;"></circle>
+                                </svg>
+                                <span id="calorieProgressPercent">50%</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="total-item">
-                        <span class="total-label">Proteína total:</span>
-                        <span class="total-value" id="totalProteinDay">0g</span>
-                    </div>
-                    <div class="total-item">
-                        <span class="total-label">Carbohidratos:</span>
-                        <span class="total-value" id="totalCarbsDay">0g</span>
-                    </div>
-                    <div class="total-item">
-                        <span class="total-label">Grasas totales:</span>
-                        <span class="total-value" id="totalFatDay">0g</span>
+                    
+                    <div class="total-grid">
+                        <div class="total-item">
+                            <span class="total-label">Calorías</span>
+                            <div class="total-value-container">
+                                <span class="total-value" id="totalCaloriesDay">0</span>
+                                <span class="total-unit">kcal</span>
+                            </div>
+                            <div class="total-goal">Meta: <span id="calorieGoalDay">2500</span> kcal</div>
+                        </div>
+                        <div class="total-item">
+                            <span class="total-label">Proteína</span>
+                            <div class="total-value-container">
+                                <span class="total-value" id="totalProteinDay">0</span>
+                                <span class="total-unit">g</span>
+                            </div>
+                            <div class="total-goal">Meta: <span id="proteinGoalDay">120</span> g</div>
+                        </div>
+                        <div class="total-item">
+                            <span class="total-label">Carbohidratos</span>
+                            <div class="total-value-container">
+                                <span class="total-value" id="totalCarbsDay">0</span>
+                                <span class="total-unit">g</span>
+                            </div>
+                            <div class="total-goal">Recomendado: 250-300g</div>
+                        </div>
+                        <div class="total-item">
+                            <span class="total-label">Grasas</span>
+                            <div class="total-value-container">
+                                <span class="total-value" id="totalFatDay">0</span>
+                                <span class="total-unit">g</span>
+                            </div>
+                            <div class="total-goal">Recomendado: 60-70g</div>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- Ejercicios del día -->
                 <div class="day-exercises">
-                    <h4><i class="fas fa-dumbbell"></i> Ejercicios del Día</h4>
+                    <div class="exercises-header">
+                        <h4><i class="fas fa-dumbbell"></i> Ejercicios del Día</h4>
+                        <span class="calories-burned" id="dayCaloriesBurned">0 kcal quemadas</span>
+                    </div>
                     <div id="dayExercisesContainer" class="exercises-items">
                         <div class="empty-state small">
                             <i class="fas fa-dumbbell"></i>
@@ -411,9 +580,27 @@
                 <select id="historyMonthSelect" class="month-select">
                     <option value="">Seleccionar mes</option>
                 </select>
+                <button id="exportHistoryBtn" class="secondary-btn small-btn">
+                    <i class="fas fa-download"></i> Exportar
+                </button>
             </div>
             
             <div class="history-container">
+                <div class="history-stats-overview">
+                    <div class="history-stat">
+                        <div class="stat-label">Promedio calorías/día</div>
+                        <div class="stat-value" id="avgCaloriesHistory">0</div>
+                    </div>
+                    <div class="history-stat">
+                        <div class="stat-label">Días activos</div>
+                        <div class="stat-value" id="activeDaysHistory">0</div>
+                    </div>
+                    <div class="history-stat">
+                        <div class="stat-label">Consistencia</div>
+                        <div class="stat-value" id="consistencyHistory">0%</div>
+                    </div>
+                </div>
+                
                 <div id="mealsHistory" class="history-items">
                     <p class="empty-history">No hay historial disponible</p>
                 </div>
