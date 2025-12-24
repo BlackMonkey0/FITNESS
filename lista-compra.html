@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de la Compra | AI Fitness Tracker</title>
+  <!-- Fuentes y estilos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="shopping-body">
+
+<!-- Canvas para efecto Matrix (si lo usas) -->
+<canvas id="matrixCanvas"></canvas>
+
+<!-- Header principal - Igual que index.html -->
+<header class="main-header">
+    <div class="header-container">
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="logo-text">
+                <h1>AI FITNESS SHOPPING</h1>
+                <p class="subtitle">NUTRI-LIST v2.0 | SMART GROCERIES</p>
+            </div>
+        </div>
+        
+        <div class="header-controls">
+            <div class="clock-display">
+                <div class="time" id="currentTime">--:--:--</div>
+                <div class="date" id="currentDate">--- --- -- ----</div>
+            </div>
+            
+            <a href="index.html" class="gym-mode-btn" style="text-decoration: none;">
+                <i class="fas fa-home"></i>
+                <span>VOLVER AL INICIO</span>
+            </a>
+            
+            <button id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<div class="shopping-container">
+  <!-- Panel de control superior -->
+  <div class="shopping-control-panel">
+    <div class="shopping-header">
+      <h1><i class="fas fa-shopping-basket"></i> Lista de la Compra Inteligente</h1>
+      <p class="shopping-subtitle">Gestión optimizada de alimentos para tu dieta fitness</p>
+    </div>
+    
+    <div class="shopping-stats">
+      <div class="stat-card shopping-stat">
+        <div class="card-header">
+          <h3><i class="fas fa-check-circle"></i> Progreso</h3>
+          <span class="goal-text" id="progressText">0% completado</span>
+        </div>
+        <div class="card-body">
+          <div class="main-value" id="contador">0/0 comprados</div>
+          <div class="progress-container">
+            <div class="progress-bar" role="progressbar">
+              <div class="progress-fill" id="shoppingProgress" style="width: 0%"></div>
+            </div>
+            <div class="progress-labels">
+              <span id="progressPercent">0%</span>
+              <span id="remainingItems">0 items restantes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stat-card shopping-stat">
+        <div class="card-header">
+          <h3><i class="fas fa-search"></i> Buscador Inteligente</h3>
+          <span class="goal-text"><i class="fas fa-robot"></i> IA Search</span>
+        </div>
+        <div class="card-body">
+          <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="busqueda" placeholder="🔍 Buscar alimento o categoría..." class="smart-search">
+            <button class="clear-search" id="clearSearchBtn">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="search-hint">
+            <small><i class="fas fa-lightbulb"></i> Escribe para filtrar por nombre, categoría o tipo</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stat-card shopping-stat">
+        <div class="card-header">
+          <h3><i class="fas fa-tools"></i> Acciones Rápidas</h3>
+        </div>
+        <div class="card-body">
+          <div class="quick-actions">
+            <button class="action-btn small-btn" onclick="marcarTodo(true)">
+              <i class="fas fa-check-double"></i> Marcar todo
+            </button>
+            <button class="action-btn small-btn secondary-btn" onclick="marcarTodo(false)">
+              <i class="fas fa-redo"></i> Reiniciar
+            </button>
+            <button class="action-btn small-btn" onclick="exportList()">
+              <i class="fas fa-download"></i> Exportar
+            </button>
+            <button class="action-btn small-btn secondary-btn" onclick="printList()">
+              <i class="fas fa-print"></i> Imprimir
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categorías con diseño mejorado -->
+  <div class="categories-container">
+    
+    <!-- Proteínas -->
+    <div class="category-card" id="proteinas-card">
+      <div class="category-header" onclick="toggleLista('proteinas')">
+        <div class="category-icon">
+          <i class="fas fa-drumstick-bite"></i>
+        </div>
+        <div class="category-title">
+          <h2>🥩 Proteínas Esenciales</h2>
+          <p class="category-subtitle">Para construcción muscular y recuperación</p>
+        </div>
+        <div class="category-stats">
+          <span class="category-count" id="proteinas-count">0/10</span>
+          <i class="fas fa-chevron-down toggle-icon" id="proteinas-icon"></i>
+        </div>
+      </div>
+      <ul id="proteinas" class="shopping-list">
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Pechugas de pollo <span class="item-quantity">(5 kg)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Pavo en filetes/picado <span class="item-quantity">(3 kg)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Huevos <span class="item-quantity">(10 docenas)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Atún en lata <span class="item-quantity">(20 latas)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Salmón fresco/congelado <span class="item-quantity">(1,5 kg)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Merluza o pescado blanco <span class="item-quantity">(1,5 kg)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Carne magra de ternera <span class="item-quantity">(1,5 kg)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Queso fresco batido 0% <span class="item-quantity">(4 kg)</span></span>
+            <span class="item-priority low">BAJA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Yogur griego natural sin azúcar <span class="item-quantity">(2 kg)</span></span>
+            <span class="item-priority low">BAJA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Clara de huevo líquida <span class="item-quantity">(2 litros)</span></span>
+            <span class="item-priority low">BAJA</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Carbohidratos -->
+    <div class="category-card" id="carbohidratos-card">
+      <div class="category-header" onclick="toggleLista('carbohidratos')">
+        <div class="category-icon">
+          <i class="fas fa-bread-slice"></i>
+        </div>
+        <div class="category-title">
+          <h2>🍚 Carbohidratos Complejos</h2>
+          <p class="category-subtitle">Energía sostenida y recuperación glucémica</p>
+        </div>
+        <div class="category-stats">
+          <span class="category-count" id="carbohidratos-count">0/8</span>
+          <i class="fas fa-chevron-down toggle-icon" id="carbohidratos-icon"></i>
+        </div>
+      </div>
+      <ul id="carbohidratos" class="shopping-list">
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Avena <span class="item-quantity">(3 kg)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Arroz integral <span class="item-quantity">(5 kg)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Pasta integral <span class="item-quantity">(4 kg)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Pan integral <span class="item-quantity">(8 barras)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Patatas <span class="item-quantity">(5 kg)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Boniatos/batatas <span class="item-quantity">(3 kg)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Tortillas de trigo integral <span class="item-quantity">(2 paquetes)</span></span>
+            <span class="item-priority low">BAJA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Harina integral <span class="item-quantity">(1 kg)</span></span>
+            <span class="item-priority low">BAJA</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Grasas saludables -->
+    <div class="category-card" id="grasas-card">
+      <div class="category-header" onclick="toggleLista('grasas')">
+        <div class="category-icon">
+          <i class="fas fa-seedling"></i>
+        </div>
+        <div class="category-title">
+          <h2>🥑 Grasas Saludables</h2>
+          <p class="category-subtitle">Ácidos grasos esenciales y salud hormonal</p>
+        </div>
+        <div class="category-stats">
+          <span class="category-count" id="grasas-count">0/5</span>
+          <i class="fas fa-chevron-down toggle-icon" id="grasas-icon"></i>
+        </div>
+      </div>
+      <ul id="grasas" class="shopping-list">
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Aguacates <span class="item-quantity">(10 uds)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Aceite de oliva virgen extra <span class="item-quantity">(1,5 L)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Frutos secos variados <span class="item-quantity">(2 kg)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Semillas de chía o lino <span class="item-quantity">(500 g)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Crema de cacahuete <span class="item-quantity">(1 kg)</span></span>
+            <span class="item-priority low">BAJA</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Frutas -->
+    <div class="category-card" id="frutas-card">
+      <div class="category-header" onclick="toggleLista('frutas')">
+        <div class="category-icon">
+          <i class="fas fa-apple-alt"></i>
+        </div>
+        <div class="category-title">
+          <h2>🍌 Frutas Frescas</h2>
+          <p class="category-subtitle">Vitaminas, fibra y antioxidantes naturales</p>
+        </div>
+        <div class="category-stats">
+          <span class="category-count" id="frutas-count">0/5</span>
+          <i class="fas fa-chevron-down toggle-icon" id="frutas-icon"></i>
+        </div>
+      </div>
+      <ul id="frutas" class="shopping-list">
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Plátanos <span class="item-quantity">(40-50 uds)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Manzanas <span class="item-quantity">(30 uds)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Naranjas <span class="item-quantity">(20 uds)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Fresas/frutos rojos <span class="item-quantity">(1,5 kg)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Uvas o mandarinas <span class="item-quantity">(2 kg)</span></span>
+            <span class="item-priority low">BAJA</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Verduras -->
+    <div class="category-card" id="verduras-card">
+      <div class="category-header" onclick="toggleLista('verduras')">
+        <div class="category-icon">
+          <i class="fas fa-carrot"></i>
+        </div>
+        <div class="category-title">
+          <h2>🥦 Verduras y Hortalizas</h2>
+          <p class="category-subtitle">Fibra, minerales y fitonutrientes esenciales</p>
+        </div>
+        <div class="category-stats">
+          <span class="category-count" id="verduras-count">0/8</span>
+          <i class="fas fa-chevron-down toggle-icon" id="verduras-icon"></i>
+        </div>
+      </div>
+      <ul id="verduras" class="shopping-list">
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Espinacas <span class="item-quantity">(2 kg)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Brócoli <span class="item-quantity">(2 kg)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Pimientos <span class="item-quantity">(2 kg)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Calabacines <span class="item-quantity">(1,5 kg)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Zanahorias <span class="item-quantity">(2 kg)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Tomates <span class="item-quantity">(2 kg)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Lechuga <span class="item-quantity">(1,5 kg)</span></span>
+            <span class="item-priority low">BAJA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Cebollas <span class="item-quantity">(1,5 kg)</span></span>
+            <span class="item-priority low">BAJA</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Lácteos -->
+    <div class="category-card" id="lacteos-card">
+      <div class="category-header" onclick="toggleLista('lacteos')">
+        <div class="category-icon">
+          <i class="fas fa-cheese"></i>
+        </div>
+        <div class="category-title">
+          <h2>🥛 Lácteos y Alternativas</h2>
+          <p class="category-subtitle">Calcio, proteína y probióticos</p>
+        </div>
+        <div class="category-stats">
+          <span class="category-count" id="lacteos-count">0/3</span>
+          <i class="fas fa-chevron-down toggle-icon" id="lacteos-icon"></i>
+        </div>
+      </div>
+      <ul id="lacteos" class="shopping-list">
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Leche <span class="item-quantity">(12 litros)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Queso fresco batido</span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Yogur griego natural</span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Líquidos e hidratación -->
+    <div class="category-card" id="liquidos-card">
+      <div class="category-header" onclick="toggleLista('liquidos')">
+        <div class="category-icon">
+          <i class="fas fa-tint"></i>
+        </div>
+        <div class="category-title">
+          <h2>🥤 Hidratación & Energía</h2>
+          <p class="category-subtitle">Hidratación óptima y bebidas funcionales</p>
+        </div>
+        <div class="category-stats">
+          <span class="category-count" id="liquidos-count">0/10</span>
+          <i class="fas fa-chevron-down toggle-icon" id="liquidos-icon"></i>
+        </div>
+      </div>
+      <ul id="liquidos" class="shopping-list">
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Botellas pequeñas de agua mineral <span class="item-quantity">(0,5L - 12 uds)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Agua de coco natural <span class="item-quantity">(4 botellas)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Bebida isotónica baja en azúcar <span class="item-quantity">(6 botellas)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Agua saborizada natural</span>
+            <span class="item-priority low">BAJA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Infusiones suaves <span class="item-quantity">(20 sobres)</span></span>
+            <span class="item-priority low">BAJA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Zumo natural sin azúcar <span class="item-quantity">(3 litros)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Leche semidesnatada o bebida vegetal <span class="item-quantity">(8 litros)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Bebida pre-entreno natural</span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Monster Zero o Reign <span class="item-quantity">(máx. 1-2 por semana)</span></span>
+            <span class="item-priority low">BAJA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Bebida con electrolitos sin azúcar</span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Suplementos -->
+    <div class="category-card" id="suplementos-card">
+      <div class="category-header" onclick="toggleLista('suplementos')">
+        <div class="category-icon">
+          <i class="fas fa-capsules"></i>
+        </div>
+        <div class="category-title">
+          <h2>💊 Suplementos Deportivos</h2>
+          <p class="category-subtitle">Apoyo nutricional y optimización del rendimiento</p>
+        </div>
+        <div class="category-stats">
+          <span class="category-count" id="suplementos-count">0/5</span>
+          <i class="fas fa-chevron-down toggle-icon" id="suplementos-icon"></i>
+        </div>
+      </div>
+      <ul id="suplementos" class="shopping-list">
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Vitamina C + Zinc</span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Magnesio + Calcio</span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Proteína whey <span class="item-quantity">(2 kg)</span></span>
+            <span class="item-priority high">ALTA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Creatina monohidrato <span class="item-quantity">(500 g)</span></span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+        <li>
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="item-text">Multivitamínico</span>
+            <span class="item-priority medium">MEDIA</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Panel de acciones finales -->
+  <div class="bottom-controls">
+    <div class="summary-card">
+      <h3><i class="fas fa-chart-pie"></i> Resumen de Compra</h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Total Items:</span>
+          <span class="summary-value" id="totalItems">0</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Completados:</span>
+          <span class="summary-value" id="completedItems">0</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Por Comprar:</span>
+          <span class="summary-value" id="pendingItems">0</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Prioridad Alta:</span>
+          <span class="summary-value" id="highPriority">0</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="action-buttons-bottom">
+      <a href="index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        Volver al Dashboard
+      </a>
+      <button class="primary-btn" onclick="shareList()">
+        <i class="fas fa-share-alt"></i>
+        Compartir Lista
+      </button>
+      <button class="secondary-btn" onclick="generateSmartList()">
+        <i class="fas fa-robot"></i>
+        Generar Lista IA
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Notificaciones toast -->
+<div id="toastContainer" class="toast-container"></div>
+
+<script>
+  // Variables globales
+  let isDarkMode = true; // Por defecto modo oscuro
+  
+  // Inicialización
+  document.addEventListener('DOMContentLoaded', function() {
+    initTheme();
+    initShoppingList();
+    setupEventListeners();
+    updateClock();
+    setInterval(updateClock, 1000);
+  });
+
+  // Inicializar tema
+  function initTheme() {
+    // Cargar preferencia de tema
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      isDarkMode = false;
+      document.body.classList.remove('dark-mode');
+      document.body.classList.add('light-mode');
+      updateThemeIcon();
+    } else {
+      // Por defecto modo oscuro
+      isDarkMode = true;
+      document.body.classList.add('dark-mode');
+      document.body.classList.remove('light-mode');
+      updateThemeIcon();
+    }
+    
+    // Configurar botón de tema
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', toggleTheme);
+    }
+  }
+
+  // Alternar tema claro/oscuro
+  function toggleTheme() {
+    isDarkMode = !isDarkMode;
+    
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode');
+      document.body.classList.remove('light-mode');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark-mode');
+      document.body.classList.add('light-mode');
+      localStorage.setItem('theme', 'light');
+    }
+    
+    updateThemeIcon();
+  }
+
+  // Actualizar icono del tema
+  function updateThemeIcon() {
+    const themeIcon = document.querySelector('#themeToggle i');
+    if (themeIcon) {
+      if (isDarkMode) {
+        themeIcon.className = 'fas fa-moon';
+        themeIcon.setAttribute('aria-label', 'Cambiar a modo claro');
+      } else {
+        themeIcon.className = 'fas fa-sun';
+        themeIcon.setAttribute('aria-label', 'Cambiar a modo oscuro');
+      }
+    }
+  }
+
+  // Reloj en tiempo real
+  function updateClock() {
+    const now = new Date();
+    const timeElement = document.getElementById('currentTime');
+    const dateElement = document.getElementById('currentDate');
+    
+    if (timeElement) {
+      timeElement.textContent = now.toLocaleTimeString('es-ES', {hour12: false});
+    }
+    
+    if (dateElement) {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      dateElement.textContent = now.toLocaleDateString('es-ES', options);
+    }
+  }
+
+  // Inicializar lista de compras
+  function initShoppingList() {
+    // Reinicio automático mensual
+    const currentMonth = new Date().getMonth();
+    const savedMonth = localStorage.getItem('shoppingMonth');
+    
+    if (!savedMonth || parseInt(savedMonth) !== currentMonth) {
+      localStorage.clear();
+      localStorage.setItem('shoppingMonth', currentMonth);
+      showNotification('¡Nuevo mes! Lista reiniciada automáticamente.', 'info');
+    }
+
+    // Cargar datos guardados
+    loadSavedData();
+    
+    // Actualizar contadores iniciales
+    updateAllCounts();
+    updateProgress();
+    
+    // Configurar todas las listas como visibles por defecto
+    document.querySelectorAll('.shopping-list').forEach(list => {
+      list.style.display = 'block';
+    });
+  }
+
+  // Configurar event listeners
+  function setupEventListeners() {
+    // Buscador
+    document.getElementById('busqueda').addEventListener('input', function(e) {
+      filterItems(e.target.value.toLowerCase());
+    });
+    
+    // Botón limpiar búsqueda
+    document.getElementById('clearSearchBtn').addEventListener('click', function() {
+      document.getElementById('busqueda').value = '';
+      filterItems('');
+    });
+    
+    // Checkboxes
+    document.querySelectorAll('.checkbox-container input[type="checkbox"]').forEach((checkbox, index) => {
+      // Cargar estado guardado
+      const savedState = localStorage.getItem(`shoppingItem_${index}`);
+      if (savedState === 'true') {
+        checkbox.checked = true;
+      }
+      
+      // Guardar estado al cambiar
+      checkbox.addEventListener('change', function() {
+        localStorage.setItem(`shoppingItem_${index}`, this.checked);
+        updateAllCounts();
+        updateProgress();
+        updateCategoryCount(this.closest('.category-card').id.replace('-card', ''));
+      });
+    });
+  }
+
+  // Filtrar items
+  function filterItems(searchTerm) {
+    const items = document.querySelectorAll('.shopping-list li');
+    let visibleCount = 0;
+    
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      if (searchTerm === '' || text.includes(searchTerm)) {
+        item.style.display = 'flex';
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+    
+    // Actualizar contador de búsqueda
+    const searchCounter = document.getElementById('searchResults');
+    if (searchCounter) {
+      searchCounter.textContent = `${visibleCount} resultados`;
+    }
+  }
+
+  // Cargar datos guardados
+  function loadSavedData() {
+    const checks = document.querySelectorAll('.checkbox-container input[type="checkbox"]');
+    checks.forEach((check, i) => {
+      if (localStorage.getItem(`shoppingItem_${i}`) === 'true') {
+        check.checked = true;
+      }
+    });
+  }
+
+  // Actualizar todos los contadores
+  function updateAllCounts() {
+    updateProgress();
+    updateCategoryCount('proteinas');
+    updateCategoryCount('carbohidratos');
+    updateCategoryCount('grasas');
+    updateCategoryCount('frutas');
+    updateCategoryCount('verduras');
+    updateCategoryCount('lacteos');
+    updateCategoryCount('liquidos');
+    updateCategoryCount('suplementos');
+    updateSummary();
+  }
+
+  // Actualizar progreso general
+  function updateProgress() {
+    const checks = document.querySelectorAll('.checkbox-container input[type="checkbox"]');
+    const total = checks.length;
+    const checked = Array.from(checks).filter(c => c.checked).length;
+    const progress = total > 0 ? (checked / total) * 100 : 0;
+    
+    // Actualizar elementos
+    document.getElementById('contador').textContent = `${checked}/${total} comprados`;
+    document.getElementById('shoppingProgress').style.width = `${progress}%`;
+    document.getElementById('progressPercent').textContent = `${Math.round(progress)}%`;
+    document.getElementById('remainingItems').textContent = `${total - checked} items restantes`;
+    document.getElementById('progressText').textContent = `${Math.round(progress)}% completado`;
+  }
+
+  // Actualizar contador de categoría
+  function updateCategoryCount(categoryId) {
+    const categoryChecks = document.querySelectorAll(`#${categoryId} .checkbox-container input[type="checkbox"]`);
+    const total = categoryChecks.length;
+    const checked = Array.from(categoryChecks).filter(c => c.checked).length;
+    
+    const countElement = document.getElementById(`${categoryId}-count`);
+    if (countElement) {
+      countElement.textContent = `${checked}/${total}`;
+    }
+    
+    // Actualizar icono si la categoría está completa
+    const categoryCard = document.getElementById(`${categoryId}-card`);
+    if (checked === total && total > 0) {
+      categoryCard.classList.add('category-complete');
+    } else {
+      categoryCard.classList.remove('category-complete');
+    }
+  }
+
+  // Actualizar resumen
+  function updateSummary() {
+    const checks = document.querySelectorAll('.checkbox-container input[type="checkbox"]');
+    const total = checks.length;
+    const checked = Array.from(checks).filter(c => c.checked).length;
+    const highPriority = document.querySelectorAll('.item-priority.high').length;
+    
+    document.getElementById('totalItems').textContent = total;
+    document.getElementById('completedItems').textContent = checked;
+    document.getElementById('pendingItems').textContent = total - checked;
+    document.getElementById('highPriority').textContent = highPriority;
+  }
+
+  // Marcar/desmarcar todo
+  function marcarTodo(estado) {
+    const checks = document.querySelectorAll('.checkbox-container input[type="checkbox"]');
+    checks.forEach((check, i) => {
+      check.checked = estado;
+      localStorage.setItem(`shoppingItem_${i}`, estado);
+    });
+    updateAllCounts();
+    
+    // Mostrar notificación
+    const message = estado ? '✅ Todos los items marcados como comprados' : '🔄 Lista reiniciada correctamente';
+    showNotification(message, estado ? 'success' : 'info');
+  }
+
+  // Alternar visibilidad de lista
+  function toggleLista(categoryId) {
+    const lista = document.getElementById(categoryId);
+    const icon = document.getElementById(`${categoryId}-icon`);
+    
+    if (lista.style.display === 'none') {
+      lista.style.display = 'block';
+      icon.classList.remove('fa-chevron-down');
+      icon.classList.add('fa-chevron-up');
+    } else {
+      lista.style.display = 'none';
+      icon.classList.remove('fa-chevron-up');
+      icon.classList.add('fa-chevron-down');
+    }
+  }
+
+  // Funciones adicionales
+  function exportList() {
+    const checkedItems = Array.from(document.querySelectorAll('.checkbox-container input[type="checkbox"]:checked'))
+      .map(check => check.closest('li').querySelector('.item-text').textContent.trim());
+    
+    const uncheckedItems = Array.from(document.querySelectorAll('.checkbox-container input[type="checkbox"]:not(:checked)'))
+      .map(check => check.closest('li').querySelector('.item-text').textContent.trim());
+    
+    const exportText = `LISTA DE COMPRA FITNESS - ${new Date().toLocaleDateString()}\n\n` +
+                      `✅ COMPRADOS (${checkedItems.length}):\n${checkedItems.join('\n')}\n\n` +
+                      `⏰ PENDIENTES (${uncheckedItems.length}):\n${uncheckedItems.join('\n')}`;
+    
+    // Crear y descargar archivo
+    const blob = new Blob([exportText], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `lista-compra-fitness-${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();
+    
+    showNotification('📥 Lista exportada correctamente', 'success');
+  }
+
+  function printList() {
+    window.print();
+  }
+
+  function shareList() {
+    if (navigator.share) {
+      const text = `Mi lista de compra fitness: ${document.getElementById('contador').textContent} completados.`;
+      navigator.share({
+        title: 'Lista de Compra Fitness',
+        text: text,
+        url: window.location.href
+      });
+    } else {
+      // Copiar al portapapeles
+      const text = `Mi lista de compra fitness:\n${window.location.href}\n\nProgreso: ${document.getElementById('contador').textContent}`;
+      navigator.clipboard.writeText(text).then(() => {
+        showNotification('📋 Enlace copiado al portapapeles', 'success');
+      });
+    }
+  }
+
+  function generateSmartList() {
+    showNotification('🤖 Generando lista inteligente con IA...', 'info');
+    // Simular generación IA
+    setTimeout(() => {
+      // Marcar automáticamente items de prioridad alta no comprados
+      const highPriorityItems = document.querySelectorAll('.item-priority.high');
+      let marked = 0;
+      highPriorityItems.forEach(item => {
+        const checkbox = item.closest('li').querySelector('input[type="checkbox"]');
+        if (!checkbox.checked) {
+          checkbox.checked = true;
+          const index = Array.from(document.querySelectorAll('.checkbox-container input')).indexOf(checkbox);
+          localStorage.setItem(`shoppingItem_${index}`, true);
+          marked++;
+        }
+      });
+      
+      updateAllCounts();
+      showNotification(`✅ IA marcó ${marked} items de prioridad alta`, 'success');
+    }, 1500);
+  }
+
+  // Mostrar notificaciones
+  function showNotification(message, type = 'info') {
+    // Crear contenedor si no existe
+    let toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) {
+      toastContainer = document.createElement('div');
+      toastContainer.id = 'toastContainer';
+      toastContainer.className = 'toast-container';
+      document.body.appendChild(toastContainer);
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = `toast-notification ${type}`;
+    notification.innerHTML = `
+      <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+      <span>${message}</span>
+    `;
+    
+    toastContainer.appendChild(notification);
+    
+    // Animar entrada
+    setTimeout(() => notification.classList.add('show'), 10);
+    
+    // Eliminar después de 3 segundos
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+</script>
+
+<style>
+  /* Estilos específicos para la lista de compra */
+  .shopping-body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .shopping-body.dark-mode {
+    --shopping-bg: var(--color-bg);
+    --shopping-card-bg: var(--color-card-bg);
+    --shopping-text: var(--color-text);
+    --shopping-text-secondary: var(--color-text-secondary);
+    --shopping-border: var(--color-border);
+    --shopping-hover: var(--color-hover);
+  }
+  
+  .shopping-body.light-mode {
+    --shopping-bg: #f5f7fa;
+    --shopping-card-bg: #ffffff;
+    --shopping-text: #2c3e50;
+    --shopping-text-secondary: #7f8c8d;
+    --shopping-border: #e1e8ed;
+    --shopping-hover: #f0f4f8;
+  }
+  
+  .shopping-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-lg);
+    background: var(--shopping-bg);
+  }
+  
+  /* Panel de control superior */
+  .shopping-control-panel {
+    margin-bottom: var(--space-xl);
+  }
+  
+  .shopping-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+  }
+  
+ .shopping-header h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background-clip: text;           /* Propiedad estándar */
+  -webkit-background-clip: text;   /* Compatibilidad WebKit */
+  color: transparent;              /* Estándar */
+  -webkit-text-fill-color: transparent;
+  margin-bottom: var(--space-sm);
+}
+
+  
+  .shopping-subtitle {
+    color: var(--shopping-text-secondary);
+    font-size: 1.1rem;
+  }
+  
+  .shopping-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+  }
+  
+  .shopping-stat {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: var(--shopping-card-bg);
+    border: 1px solid var(--shopping-border);
+  }
+  
+  .shopping-stat:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  .search-container {
+    position: relative;
+    margin-top: var(--space-md);
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: var(--space-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--shopping-text-secondary);
+  }
+  
+  .smart-search {
+    width: 100%;
+    padding: var(--space-md) var(--space-md) var(--space-md) 3rem;
+    background: var(--shopping-card-bg);
+    border: 1px solid var(--shopping-border);
+    border-radius: var(--border-radius);
+    color: var(--shopping-text);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .smart-search:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+  }
+  
+  .clear-search {
+    position: absolute;
+    right: var(--space-md);
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--shopping-text-secondary);
+    cursor: pointer;
+    padding: var(--space-xs);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+  
+  .clear-search:hover {
+    background: var(--shopping-hover);
+    color: var(--shopping-text);
+  }
+  
+  .search-hint {
+    margin-top: var(--space-xs);
+    color: var(--shopping-text-secondary);
+    font-size: 0.9rem;
+  }
+  
+  .quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+  
+  /* Tarjetas de categoría */
+  .categories-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+  }
+  
+  .category-card {
+    background: var(--shopping-card-bg);
+    border-radius: var(--border-radius-lg);
+    border-left: 4px solid var(--color-primary);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    border: 1px solid var(--shopping-border);
+  }
+  
+  .category-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
+  }
+  
+  .category-header {
+    display: flex;
+    align-items: center;
+    padding: var(--space-lg);
+    cursor: pointer;
+    background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.1), transparent);
+    border-bottom: 1px solid var(--shopping-border);
+  }
+  
+  .category-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--space-md);
+    color: white;
+    font-size: 1.5rem;
+  }
+  
+  .category-title {
+    flex: 1;
+  }
+  
+  .category-title h2 {
+    font-size: 1.3rem;
+    margin-bottom: var(--space-xs);
+    color: var(--shopping-text);
+  }
+  
+  .category-subtitle {
+    color: var(--shopping-text-secondary);
+    font-size: 0.9rem;
+  }
+  
+  .category-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+  
+  .category-count {
+    background: var(--shopping-bg);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-primary);
+  }
+  
+  .toggle-icon {
+    color: var(--shopping-text-secondary);
+    transition: transform 0.3s ease;
+  }
+  
+  /* Lista de compras */
+  .shopping-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .shopping-list li {
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--shopping-border);
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease;
+  }
+  
+  .shopping-list li:hover {
+    background-color: var(--shopping-hover);
+  }
+  
+  .shopping-list li:last-child {
+    border-bottom: none;
+  }
+  
+  /* Checkboxes personalizados */
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+    position: relative;
+    user-select: none;
+  }
+  
+  .checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  
+  .checkmark {
+    position: relative;
+    height: 24px;
+    width: 24px;
+    background-color: var(--shopping-card-bg);
+    border: 2px solid var(--shopping-border);
+    border-radius: 6px;
+    margin-right: var(--space-md);
+    transition: all 0.3s ease;
+  }
+  
+  .checkbox-container:hover input ~ .checkmark {
+    border-color: var(--color-primary);
+  }
+  
+  .checkbox-container input:checked ~ .checkmark {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+  
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  .checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+  .checkbox-container .checkmark:after {
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 11px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  
+  .item-text {
+    flex: 1;
+    font-size: 1rem;
+    color: var(--shopping-text);
+  }
+  
+  .item-quantity {
+    color: var(--shopping-text-secondary);
+    font-size: 0.9rem;
+    margin-left: var(--space-xs);
+  }
+  
+  .item-priority {
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .item-priority.high {
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+  }
+  
+  .item-priority.medium {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+  }
+  
+  .item-priority.low {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+  }
+  
+  /* Controles inferiores */
+  .bottom-controls {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+  }
+  
+  @media (max-width: 768px) {
+    .bottom-controls {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .summary-card {
+    background: var(--shopping-card-bg);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--shopping-border);
+  }
+  
+  .summary-card h3 {
+    margin-bottom: var(--space-lg);
+    color: var(--shopping-text);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+  
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+  
+  .summary-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-md);
+    background: var(--shopping-bg);
+    border-radius: var(--border-radius);
+    text-align: center;
+    border: 1px solid var(--shopping-border);
+  }
+  
+  .summary-label {
+    font-size: 0.9rem;
+    color: var(--shopping-text-secondary);
+    margin-bottom: var(--space-xs);
+  }
+  
+  .summary-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    font-family: 'Orbitron', sans-serif;
+  }
+  
+  .action-buttons-bottom {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+    justify-content: flex-end;
+  }
+  
+  @media (max-width: 768px) {
+    .action-buttons-bottom {
+      flex-direction: column;
+    }
+    
+    .action-buttons-bottom button,
+    .action-buttons-bottom a {
+      width: 100%;
+    }
+  }
+  
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--shopping-card-bg);
+    color: var(--shopping-text);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1px solid var(--shopping-border);
+  }
+  
+  .back-btn:hover {
+    background: var(--shopping-hover);
+    transform: translateX(-3px);
+  }
+  
+  /* Notificaciones */
+  .toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--shopping-card-bg);
+    color: var(--shopping-text);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    border-left: 4px solid var(--color-primary);
+    border: 1px solid var(--shopping-border);
+  }
+  
+  .toast-notification.success {
+    border-left-color: var(--color-success);
+  }
+  
+  .toast-notification.warning {
+    border-left-color: var(--color-warning);
+  }
+  
+  .toast-notification.info {
+    border-left-color: var(--color-info);
+  }
+  
+  .toast-notification.show {
+    transform: translateX(0);
+  }
+  
+  .category-complete {
+    border-left: 4px solid var(--color-success) !important;
+    background: linear-gradient(90deg, rgba(76, 175, 80, 0.05) 0%, transparent 100%);
+  }
+  
+  /* Scrollbar personalizado */
+  .shopping-list::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .shopping-list::-webkit-scrollbar-track {
+    background: var(--shopping-bg);
+    border-radius: 4px;
+  }
+  
+  .shopping-list::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 4px;
+  }
+  
+  .shopping-list::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent);
+  }
+  
+  /* Animaciones */
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .category-card {
+    animation: slideIn 0.5s ease backwards;
+  }
+  
+  .category-card:nth-child(2) { animation-delay: 0.1s; }
+  .category-card:nth-child(3) { animation-delay: 0.2s; }
+  .category-card:nth-child(4) { animation-delay: 0.3s; }
+  .category-card:nth-child(5) { animation-delay: 0.4s; }
+  .category-card:nth-child(6) { animation-delay: 0.5s; }
+  .category-card:nth-child(7) { animation-delay: 0.6s; }
+  .category-card:nth-child(8) { animation-delay: 0.7s; }
+  
+  /* Modo impresión */
+  @media print {
+    .header-controls, .search-container, .quick-actions, .action-buttons-bottom {
+      display: none !important;
+    }
+    
+    .category-card {
+      break-inside: avoid;
+      border: 1px solid #ddd !important;
+    }
+    
+    .shopping-list {
+      display: block !important;
+    }
+  }
+</style>
+
+</body>
+</html>
