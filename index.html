@@ -119,6 +119,247 @@
                     </div>
                 </div>
             </div>
+            <!-- Sistema de Logros Gamificado -->
+<section class="achievements-section">
+    <div class="section-header">
+        <h2><i class="fas fa-trophy"></i> MIS LOGROS</h2>
+        <p class="section-subtitle">Desbloquea recompensas por tu disciplina</p>
+    </div>
+    
+    <div class="achievements-container">
+        <!-- Nivel del Usuario -->
+        <div class="user-level-card">
+            <div class="level-display">
+                <div class="level-circle">
+                    <span class="level-number">12</span>
+                    <span class="level-label">NIVEL</span>
+                </div>
+                <div class="level-info">
+                    <h3>GUERRERO FITNESS</h3>
+                    <div class="xp-display">
+                        <span class="current-xp">2,450 XP</span>
+                        <span class="next-level">3,000 XP para nivel 13</span>
+                    </div>
+                    <div class="xp-bar">
+                        <div class="xp-fill" style="width: 82%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="daily-streak">
+                <div class="streak-display">
+                    <i class="fas fa-fire"></i>
+                    <span class="streak-count">21</span>
+                    <span class="streak-label">días seguidos</span>
+                </div>
+                <button class="claim-reward-btn" onclick="claimDailyReward()">
+                    <i class="fas fa-gift"></i> Reclamar recompensa diaria
+                </button>
+            </div>
+        </div>
+        
+        <!-- Logros activos -->
+        <div class="achievements-grid">
+            <div class="achievement-category">
+                <h3><i class="fas fa-dumbbell"></i> LOGROS DE FUERZA</h3>
+                <div class="achievements-list">
+                    <div class="achievement-card unlocked">
+                        <div class="achievement-icon">
+                            <i class="fas fa-fist-raised"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>PRIMEROS PASOS</h4>
+                            <p>Completa 5 entrenamientos consecutivos</p>
+                            <div class="achievement-progress">
+                                <div class="progress-bar small">
+                                    <div class="progress-fill" style="width: 100%"></div>
+                                </div>
+                                <span class="progress-text">5/5</span>
+                            </div>
+                        </div>
+                        <div class="achievement-reward">
+                            <span class="reward-xp">+50 XP</span>
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement-card in-progress">
+                        <div class="achievement-icon">
+                            <i class="fas fa-mountain"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>ASCENSO AL MONTE</h4>
+                            <p>Alcanza 100kg en press banca</p>
+                            <div class="achievement-progress">
+                                <div class="progress-bar small">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                                <span class="progress-text">65/100 kg</span>
+                            </div>
+                        </div>
+                        <div class="achievement-reward">
+                            <span class="reward-xp">+200 XP</span>
+                            <span class="reward-badge">🏆</span>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement-card locked">
+                        <div class="achievement-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>LEYENDA DEL GIMNASIO</h4>
+                            <p>Más de 1000 entrenamientos registrados</p>
+                            <div class="achievement-progress">
+                                <div class="progress-bar small">
+                                    <div class="progress-fill" style="width: 12%"></div>
+                                </div>
+                                <span class="progress-text">128/1000</span>
+                            </div>
+                        </div>
+                        <div class="achievement-reward">
+                            <span class="reward-xp">+1000 XP</span>
+                            <span class="reward-badge">👑</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="achievement-category">
+                <h3><i class="fas fa-apple-alt"></i> LOGROS NUTRICIONALES</h3>
+                <div class="achievements-list">
+                    <div class="achievement-card unlocked">
+                        <div class="achievement-icon">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>ALIMENTO CONSCIENTE</h4>
+                            <p>Registra comidas por 30 días seguidos</p>
+                            <div class="achievement-progress">
+                                <div class="progress-bar small">
+                                    <div class="progress-fill" style="width: 73%"></div>
+                                </div>
+                                <span class="progress-text">22/30 días</span>
+                            </div>
+                        </div>
+                        <div class="achievement-reward">
+                            <span class="reward-xp">+150 XP</span>
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement-card in-progress">
+                        <div class="achievement-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>PRECISIÓN DE MACROS</h4>
+                            <p>Mantén tus macros dentro del ±5% por 2 semanas</p>
+                            <div class="achievement-progress">
+                                <div class="progress-bar small">
+                                    <div class="progress-fill" style="width: 43%"></div>
+                                </div>
+                                <span class="progress-text">6/14 días</span>
+                            </div>
+                        </div>
+                        <div class="achievement-reward">
+                            <span class="reward-xp">+300 XP</span>
+                            <span class="reward-badge">⚖️</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="achievement-category">
+                <h3><i class="fas fa-heartbeat"></i> LOGROS DE CONSISTENCIA</h3>
+                <div class="achievements-list">
+                    <div class="achievement-card unlocked">
+                        <div class="achievement-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>RACHA DE ACERO</h4>
+                            <p>30 días seguidos sin saltarte un entrenamiento</p>
+                            <div class="achievement-progress">
+                                <div class="progress-bar small">
+                                    <div class="progress-fill" style="width: 70%"></div>
+                                </div>
+                                <span class="progress-text">21/30 días</span>
+                            </div>
+                        </div>
+                        <div class="achievement-reward">
+                            <span class="reward-xp">+500 XP</span>
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement-card special">
+                        <div class="achievement-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>DESAFÍO RELÁMPAGO</h4>
+                            <p>Completa 5 entrenamientos en 48 horas</p>
+                            <div class="achievement-timer">
+                                <i class="fas fa-clock"></i>
+                                <span class="timer">12:34:21</span>
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar small">
+                                    <div class="progress-fill" style="width: 40%"></div>
+                                </div>
+                                <span class="progress-text">2/5 completados</span>
+                            </div>
+                        </div>
+                        <div class="achievement-reward">
+                            <span class="reward-xp">+750 XP</span>
+                            <span class="reward-badge">⚡</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recompensas disponibles -->
+        <div class="rewards-section">
+            <h3><i class="fas fa-gift"></i> RECOMPENSAS DISPONIBLES</h3>
+            <div class="rewards-grid">
+                <div class="reward-card">
+                    <div class="reward-icon daily">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <h4>Recompensa Diaria</h4>
+                    <p>Disponible en: <span class="countdown">4h 22m</span></p>
+                    <button class="reward-btn" onclick="claimReward('daily')" disabled>
+                        <i class="fas fa-lock"></i> Próximamente
+                    </button>
+                </div>
+                
+                <div class="reward-card">
+                    <div class="reward-icon weekly">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <h4>Recompensa Semanal</h4>
+                    <p>Logros completados: 3/5</p>
+                    <button class="reward-btn" onclick="claimReward('weekly')">
+                        <i class="fas fa-unlock"></i> Reclamar
+                    </button>
+                </div>
+                
+                <div class="reward-card">
+                    <div class="reward-icon milestone">
+                        <i class="fas fa-flag-checkered"></i>
+                    </div>
+                    <h4>Hito Mensual</h4>
+                    <p>Nivel 15: <span class="progress">82%</span></p>
+                    <button class="reward-btn" onclick="claimReward('milestone')" disabled>
+                        <i class="fas fa-hourglass-half"></i> En Progreso
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
             
             <!-- Tarjeta de proteína -->
             <div class="stat-card">
@@ -225,6 +466,7 @@
         <div class="section-header">
             <h2><i class="fas fa-utensils"></i> Gestión de Comidas</h2>
             <p class="section-subtitle">Registra y analiza tu consumo nutricional</p>
+            
         </div>
         
         <!-- CALENDARIO COMPLETO PARA SELECCIONAR FECHA -->
@@ -1594,5 +1836,204 @@
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
 <script src="script.js"></script>
+<!-- Chef IA Section -->
+<section id="chef-ai" class="content-section">
+    <div class="section-header">
+        <h2><i class="fas fa-robot"></i> Chef IA Personalizado</h2>
+        <p class="section-subtitle">Recetas personalizadas según tus objetivos y alimentos disponibles</p>
+    </div>
+
+    <!-- Panel de configuración -->
+    <div class="chef-config card">
+        <div class="config-header">
+            <h3><i class="fas fa-sliders-h"></i> Configura tu perfil</h3>
+            <button class="btn btn-primary btn-sm" id="auto-detect-profile">
+                <i class="fas fa-magic"></i> Auto-detectar
+            </button>
+        </div>
+        
+        <div class="config-grid">
+            <!-- Objetivo -->
+            <div class="config-group">
+                <label><i class="fas fa-bullseye"></i> Objetivo principal</label>
+                <div class="objective-buttons">
+                    <button class="objective-btn active" data-objective="muscle-gain">
+                        <i class="fas fa-dumbbell"></i> Ganar Masa
+                    </button>
+                    <button class="objective-btn" data-objective="fat-loss">
+                        <i class="fas fa-weight"></i> Perder Grasa
+                    </button>
+                    <button class="objective-btn" data-objective="maintenance">
+                        <i class="fas fa-balance-scale"></i> Mantenimiento
+                    </button>
+                    <button class="objective-btn" data-objective="performance">
+                        <i class="fas fa-running"></i> Rendimiento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preferencias -->
+            <div class="config-group">
+                <label><i class="fas fa-heart"></i> Preferencias dietéticas</label>
+                <div class="preference-chips">
+                    <span class="chip active" data-pref="vegetarian">Vegetariano</span>
+                    <span class="chip" data-pref="high-protein">Alta Proteína</span>
+                    <span class="chip" data-pref="low-carb">Bajo en Carbos</span>
+                    <span class="chip" data-pref="gluten-free">Sin Gluten</span>
+                    <span class="chip" data-pref="lactose-free">Sin Lactosa</span>
+                    <span class="chip" data-pref="quick">Rápido (≤20min)</span>
+                </div>
+            </div>
+
+            <!-- Nivel culinario -->
+            <div class="config-group">
+                <label><i class="fas fa-utensils"></i> Nivel de cocina</label>
+                <div class="skill-slider">
+                    <div class="skill-levels">
+                        <span class="skill-level beginner active">Principiante</span>
+                        <span class="skill-level intermediate">Intermedio</span>
+                        <span class="skill-level advanced">Avanzado</span>
+                    </div>
+                    <input type="range" min="1" max="3" value="1" class="skill-slider-input">
+                </div>
+            </div>
+
+            <!-- Alimentos disponibles -->
+            <div class="config-group">
+                <label><i class="fas fa-shopping-basket"></i> Alimentos disponibles</label>
+                <div class="food-selector">
+                    <input type="text" class="food-search" placeholder="Busca alimentos...">
+                    <div class="selected-foods">
+                        <!-- Se llena dinámicamente desde lista de compras -->
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="import-shopping-list">
+                        <i class="fas fa-download"></i> Importar lista de compras
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón generar -->
+        <div class="generate-section">
+            <button class="btn btn-primary btn-lg" id="generate-meal-plan">
+                <i class="fas fa-concierge-bell"></i> Generar Plan de Comidas
+            </button>
+            <div class="meal-options">
+                <label><input type="checkbox" id="include-workout" checked> Incluir rutina de ejercicios</label>
+                <label><input type="checkbox" id="generate-week" checked> Plan semanal completo</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="chef-results">
+        <!-- Sección de plan diario -->
+        <div class="daily-plan card hidden">
+            <div class="plan-header">
+                <h3><i class="fas fa-calendar-day"></i> Plan del Día</h3>
+                <div class="plan-date">
+                    <span id="current-date"></span>
+                    <button class="btn btn-secondary btn-sm" id="prev-day">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="btn btn-secondary btn-sm" id="next-day">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="meal-timeline">
+                <!-- Desayuno -->
+                <div class="meal-slot" data-meal="breakfast">
+                    <div class="meal-time">
+                        <i class="fas fa-sun"></i>
+                        <span>07:00 - Desayuno</span>
+                    </div>
+                    <div class="meal-content">
+                        <!-- Receta generada aquí -->
+                    </div>
+                </div>
+
+                <!-- Almuerzo -->
+                <div class="meal-slot" data-meal="lunch">
+                    <div class="meal-time">
+                        <i class="fas fa-sun"></i>
+                        <span>13:00 - Almuerzo</span>
+                    </div>
+                    <div class="meal-content"></div>
+                </div>
+
+                <!-- Cena -->
+                <div class="meal-slot" data-meal="dinner">
+                    <div class="meal-time">
+                        <i class="fas fa-moon"></i>
+                        <span>20:00 - Cena</span>
+                    </div>
+                    <div class="meal-content"></div>
+                </div>
+
+                <!-- Snacks -->
+                <div class="meal-slot" data-meal="snacks">
+                    <div class="meal-time">
+                        <i class="fas fa-apple-alt"></i>
+                        <span>Snacks</span>
+                    </div>
+                    <div class="meal-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de ejercicios -->
+        <div class="workout-plan card hidden">
+            <div class="plan-header">
+                <h3><i class="fas fa-dumbbell"></i> Rutina del Día</h3>
+                <span class="workout-focus" id="workout-focus"></span>
+            </div>
+            <div class="workout-content" id="workout-content">
+                <!-- Ejercicios generados aquí -->
+            </div>
+        </div>
+
+        <!-- Resumen nutricional -->
+        <div class="nutrition-summary card hidden">
+            <div class="summary-header">
+                <h3><i class="fas fa-chart-pie"></i> Resumen Nutricional</h3>
+                <button class="btn btn-secondary btn-sm" id="detailed-view">
+                    <i class="fas fa-chart-bar"></i> Vista Detallada
+                </button>
+            </div>
+            <div class="macros-overview">
+                <div class="macro-item">
+                    <div class="macro-label">Proteína</div>
+                    <div class="macro-bar">
+                        <div class="macro-fill protein" style="width: 30%"></div>
+                    </div>
+                    <div class="macro-value">120g</div>
+                </div>
+                <!-- Más macros... -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Base de recetas -->
+    <div class="recipe-database card hidden">
+        <div class="database-header">
+            <h3><i class="fas fa-book"></i> Tus Recetas Guardadas</h3>
+            <div class="database-filters">
+                <input type="text" placeholder="Filtrar recetas..." class="recipe-filter">
+                <select class="category-filter">
+                    <option value="all">Todas las categorías</option>
+                    <option value="breakfast">Desayunos</option>
+                    <option value="lunch">Almuerzos</option>
+                    <option value="dinner">Cenas</option>
+                    <option value="snack">Snacks</option>
+                </select>
+            </div>
+        </div>
+        <div class="recipes-grid" id="recipes-grid">
+            <!-- Recetas guardadas se cargan aquí -->
+        </div>
+    </div>
+</section>
 </body>
 </html>
