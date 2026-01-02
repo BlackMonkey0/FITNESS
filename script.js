@@ -3248,3 +3248,1617 @@ window.prevTestQuestion = prevTestQuestion;
  * INICIO DE LA APLICACIÓN
  **********************/
 document.addEventListener('DOMContentLoaded', initApp);
+// Sistema de Logros Gamificado
+class AchievementSystem {
+    constructor() {
+        this.achievements = [];
+        this.userLevel = 1;
+        this.userXP = 0;
+        this.dailyStreak = 0;
+        this.lastActivityDate = null;
+        this.initialize();
+    }
+
+    initialize() {
+        this.loadUserProgress();
+        this.checkDailyStreak();
+        this.setupAchievements();
+        this.startRewardCountdown();
+    }
+
+    loadUserProgress() {
+        const savedProgress = localStorage.getItem('fitnessAchievements');
+        if (savedProgress) {
+            const progress = JSON.parse(savedProgress);
+            this.userLevel = progress.level || 1;
+            this.userXP = progress.xp || 0;
+            this.dailyStreak = progress.streak || 0;
+            this.lastActivityDate = progress.lastActivity ? new Date(progress.lastActivity) : null;
+            this.updateDisplay();
+        }
+    }
+
+    saveUserProgress() {
+        const progress = {
+            level: this.userLevel,
+            xp: this.userXP,
+            streak: this.dailyStreak,
+            lastActivity: new Date().toISOString(),
+            achievements: this.achievements.filter(a => a.unlocked)
+        };
+        localStorage.setItem('fitnessAchievements', JSON.stringify(progress));
+    }
+
+    checkDailyStreak() {
+        const today = new Date().toDateString();
+        if (!this.lastActivityDate) {
+            this.dailyStreak = 1;
+            this.lastActivityDate = new Date();
+        } else {
+            const lastDate = new Date(this.lastActivityDate).toDateString();
+            if (today === lastDate) {
+                // Ya registrado hoy
+                return;
+            }
+            
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            if (lastDate === yesterday.toDateString()) {
+                this.dailyStreak++;
+            } else {
+                this.dailyStreak = 1; // Rompió la racha
+            }
+            this.lastActivityDate = new Date();
+        }
+        this.saveUserProgress();
+        this.updateDisplay();
+    }
+
+    setupAchievements() {
+        this.achievements = [
+            {
+                id: 'first_steps',
+                name: 'PRIMEROS PASOS',
+                description: 'Completa 5 entrenamientos consecutivos',
+                category: 'strength',
+                target: 5,
+                current: 5,
+                unlocked: true,
+                xpReward: 50,
+                icon: 'fa-fist-raised'
+            },
+            {
+                id: 'mountain_climb',
+                name: 'ASCENSO AL MONTE',
+                description: 'Alcanza 100kg en press banca',
+                category: 'strength',
+                target: 100,
+                current: 65,
+                unlocked: false,
+                xpReward: 200,
+                icon: 'fa-mountain'
+            },
+            {
+                id: 'gym_legend',
+                name: 'LEYENDA DEL GIMNASIO',
+                description: 'Más de 1000 entrenamientos registrados',
+                category: 'strength',
+                target: 1000,
+                current: 128,
+                unlocked: false,
+                xpReward: 1000,
+                icon: 'fa-crown'
+            },
+            {
+                id: 'mindful_eater',
+                name: 'ALIMENTO CONSCIENTE',
+                description: 'Registra comidas por 30 días seguidos',
+                category: 'nutrition',
+                target: 30,
+                current: 22,
+                unlocked: false,
+                xpReward: 150,
+                icon: 'fa-seedling'
+            },
+            {
+                id: 'macro_precision',
+                name: 'PRECISIÓN DE MACROS',
+                description: 'Mantén tus macros dentro del ±5% por 2 semanas',
+                category: 'nutrition',
+                target: 14,
+                current: 6,
+                unlocked: false,
+                xpReward: 300,
+                icon: 'fa-balance-scale'
+            },
+            {
+                id: 'steel_streak',
+                name: 'RACHA DE ACERO',
+                description: '30 días seguidos sin saltarte un entrenamiento',
+                category: 'consistency',
+                target: 30,
+                current: 21,
+                unlocked: false,
+                xpReward: 500,
+                icon: 'fa-calendar-check'
+            }
+        ];
+    }
+
+    addXP(amount, source) {
+        const oldLevel = this.userLevel;
+        this.userXP += amount;
+        
+        // Subir de nivel cada 1000 XP
+        const newLevel = Math.floor(this.userXP / 1000) + 1;
+        if (newLevel > this.userLevel) {
+            this.userLevel = newLevel;
+            this.showLevelUpNotification(oldLevel, newLevel);
+        }
+        
+        this.saveUserProgress();
+        this.updateDisplay();
+        this.showXPGainedNotification(amount, source);
+    }
+
+    updateAchievementProgress(achievementId, increment = 1) {
+        const achievement = this.achievements.find(a => a.id === achievementId);
+        if (!achievement || achievement.unlocked) return;
+        
+        achievement.current += increment;
+        if (achievement.current >= achievement.target) {
+            achievement.unlocked = true;
+            this.addXP(achievement.xpReward, `Logro: ${achievement.name}`);
+            this.showAchievementUnlockedNotification(achievement);
+        }
+        
+        this.saveUserProgress();
+        this.updateDisplay();
+    }
+
+    updateDisplay() {
+        // Actualizar nivel y XP
+        const levelElement = document.querySelector('.level-number');
+        const xpElement = document.querySelector('.current-xp');
+        const nextLevelElement = document.querySelector('.next-level');
+        const xpFillElement = document.querySelector('.xp-fill');
+        const streakElement = document.querySelector('.streak-count');
+        
+        if (levelElement) levelElement.textContent = this.userLevel;
+        if (xpElement) xpElement.textContent = `${this.userXP.toLocaleString()} XP`;
+        
+        const xpForNextLevel = this.userLevel * 1000;
+        const xpInCurrentLevel = this.userXP % 1000;
+        const percentage = (xpInCurrentLevel / 1000) * 100;
+        
+        if (nextLevelElement) nextLevelElement.textContent = `${xpForNextLevel - this.userXP} XP para nivel ${this.userLevel + 1}`;
+        if (xpFillElement) xpFillElement.style.width = `${percentage}%`;
+        if (streakElement) streakElement.textContent = this.dailyStreak;
+        
+        // Actualizar logros
+        this.updateAchievementsDisplay();
+    }
+
+    updateAchievementsDisplay() {
+        // Esta función actualiza los logros en la UI
+        // Implementar según la estructura específica
+    }
+
+    showLevelUpNotification(oldLevel, newLevel) {
+        const notification = document.createElement('div');
+        notification.className = 'level-up-notification';
+        notification.innerHTML = `
+            <div class="level-up-content">
+                <i class="fas fa-arrow-up"></i>
+                <h3>¡NIVEL SUBIDO!</h3>
+                <p>Has alcanzado el nivel <strong>${newLevel}</strong></p>
+                <div class="level-badge">${newLevel}</div>
+                <button onclick="this.parentElement.parentElement.remove()">OK</button>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 5000);
+    }
+
+    showXPGainedNotification(amount, source) {
+        const notification = document.createElement('div');
+        notification.className = 'xp-notification';
+        notification.innerHTML = `
+            <div class="xp-content">
+                <i class="fas fa-star"></i>
+                <span>+${amount} XP</span>
+                <small>${source}</small>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
+
+    showAchievementUnlockedNotification(achievement) {
+        const notification = document.createElement('div');
+        notification.className = 'achievement-notification';
+        notification.innerHTML = `
+            <div class="achievement-notification-content">
+                <div class="achievement-icon-large">
+                    <i class="fas ${achievement.icon}"></i>
+                </div>
+                <div class="achievement-info">
+                    <h4>¡LOGRO DESBLOQUEADO!</h4>
+                    <p><strong>${achievement.name}</strong></p>
+                    <p>${achievement.description}</p>
+                    <div class="achievement-reward-large">
+                        <i class="fas fa-trophy"></i>
+                        <span>+${achievement.xpReward} XP</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 5000);
+    }
+
+    claimDailyReward() {
+        const today = new Date().toDateString();
+        const lastClaim = localStorage.getItem('lastDailyReward');
+        
+        if (lastClaim === today) {
+            showNotification('Ya has reclamado tu recompensa diaria hoy', 'warning');
+            return;
+        }
+        
+        // Recompensa base + bonus por racha
+        const baseReward = 50;
+        const streakBonus = Math.min(this.dailyStreak * 10, 200);
+        const totalReward = baseReward + streakBonus;
+        
+        this.addXP(totalReward, 'Recompensa diaria');
+        localStorage.setItem('lastDailyReward', today);
+        
+        showNotification(`¡Recompensa diaria reclamada! +${totalReward} XP (${streakBonus} por racha)`, 'success');
+    }
+
+    startRewardCountdown() {
+        const countdownElement = document.querySelector('.countdown');
+        if (!countdownElement) return;
+        
+        const updateCountdown = () => {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+            
+            const diff = tomorrow - now;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            countdownElement.textContent = `${hours}h ${minutes}m`;
+        };
+        
+        updateCountdown();
+        setInterval(updateCountdown, 60000);
+    }
+}
+
+// Inicializar el sistema de logros
+let achievementSystem;
+
+document.addEventListener('DOMContentLoaded', function() {
+    achievementSystem = new AchievementSystem();
+    
+    // Ejemplo: Añadir XP cuando se complete un entrenamiento
+    document.addEventListener('workoutCompleted', function(e) {
+        const xpGained = e.detail.duration * 2; // 2 XP por minuto
+        achievementSystem.addXP(xpGained, 'Entrenamiento completado');
+        achievementSystem.updateAchievementProgress('first_steps');
+    });
+    
+    // Ejemplo: Añadir XP cuando se registre una comida
+    document.addEventListener('mealLogged', function() {
+        achievementSystem.addXP(10, 'Comida registrada');
+        achievementSystem.updateAchievementProgress('mindful_eater');
+    });
+});
+
+// Funciones globales
+function claimDailyReward() {
+    if (achievementSystem) {
+        achievementSystem.claimDailyReward();
+    }
+}
+
+function claimReward(type) {
+    let xpAmount = 0;
+    let message = '';
+    
+    switch(type) {
+        case 'daily':
+            xpAmount = 50;
+            message = 'Recompensa diaria reclamada';
+            break;
+        case 'weekly':
+            xpAmount = 200;
+            message = 'Recompensa semanal reclamada';
+            break;
+        case 'milestone':
+            xpAmount = 500;
+            message = 'Hito mensual alcanzado';
+            break;
+    }
+    
+    if (achievementSystem) {
+        achievementSystem.addXP(xpAmount, message);
+        showNotification(`+${xpAmount} XP reclamados!`, 'success');
+    }
+}
+
+// Eventos personalizados para integrar con otras funciones
+function triggerWorkoutCompleted(duration) {
+    const event = new CustomEvent('workoutCompleted', {
+        detail: { duration: duration }
+    });
+    document.dispatchEvent(event);
+}
+
+function triggerMealLogged() {
+    const event = new CustomEvent('mealLogged');
+    document.dispatchEvent(event);
+}
+// ChefIA.js - Sistema completo de Chef Inteligente
+
+class ChefIA {
+    constructor() {
+        this.userProfile = {
+            objective: 'muscle-gain',
+            preferences: ['high-protein'],
+            skillLevel: 1,
+            availableFoods: [],
+            calories: 2500,
+            macros: { protein: 120, carbs: 250, fat: 83 }
+        };
+        
+        this.recipeDatabase = this.initializeRecipeDatabase();
+        this.workoutDatabase = this.initializeWorkoutDatabase();
+        this.currentDay = 0;
+        
+        this.initializeEventListeners();
+        this.loadUserPreferences();
+    }
+    
+    initializeEventListeners() {
+        // Botones de objetivo
+        document.querySelectorAll('.objective-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.setObjective(e.target.dataset.objective);
+            });
+        });
+        
+        // Chips de preferencias
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                this.togglePreference(e.target.dataset.pref);
+            });
+        });
+        
+        // Slider de nivel
+        document.querySelector('.skill-slider-input').addEventListener('input', (e) => {
+            this.setSkillLevel(e.target.value);
+        });
+        
+        // Importar lista de compras
+        document.getElementById('import-shopping-list').addEventListener('click', () => {
+            this.importShoppingList();
+        });
+        
+        // Generar plan de comidas
+        document.getElementById('generate-meal-plan').addEventListener('click', () => {
+            this.generateDailyPlan();
+        });
+        
+        // Navegación días
+        document.getElementById('prev-day').addEventListener('click', () => {
+            this.changeDay(-1);
+        });
+        
+        document.getElementById('next-day').addEventListener('click', () => {
+            this.changeDay(1);
+        });
+    }
+    
+    setObjective(objective) {
+        this.userProfile.objective = objective;
+        
+        // Actualizar UI
+        document.querySelectorAll('.objective-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.objective === objective);
+        });
+        
+        // Actualizar macros según objetivo
+        this.updateMacrosForObjective();
+    }
+    
+    togglePreference(pref) {
+        const index = this.userProfile.preferences.indexOf(pref);
+        const chip = document.querySelector(`.chip[data-pref="${pref}"]`);
+        
+        if (index === -1) {
+            this.userProfile.preferences.push(pref);
+            chip.classList.add('active');
+        } else {
+            this.userProfile.preferences.splice(index, 1);
+            chip.classList.remove('active');
+        }
+    }
+    
+    setSkillLevel(level) {
+        this.userProfile.skillLevel = parseInt(level);
+        
+        // Actualizar niveles visibles
+        document.querySelectorAll('.skill-level').forEach((el, idx) => {
+            el.classList.toggle('active', idx === level - 1);
+        });
+    }
+    
+    importShoppingList() {
+        // Obtener alimentos de la lista de compras
+        const shoppingItems = JSON.parse(localStorage.getItem('shoppingList') || '[]');
+        this.userProfile.availableFoods = shoppingItems.map(item => item.name.toLowerCase());
+        
+        // Actualizar UI
+        this.updateAvailableFoodsDisplay();
+        
+        // Mostrar notificación
+        this.showMessage(`Importados ${shoppingItems.length} alimentos de tu lista de compras`, 'success');
+    }
+    
+    updateAvailableFoodsDisplay() {
+        const container = document.querySelector('.selected-foods');
+        container.innerHTML = '';
+        
+        this.userProfile.availableFoods.forEach(food => {
+            const foodEl = document.createElement('div');
+            foodEl.className = 'food-item';
+            foodEl.innerHTML = `
+                <i class="fas fa-carrot"></i>
+                <span>${food}</span>
+                <button class="remove-food" data-food="${food}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(foodEl);
+        });
+        
+        // Añadir event listeners para remover
+        document.querySelectorAll('.remove-food').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const food = e.target.closest('.remove-food').dataset.food;
+                this.removeFood(food);
+            });
+        });
+    }
+    
+    removeFood(food) {
+        const index = this.userProfile.availableFoods.indexOf(food);
+        if (index > -1) {
+            this.userProfile.availableFoods.splice(index, 1);
+            this.updateAvailableFoodsDisplay();
+        }
+    }
+    
+    updateMacrosForObjective() {
+        switch(this.userProfile.objective) {
+            case 'muscle-gain':
+                this.userProfile.macros = { protein: 140, carbs: 300, fat: 90 };
+                this.userProfile.calories = 2800;
+                break;
+            case 'fat-loss':
+                this.userProfile.macros = { protein: 130, carbs: 150, fat: 70 };
+                this.userProfile.calories = 2000;
+                break;
+            case 'maintenance':
+                this.userProfile.macros = { protein: 120, carbs: 250, fat: 83 };
+                this.userProfile.calories = 2500;
+                break;
+            case 'performance':
+                this.userProfile.macros = { protein: 130, carbs: 350, fat: 80 };
+                this.userProfile.calories = 3000;
+                break;
+        }
+    }
+    
+    async generateDailyPlan() {
+        // Mostrar estado de carga
+        this.showLoading(true);
+        
+        try {
+            // Generar recetas para cada comida
+            const breakfast = this.generateRecipe('breakfast');
+            const lunch = this.generateRecipe('lunch');
+            const dinner = this.generateRecipe('dinner');
+            const snacks = this.generateRecipe('snack');
+            
+            // Generar rutina de ejercicios si está marcado
+            let workout = null;
+            if (document.getElementById('include-workout').checked) {
+                workout = this.generateWorkout();
+            }
+            
+            // Actualizar UI
+            await this.updateMealDisplay('breakfast', breakfast);
+            await this.updateMealDisplay('lunch', lunch);
+            await this.updateMealDisplay('dinner', dinner);
+            await this.updateMealDisplay('snacks', snacks);
+            
+            if (workout) {
+                this.updateWorkoutDisplay(workout);
+            }
+            
+            // Calcular y mostrar macros
+            this.updateNutritionSummary([breakfast, lunch, dinner, snacks]);
+            
+            // Mostrar resultados
+            this.showResults();
+            
+            // Guardar en historial
+            this.saveToHistory({
+                date: new Date().toISOString(),
+                meals: { breakfast, lunch, dinner, snacks },
+                workout,
+                profile: { ...this.userProfile }
+            });
+            
+            this.showMessage('¡Plan generado con éxito!', 'success');
+            
+        } catch (error) {
+            console.error('Error generando plan:', error);
+            this.showMessage('Error al generar el plan. Intenta de nuevo.', 'error');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+    
+    generateRecipe(mealType) {
+        // Filtrar recetas por tipo de comida, nivel de habilidad y alimentos disponibles
+        const availableRecipes = this.recipeDatabase.filter(recipe => {
+            if (recipe.mealType !== mealType) return false;
+            if (recipe.difficulty > this.userProfile.skillLevel) return false;
+            
+            // Verificar si tenemos ingredientes
+            const hasIngredients = recipe.ingredients.every(ing => 
+                this.hasIngredient(ing.name.toLowerCase())
+            );
+            
+            // Para snacks, ser más flexible
+            if (mealType === 'snack' && !hasIngredients) {
+                return recipe.ingredients.length <= 3; // Snacks simples
+            }
+            
+            return hasIngredients;
+        });
+        
+        if (availableRecipes.length === 0) {
+            // Si no hay recetas exactas, buscar las más cercanas
+            return this.findClosestRecipe(mealType);
+        }
+        
+        // Seleccionar receta aleatoria ponderada por adecuación al objetivo
+        const scoredRecipes = availableRecipes.map(recipe => ({
+            recipe,
+            score: this.calculateRecipeScore(recipe)
+        }));
+        
+        // Ordenar por score y tomar la mejor
+        scoredRecipes.sort((a, b) => b.score - a.score);
+        return scoredRecipes[0].recipe;
+    }
+    
+    calculateRecipeScore(recipe) {
+        let score = 100;
+        
+        // Ajustar según objetivo
+        switch(this.userProfile.objective) {
+            case 'muscle-gain':
+                score += recipe.macros.protein * 2;
+                break;
+            case 'fat-loss':
+                score -= recipe.calories / 10;
+                score += recipe.macros.protein;
+                break;
+            case 'performance':
+                score += recipe.macros.carbs;
+                break;
+        }
+        
+        // Ajustar según preferencias
+        if (this.userProfile.preferences.includes('high-protein') && recipe.macros.protein > 20) {
+            score += 50;
+        }
+        
+        if (this.userProfile.preferences.includes('low-carb') && recipe.macros.carbs < 30) {
+            score += 30;
+        }
+        
+        if (this.userProfile.preferences.includes('quick') && recipe.prepTime <= 20) {
+            score += 40;
+        }
+        
+        return score;
+    }
+    
+    hasIngredient(ingredientName) {
+        // Buscar ingrediente en alimentos disponibles (con flexibilidad)
+        return this.userProfile.availableFoods.some(food => {
+            // Verificar si el alimento contiene el ingrediente o viceversa
+            return food.includes(ingredientName) || ingredientName.includes(food);
+        });
+    }
+    
+    findClosestRecipe(mealType) {
+        // Encontrar receta que use ingredientes similares
+        const allRecipes = this.recipeDatabase.filter(r => r.mealType === mealType);
+        
+        const scoredRecipes = allRecipes.map(recipe => ({
+            recipe,
+            matchScore: this.calculateIngredientMatch(recipe.ingredients)
+        }));
+        
+        scoredRecipes.sort((a, b) => b.matchScore - a.matchScore);
+        
+        // Si hay al menos un 50% de coincidencia, usar esa receta
+        if (scoredRecipes[0].matchScore >= 50) {
+            return scoredRecipes[0].recipe;
+        }
+        
+        // Si no, generar receta simple con lo que tenemos
+        return this.generateSimpleRecipe(mealType);
+    }
+    
+    calculateIngredientMatch(ingredients) {
+        const totalIngredients = ingredients.length;
+        const matchingIngredients = ingredients.filter(ing => 
+            this.hasIngredient(ing.name.toLowerCase())
+        ).length;
+        
+        return (matchingIngredients / totalIngredients) * 100;
+    }
+    
+    generateSimpleRecipe(mealType) {
+        // Crear receta simple con ingredientes disponibles
+        const availableIngredients = this.userProfile.availableFoods.slice(0, 5);
+        
+        return {
+            id: 'simple-' + Date.now(),
+            name: `${mealType.charAt(0).toUpperCase() + mealType.slice(1)} Simple con ${availableIngredients[0]}`,
+            description: `Receta rápida usando lo que tienes disponible`,
+            mealType,
+            difficulty: 1,
+            prepTime: 15,
+            servings: 1,
+            ingredients: availableIngredients.map((ing, idx) => ({
+                name: ing,
+                quantity: idx === 0 ? '200g' : 'al gusto',
+                unit: idx === 0 ? 'g' : ''
+            })),
+            instructions: this.generateSimpleInstructions(availableIngredients, mealType),
+            macros: this.estimateMacros(availableIngredients),
+            calories: this.estimateCalories(availableIngredients),
+            tags: ['simple', 'rápido', 'con-ingredientes-disponibles']
+        };
+    }
+    
+    generateSimpleInstructions(ingredients, mealType) {
+        const instructions = [];
+        
+        if (mealType === 'breakfast') {
+            instructions.push(
+                "En un bol, mezcla todos los ingredientes disponibles",
+                "Calienta una sartén antiadherente a fuego medio",
+                "Cocina la mezcla por ambos lados hasta que esté dorada",
+                "Sirve caliente y disfruta"
+            );
+        } else if (mealType === 'lunch' || mealType === 'dinner') {
+            instructions.push(
+                "Prepara todos los ingredientes: lava y corta lo necesario",
+                "En una sartén grande, saltea los ingredientes más duros primero",
+                "Añade el resto de ingredientes y cocina hasta que estén tiernos",
+                "Ajusta la sazón al gusto y sirve"
+            );
+        } else {
+            instructions.push(
+                "Mezcla todos los ingredientes en un recipiente",
+                "Si es necesario, refrigera por 10 minutos",
+                "Sirve y disfruta como snack saludable"
+            );
+        }
+        
+        return instructions.map((text, idx) => ({
+            step: idx + 1,
+            title: `Paso ${idx + 1}`,
+            description: text,
+            tip: idx === 0 ? "Usa ingredientes frescos para mejor sabor" : ""
+        }));
+    }
+    
+    estimateMacros(ingredients) {
+        // Estimación simple basada en ingredientes comunes
+        let protein = 0, carbs = 0, fat = 0;
+        
+        ingredients.forEach(ing => {
+            if (ing.includes('pollo') || ing.includes('ternera') || ing.includes('pescado')) {
+                protein += 25;
+                fat += 5;
+            } else if (ing.includes('huevo')) {
+                protein += 6;
+                fat += 5;
+            } else if (ing.includes('arroz') || ing.includes('pasta') || ing.includes('patata')) {
+                carbs += 30;
+                protein += 3;
+            } else if (ing.includes('queso')) {
+                protein += 7;
+                fat += 9;
+            } else if (ing.includes('aguacate') || ing.includes('aceite')) {
+                fat += 15;
+            } else if (ing.includes('legumbre')) {
+                protein += 8;
+                carbs += 20;
+            }
+        });
+        
+        return { protein, carbs, fat };
+    }
+    
+    estimateCalories(ingredients) {
+        const macros = this.estimateMacros(ingredients);
+        return (macros.protein * 4) + (macros.carbs * 4) + (macros.fat * 9);
+    }
+    
+    generateWorkout() {
+        // Generar rutina basada en objetivo
+        const workouts = this.workoutDatabase[this.userProfile.objective];
+        
+        if (!workouts || workouts.length === 0) {
+            return this.generateDefaultWorkout();
+        }
+        
+        // Seleccionar workout aleatorio
+        const randomIndex = Math.floor(Math.random() * workouts.length);
+        return workouts[randomIndex];
+    }
+    
+    generateDefaultWorkout() {
+        return {
+            focus: 'Full Body',
+            duration: '45-60 minutos',
+            exercises: [
+                {
+                    name: 'Sentadillas',
+                    sets: '3x10-12',
+                    rest: '60s',
+                    target: 'Piernas y glúteos',
+                    tips: 'Mantén la espalda recta y baja hasta que los muslos estén paralelos al suelo'
+                },
+                {
+                    name: 'Flexiones',
+                    sets: '3x8-12',
+                    rest: '45s',
+                    target: 'Pecho y tríceps',
+                    tips: 'Mantén el cuerpo recto como una tabla'
+                },
+                {
+                    name: 'Dominadas asistidas',
+                    sets: '3x6-8',
+                    rest: '90s',
+                    target: 'Espalda y bíceps',
+                    tips: 'Concéntrate en apretar los omóplatos'
+                },
+                {
+                    name: 'Plancha',
+                    sets: '3x30-45s',
+                    rest: '30s',
+                    target: 'Core completo',
+                    tips: 'Mantén las caderas alineadas con los hombros'
+                }
+            ]
+        };
+    }
+    
+    async updateMealDisplay(mealType, recipe) {
+        const container = document.querySelector(`.meal-slot[data-meal="${mealType}"] .meal-content`);
+        
+        if (!container) return;
+        
+        container.innerHTML = this.createRecipeHTML(recipe);
+        
+        // Añadir event listeners a los botones de la receta
+        this.addRecipeEventListeners(recipe);
+    }
+    
+    createRecipeHTML(recipe) {
+        return `
+            <div class="recipe-card" data-recipe-id="${recipe.id}">
+                <div class="recipe-info">
+                    <h3 class="recipe-title">${recipe.name}</h3>
+                    <p class="recipe-description">${recipe.description}</p>
+                    
+                    <div class="recipe-meta">
+                        <span class="recipe-difficulty ${this.getDifficultyClass(recipe.difficulty)}">
+                            ${this.getDifficultyText(recipe.difficulty)}
+                        </span>
+                        <span class="recipe-time">
+                            <i class="far fa-clock"></i> ${recipe.prepTime} min
+                        </span>
+                        <span class="recipe-servings">
+                            <i class="fas fa-users"></i> ${recipe.servings} persona(s)
+                        </span>
+                    </div>
+                    
+                    <div class="recipe-instructions">
+                        <h4><i class="fas fa-list-ol"></i> Preparación paso a paso:</h4>
+                        ${recipe.instructions.map(step => `
+                            <div class="instruction-step">
+                                <div class="step-number">${step.step}</div>
+                                <div class="step-content">
+                                    <h4>${step.title}</h4>
+                                    <p>${step.description}</p>
+                                    ${step.tip ? `<p class="step-tip"><i class="fas fa-lightbulb"></i> ${step.tip}</p>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="recipe-actions">
+                        <button class="btn btn-primary save-recipe" data-recipe-id="${recipe.id}">
+                            <i class="far fa-bookmark"></i> Guardar Receta
+                        </button>
+                        <button class="btn btn-secondary generate-variation" data-recipe-id="${recipe.id}">
+                            <i class="fas fa-random"></i> Variación
+                        </button>
+                        <button class="btn btn-secondary add-to-shopping" data-recipe-id="${recipe.id}">
+                            <i class="fas fa-cart-plus"></i> Comprar ingredientes
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="recipe-sidebar">
+                    <h4><i class="fas fa-carrot"></i> Ingredientes:</h4>
+                    <ul class="ingredients-list">
+                        ${recipe.ingredients.map(ing => `
+                            <li class="ingredient-item" data-ingredient="${ing.name.toLowerCase()}">
+                                <span class="ingredient-name">
+                                    <i class="fas fa-check-circle"></i>
+                                    ${ing.name}
+                                </span>
+                                <span class="ingredient-quantity">${ing.quantity} ${ing.unit}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                    
+                    <div class="nutrition-facts">
+                        <h4><i class="fas fa-chart-pie"></i> Información Nutricional (por porción):</h4>
+                        <div class="nutrition-item">
+                            <span class="nutrition-label">Calorías</span>
+                            <span class="nutrition-value">${recipe.calories} kcal</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span class="nutrition-label">Proteína</span>
+                            <span class="nutrition-value">${recipe.macros.protein}g</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span class="nutrition-label">Carbohidratos</span>
+                            <span class="nutrition-value">${recipe.macros.carbs}g</span>
+                        </div>
+                        <div class="nutrition-item">
+                            <span class="nutrition-label">Grasas</span>
+                            <span class="nutrition-value">${recipe.macros.fat}g</span>
+                        </div>
+                    </div>
+                    
+                    <div class="recipe-tags">
+                        ${recipe.tags.map(tag => `
+                            <span class="tag">${tag}</span>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    addRecipeEventListeners(recipe) {
+        // Guardar receta
+        const saveBtn = document.querySelector(`.save-recipe[data-recipe-id="${recipe.id}"]`);
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => this.saveRecipe(recipe));
+        }
+        
+        // Generar variación
+        const variationBtn = document.querySelector(`.generate-variation[data-recipe-id="${recipe.id}"]`);
+        if (variationBtn) {
+            variationBtn.addEventListener('click', () => this.generateVariation(recipe));
+        }
+        
+        // Añadir a lista de compras
+        const shoppingBtn = document.querySelector(`.add-to-shopping[data-recipe-id="${recipe.id}"]`);
+        if (shoppingBtn) {
+            shoppingBtn.addEventListener('click', () => this.addToShoppingList(recipe));
+        }
+        
+        // Resaltar ingredientes que tenemos
+        document.querySelectorAll('.ingredient-item').forEach(item => {
+            const ingredient = item.dataset.ingredient;
+            if (this.hasIngredient(ingredient)) {
+                item.classList.add('highlight');
+            }
+        });
+    }
+    
+    updateWorkoutDisplay(workout) {
+        const container = document.getElementById('workout-content');
+        const focusEl = document.getElementById('workout-focus');
+        
+        if (!container || !focusEl) return;
+        
+        focusEl.textContent = workout.focus;
+        
+        container.innerHTML = `
+            <div class="workout-info">
+                <p><i class="far fa-clock"></i> Duración: ${workout.duration}</p>
+                <p><i class="fas fa-fire"></i> Enfoque: ${workout.focus}</p>
+            </div>
+            
+            <div class="exercises-list">
+                ${workout.exercises.map((ex, idx) => `
+                    <div class="exercise-item">
+                        <div class="exercise-icon">
+                            ${idx + 1}
+                        </div>
+                        <div class="exercise-details">
+                            <h4 class="exercise-name">${ex.name}</h4>
+                            <div class="exercise-sets">${ex.sets} - Descanso: ${ex.rest}</div>
+                            <div class="exercise-target">${ex.target}</div>
+                            ${ex.tips ? `<div class="exercise-tips"><i class="fas fa-lightbulb"></i> ${ex.tips}</div>` : ''}
+                        </div>
+                        <button class="btn btn-sm btn-secondary exercise-demo" data-exercise="${ex.name}">
+                            <i class="fas fa-play"></i> Demo
+                        </button>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="workout-notes">
+                <h4><i class="fas fa-sticky-note"></i> Notas importantes:</h4>
+                <ul>
+                    <li>Calienta 5-10 minutos antes de empezar</li>
+                    <li>Mantén buena forma en todos los ejercicios</li>
+                    <li>Hidrátate durante el entrenamiento</li>
+                    <li>Estira después de terminar</li>
+                </ul>
+            </div>
+        `;
+        
+        // Añadir event listeners para demos
+        document.querySelectorAll('.exercise-demo').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const exercise = e.target.closest('.exercise-demo').dataset.exercise;
+                this.showExerciseDemo(exercise);
+            });
+        });
+    }
+    
+    updateNutritionSummary(meals) {
+        // Calcular totales
+        const totals = {
+            calories: 0,
+            protein: 0,
+            carbs: 0,
+            fat: 0
+        };
+        
+        meals.forEach(meal => {
+            totals.calories += meal.calories;
+            totals.protein += meal.macros.protein;
+            totals.carbs += meal.macros.carbs;
+            totals.fat += meal.macros.fat;
+        });
+        
+        // Calcular porcentajes
+        const totalCals = totals.protein * 4 + totals.carbs * 4 + totals.fat * 9;
+        const proteinPercent = (totals.protein * 4 / totalCals) * 100;
+        const carbsPercent = (totals.carbs * 4 / totalCals) * 100;
+        const fatPercent = (totals.fat * 9 / totalCals) * 100;
+        
+        // Actualizar UI
+        const container = document.querySelector('.macros-overview');
+        if (!container) return;
+        
+        container.innerHTML = `
+            <div class="macro-item">
+                <div class="macro-label">Calorías</div>
+                <div class="macro-value">${Math.round(totals.calories)} kcal</div>
+            </div>
+            <div class="macro-item">
+                <div class="macro-label">Proteína</div>
+                <div class="macro-bar">
+                    <div class="macro-fill protein" style="width: ${proteinPercent}%"></div>
+                </div>
+                <div class="macro-value">${Math.round(totals.protein)}g (${Math.round(proteinPercent)}%)</div>
+            </div>
+            <div class="macro-item">
+                <div class="macro-label">Carbohidratos</div>
+                <div class="macro-bar">
+                    <div class="macro-fill carbs" style="width: ${carbsPercent}%"></div>
+                </div>
+                <div class="macro-value">${Math.round(totals.carbs)}g (${Math.round(carbsPercent)}%)</div>
+            </div>
+            <div class="macro-item">
+                <div class="macro-label">Grasas</div>
+                <div class="macro-bar">
+                    <div class="macro-fill fat" style="width: ${fatPercent}%"></div>
+                </div>
+                <div class="macro-value">${Math.round(totals.fat)}g (${Math.round(fatPercent)}%)</div>
+            </div>
+        `;
+    }
+    
+    showResults() {
+        // Mostrar todas las secciones de resultados
+        document.querySelectorAll('.chef-results .card').forEach(card => {
+            card.classList.remove('hidden');
+        });
+    }
+    
+    showLoading(show) {
+        const resultsSection = document.querySelector('.chef-results');
+        
+        if (show) {
+            resultsSection.innerHTML = `
+                <div class="chef-loading">
+                    <i class="fas fa-utensils fa-spin"></i>
+                    <p>El Chef IA está preparando tu plan personalizado...</p>
+                    <p class="loading-sub">Analizando alimentos disponibles y generando recetas</p>
+                </div>
+            `;
+        }
+    }
+    
+    showMessage(text, type = 'info') {
+        const container = document.querySelector('.chef-config');
+        
+        // Remover mensajes existentes
+        const existingMsg = container.querySelector('.chef-message');
+        if (existingMsg) existingMsg.remove();
+        
+        // Crear nuevo mensaje
+        const messageEl = document.createElement('div');
+        messageEl.className = `chef-message ${type}`;
+        messageEl.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <span>${text}</span>
+        `;
+        
+        container.insertBefore(messageEl, container.firstChild);
+        
+        // Auto-remover después de 5 segundos
+        setTimeout(() => {
+            if (messageEl.parentNode) {
+                messageEl.remove();
+            }
+        }, 5000);
+    }
+    
+    saveRecipe(recipe) {
+        const savedRecipes = JSON.parse(localStorage.getItem('savedRecipes') || '[]');
+        
+        // Verificar si ya está guardada
+        if (!savedRecipes.some(r => r.id === recipe.id)) {
+            savedRecipes.push({
+                ...recipe,
+                savedDate: new Date().toISOString(),
+                savedWith: this.userProfile.objective
+            });
+            
+            localStorage.setItem('savedRecipes', JSON.stringify(savedRecipes));
+            this.showMessage('¡Receta guardada en tu colección!', 'success');
+        } else {
+            this.showMessage('Esta receta ya está en tu colección', 'info');
+        }
+    }
+    
+    generateVariation(originalRecipe) {
+        // Crear variación cambiando algunos ingredientes
+        const variation = { ...originalRecipe };
+        variation.id = originalRecipe.id + '-var-' + Date.now();
+        variation.name = originalRecipe.name + ' (Variación)';
+        
+        // Modificar algunos ingredientes
+        if (variation.ingredients.length > 2) {
+            const indexToChange = Math.floor(Math.random() * variation.ingredients.length);
+            const alternatives = this.findIngredientAlternatives(variation.ingredients[indexToChange].name);
+            
+            if (alternatives.length > 0) {
+                const newIngredient = alternatives[Math.floor(Math.random() * alternatives.length)];
+                variation.ingredients[indexToChange] = {
+                    name: newIngredient,
+                    quantity: variation.ingredients[indexToChange].quantity,
+                    unit: variation.ingredients[indexToChange].unit
+                };
+                
+                variation.description = `Variación de ${originalRecipe.name} con ${newIngredient}`;
+            }
+        }
+        
+        // Actualizar la receta en pantalla
+        this.updateMealDisplay(originalRecipe.mealType, variation);
+        this.showMessage('¡Variación generada!', 'success');
+    }
+    
+    findIngredientAlternatives(ingredient) {
+        // Mapeo de alternativas comunes
+        const alternatives = {
+            'pollo': ['pavo', 'ternera', 'tofu', 'seitán'],
+            'ternera': ['pollo', 'pavo', 'cerdo', 'tofu'],
+            'pescado': ['pollo', 'tofu', 'gambas', 'calamar'],
+            'huevo': ['tofu', 'garbanzos', 'linaza'],
+            'arroz': ['quinoa', 'bulgur', 'couscous', 'mijo'],
+            'pasta': ['arroz', 'quinoa', 'pasta de lentejas', 'calabacín espiralizado'],
+            'patata': ['boniato', 'calabaza', 'zanahoria', 'ñame'],
+            'queso': ['tofu', 'levadura nutricional', 'queso vegano'],
+            'leche': ['leche de almendras', 'leche de avena', 'leche de coco']
+        };
+        
+        const lowerIngredient = ingredient.toLowerCase();
+        
+        for (const [key, values] of Object.entries(alternatives)) {
+            if (lowerIngredient.includes(key)) {
+                return values.filter(alt => this.hasIngredient(alt));
+            }
+        }
+        
+        return [];
+    }
+    
+    addToShoppingList(recipe) {
+        const shoppingList = JSON.parse(localStorage.getItem('shoppingList') || '[]');
+        
+        recipe.ingredients.forEach(ing => {
+            // Verificar si ya está en la lista
+            const exists = shoppingList.some(item => 
+                item.name.toLowerCase() === ing.name.toLowerCase()
+            );
+            
+            if (!exists) {
+                shoppingList.push({
+                    name: ing.name,
+                    quantity: ing.quantity,
+                    category: this.categorizeIngredient(ing.name),
+                    priority: 'medium',
+                    addedFrom: 'chef-ia'
+                });
+            }
+        });
+        
+        localStorage.setItem('shoppingList', JSON.stringify(shoppingList));
+        
+        // Actualizar alimentos disponibles
+        this.userProfile.availableFoods = [
+            ...this.userProfile.availableFoods,
+            ...recipe.ingredients.map(ing => ing.name.toLowerCase())
+        ];
+        this.updateAvailableFoodsDisplay();
+        
+        this.showMessage(`${recipe.ingredients.length} ingredientes añadidos a la lista de compras`, 'success');
+    }
+    
+    categorizeIngredient(ingredient) {
+        const lower = ingredient.toLowerCase();
+        
+        if (lower.includes('pollo') || lower.includes('ternera') || lower.includes('pescado') || lower.includes('huevo')) {
+            return 'proteina';
+        } else if (lower.includes('arroz') || lower.includes('pasta') || lower.includes('patata') || lower.includes('pan')) {
+            return 'carbohidratos';
+        } else if (lower.includes('aceite') || lower.includes('aguacate') || lower.includes('fruto seco')) {
+            return 'grasas';
+        } else if (lower.includes('brócoli') || lower.includes('espinaca') || lower.includes('pimiento') || lower.includes('cebolla')) {
+            return 'vegetales';
+        } else if (lower.includes('queso') || lower.includes('yogur') || lower.includes('leche')) {
+            return 'lacteos';
+        } else {
+            return 'otros';
+        }
+    }
+    
+    showExerciseDemo(exerciseName) {
+        // Aquí podrías integrar con una API de videos o mostrar GIFs
+        const demoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(exerciseName + ' ejercicio correcta forma')}`;
+        
+        this.showMessage(`Buscando demostración de ${exerciseName}... Abriendo en nueva pestaña`, 'info');
+        
+        // Abrir en nueva pestaña
+        window.open(demoUrl, '_blank');
+    }
+    
+    saveToHistory(plan) {
+        const history = JSON.parse(localStorage.getItem('chefHistory') || '[]');
+        history.unshift(plan); // Añadir al inicio
+        
+        // Mantener solo los últimos 50 planes
+        if (history.length > 50) {
+            history.pop();
+        }
+        
+        localStorage.setItem('chefHistory', JSON.stringify(history));
+    }
+    
+    loadUserPreferences() {
+        const saved = localStorage.getItem('chefPreferences');
+        if (saved) {
+            this.userProfile = { ...this.userProfile, ...JSON.parse(saved) };
+            this.updateUIFromProfile();
+        }
+    }
+    
+    saveUserPreferences() {
+        localStorage.setItem('chefPreferences', JSON.stringify(this.userProfile));
+    }
+    
+    updateUIFromProfile() {
+        // Actualizar botones de objetivo
+        document.querySelectorAll('.objective-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.objective === this.userProfile.objective);
+        });
+        
+        // Actualizar chips de preferencias
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.classList.toggle('active', 
+                this.userProfile.preferences.includes(chip.dataset.pref)
+            );
+        });
+        
+        // Actualizar slider de nivel
+        document.querySelector('.skill-slider-input').value = this.userProfile.skillLevel;
+        document.querySelectorAll('.skill-level').forEach((el, idx) => {
+            el.classList.toggle('active', idx === this.userProfile.skillLevel - 1);
+        });
+        
+        // Actualizar alimentos disponibles
+        this.updateAvailableFoodsDisplay();
+    }
+    
+    changeDay(delta) {
+        this.currentDay += delta;
+        this.updateDateDisplay();
+        
+        // Aquí podrías cargar un plan diferente para ese día
+        // Por ahora, solo actualizamos la fecha
+    }
+    
+    updateDateDisplay() {
+        const date = new Date();
+        date.setDate(date.getDate() + this.currentDay);
+        
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const dateStr = date.toLocaleDateString('es-ES', options);
+        
+        const dateEl = document.getElementById('current-date');
+        if (dateEl) {
+            dateEl.textContent = dateStr;
+        }
+    }
+    
+    getDifficultyClass(level) {
+        switch(level) {
+            case 1: return 'beginner';
+            case 2: return 'intermediate';
+            case 3: return 'advanced';
+            default: return 'beginner';
+        }
+    }
+    
+    getDifficultyText(level) {
+        switch(level) {
+            case 1: return 'Principiante';
+            case 2: return 'Intermedio';
+            case 3: return 'Avanzado';
+            default: return 'Principiante';
+        }
+    }
+    
+    initializeRecipeDatabase() {
+        // Base de datos de recetas (se puede ampliar mucho más)
+        return [
+            {
+                id: 'recipe-1',
+                name: 'Tortilla de Espinacas y Queso Feta',
+                description: 'Tortilla esponjosa cargada de espinacas frescas y queso feta desmenuzado. Perfecta para un desayuno proteico.',
+                mealType: 'breakfast',
+                difficulty: 1,
+                prepTime: 15,
+                servings: 1,
+                ingredients: [
+                    { name: 'Huevos', quantity: '2', unit: 'unidades' },
+                    { name: 'Espinacas frescas', quantity: '50', unit: 'g' },
+                    { name: 'Queso feta', quantity: '30', unit: 'g' },
+                    { name: 'Aceite de oliva', quantity: '1', unit: 'cucharada' },
+                    { name: 'Sal', quantity: 'al gusto', unit: '' },
+                    { name: 'Pimienta', quantity: 'al gusto', unit: '' }
+                ],
+                instructions: [
+                    {
+                        step: 1,
+                        title: 'Preparar los ingredientes',
+                        description: 'Lava bien las espinacas y pícalas groseramente. Desmenuza el queso feta con las manos.',
+                        tip: 'Secar bien las espinacas para que no suelten agua en la tortilla'
+                    },
+                    {
+                        step: 2,
+                        title: 'Batir los huevos',
+                        description: 'En un bol, casca los dos huevos. Añade una pizca de sal y pimienta. Bate vigorosamente con un tenedor hasta que estén bien mezclados.',
+                        tip: 'Batir bien los huevos hace que la tortilla quede más esponjosa'
+                    },
+                    {
+                        step: 3,
+                        title: 'Mezclar con verduras y queso',
+                        description: 'Añade las espinacas picadas y el queso feta desmenuzado a los huevos batidos. Mezcla suavemente.',
+                        tip: 'No mezcles demasiado para no romper las espinacas'
+                    },
+                    {
+                        step: 4,
+                        title: 'Cocinar la tortilla',
+                        description: 'Calienta una sartén antiadherente a fuego medio-bajo con el aceite de oliva. Cuando esté caliente, vierte la mezcla. Cocina 3-4 minutos hasta que los bordes empiecen a cuajar.',
+                        tip: 'Fuego bajo para que se cocine uniformemente sin quemarse'
+                    },
+                    {
+                        step: 5,
+                        title: 'Dar la vuelta y terminar',
+                        description: 'Con una espátula, voltea la tortilla con cuidado. Cocina otros 2-3 minutos hasta que esté completamente cuajada pero jugosa.',
+                        tip: 'Si te cuesta voltearla, puedes cortarla en cuartos y darles la vuelta por separado'
+                    },
+                    {
+                        step: 6,
+                        title: 'Servir',
+                        description: 'Desliza la tortilla a un plato. Sirve inmediatamente, caliente. Puedes acompañar con una rebanada de pan integral tostado.',
+                        tip: 'Añadir unas gotas de limón fresco realza los sabores'
+                    }
+                ],
+                macros: { protein: 22, carbs: 3, fat: 18 },
+                calories: 280,
+                tags: ['rápido', 'proteico', 'vegetariano', 'desayuno']
+            },
+            {
+                id: 'recipe-2',
+                name: 'Pollo al Curry con Arroz',
+                description: 'Pollo tierno en salsa de curry cremosa con especias, servido con arroz blanco esponjoso.',
+                mealType: 'lunch',
+                difficulty: 2,
+                prepTime: 30,
+                servings: 2,
+                ingredients: [
+                    { name: 'Pechuga de pollo', quantity: '300', unit: 'g' },
+                    { name: 'Arroz blanco', quantity: '150', unit: 'g' },
+                    { name: 'Cebolla', quantity: '1', unit: 'unidad' },
+                    { name: 'Ajo', quantity: '2', unit: 'dientes' },
+                    { name: 'Leche de coco', quantity: '200', unit: 'ml' },
+                    { name: 'Pasta de curry', quantity: '2', unit: 'cucharadas' },
+                    { name: 'Aceite de oliva', quantity: '2', unit: 'cucharadas' },
+                    { name: 'Sal', quantity: 'al gusto', unit: '' }
+                ],
+                instructions: [
+                    {
+                        step: 1,
+                        title: 'Cocinar el arroz',
+                        description: 'Lava el arroz bajo el grifo hasta que el agua salga clara. Hierve 2 tazas de agua con una pizca de sal, añade el arroz, tapa y cocina a fuego bajo 15 minutos. Apaga y deja reposar 5 minutos.',
+                        tip: 'No destapar el arroz mientras se cocina para que quede esponjoso'
+                    },
+                    {
+                        step: 2,
+                        title: 'Preparar el pollo',
+                        description: 'Corta el pollo en cubos de 2-3 cm. Sazona con sal. Pica finamente la cebolla y el ajo.',
+                        tip: 'Cortar el pollo en piezas uniformes para que se cocinen igual'
+                    },
+                    {
+                        step: 3,
+                        title: 'Sofreír cebolla y ajo',
+                        description: 'Calienta el aceite en una sartén grande. Añade la cebolla y cocina a fuego medio 5 minutos hasta que esté transparente. Añade el ajo y cocina 1 minuto más.',
+                        tip: 'No dejar que el ajo se queme o amargará el plato'
+                    },
+                    {
+                        step: 4,
+                        title: 'Cocinar el pollo',
+                        description: 'Añade el pollo a la sartén y sube el fuego. Dorar por todos lados durante 5-6 minutos hasta que esté sellado.',
+                        tip: 'No mover el pollo demasiado para que se dore bien'
+                    },
+                    {
+                        step: 5,
+                        title: 'Añadir el curry',
+                        description: 'Baja el fuego. Añade la pasta de curry y mezcla bien con el pollo durante 1 minuto para que libere sus aromas.',
+                        tip: 'Tostar la pasta de curry realza su sabor'
+                    },
+                    {
+                        step: 6,
+                        title: 'Crear la salsa',
+                        description: 'Vierte la leche de coco. Remueve bien para desglasar el fondo de la sartén. Deja cocer a fuego lento 10 minutos hasta que la salsa espese.',
+                        tip: 'Raspar el fondo de la sartén para incorporar todos los sabores'
+                    },
+                    {
+                        step: 7,
+                        title: 'Servir',
+                        description: 'Sirve el pollo al curry sobre el arroz. Decora con cilantro fresco si lo tienes.',
+                        tip: 'Dejar reposar 2 minutos antes de servir para que los sabores se integren'
+                    }
+                ],
+                macros: { protein: 45, carbs: 70, fat: 25 },
+                calories: 680,
+                tags: ['completo', 'especiado', 'sabroso', 'almuerzo']
+            },
+            {
+                id: 'recipe-3',
+                name: 'Salmón al Horno con Brócoli',
+                description: 'Filete de salmón horneado con limón y eneldo, acompañado de brócoli al dente.',
+                mealType: 'dinner',
+                difficulty: 1,
+                prepTime: 25,
+                servings: 1,
+                ingredients: [
+                    { name: 'Filete de salmón', quantity: '200', unit: 'g' },
+                    { name: 'Brócoli', quantity: '200', unit: 'g' },
+                    { name: 'Limón', quantity: '0.5', unit: 'unidad' },
+                    { name: 'Aceite de oliva', quantity: '2', unit: 'cucharadas' },
+                    { name: 'Eneldo seco', quantity: '1', unit: 'cucharadita' },
+                    { name: 'Ajo en polvo', quantity: '0.5', unit: 'cucharadita' },
+                    { name: 'Sal', quantity: 'al gusto', unit: '' }
+                ],
+                instructions: [
+                    {
+                        step: 1,
+                        title: 'Precalentar el horno',
+                        description: 'Precalienta el horno a 200°C (400°F). Forra una bandeja de horno con papel de hornear.',
+                        tip: 'Precalentar bien el horno es clave para una cocción uniforme'
+                    },
+                    {
+                        step: 2,
+                        title: 'Preparar el brócoli',
+                        description: 'Lava el brócoli y sepáralo en floretes pequeños. Colócalo en un bol y mezcla con 1 cucharada de aceite de oliva, ajo en polvo y sal.',
+                        tip: 'Floretes pequeños se cocinan más rápido y uniformemente'
+                    },
+                    {
+                        step: 3,
+                        title: 'Sazonar el salmón',
+                        description: 'Coloca el filete de salmón en la bandeja de horno. Rocía con el resto del aceite de oliva. Espolvorea con eneldo y sal. Corta el limón en rodajas finas.',
+                        tip: 'Secar el salmón con papel de cocina para que se dore mejor'
+                    },
+                    {
+                        step: 4,
+                        title: 'Colocar las rodajas de limón',
+                        description: 'Coloca 2-3 rodajas de limón sobre el salmón. Las demás rodajas repártelas alrededor en la bandeja.',
+                        tip: 'El limón bajo el salmón también le da sabor'
+                    },
+                    {
+                        step: 5,
+                        title: 'Hornear',
+                        description: 'Coloca el brócoli alrededor del salmón. Hornea durante 12-15 minutos. El salmón debe estar opaco y desmenuzarse fácilmente.',
+                        tip: 'No sobrecocinar el salmón o quedará seco'
+                    },
+                    {
+                        step: 6,
+                        title: 'Servir',
+                        description: 'Sirve inmediatamente. Exprime el jugo del limón restante sobre el plato al servir.',
+                        tip: 'El salmón debe estar jugoso por dentro'
+                    }
+                ],
+                macros: { protein: 42, carbs: 12, fat: 28 },
+                calories: 480,
+                tags: ['ligero', 'omega-3', 'saludable', 'cena']
+            },
+            {
+                id: 'recipe-4',
+                name: 'Yogur con Frutos Secos y Miel',
+                description: 'Yogur griego cremoso con mezcla de frutos secos crujientes y un toque de miel natural.',
+                mealType: 'snack',
+                difficulty: 1,
+                prepTime: 5,
+                servings: 1,
+                ingredients: [
+                    { name: 'Yogur griego natural', quantity: '200', unit: 'g' },
+                    { name: 'Almendras', quantity: '15', unit: 'g' },
+                    { name: 'Nueces', quantity: '10', unit: 'g' },
+                    { name: 'Miel', quantity: '1', unit: 'cucharadita' },
+                    { name: 'Canela en polvo', quantity: 'una pizca', unit: '' }
+                ],
+                instructions: [
+                    {
+                        step: 1,
+                        title: 'Preparar los frutos secos',
+                        description: 'Pica groseramente las almendras y nueces. Puedes tostarlas ligeramente en una sartén sin aceite durante 2 minutos para realzar su sabor.',
+                        tip: 'Tostar los frutos secos los hace más digestivos y sabrosos'
+                    },
+                    {
+                        step: 2,
+                        title: 'Montar el yogur',
+                        description: 'Coloca el yogur griego en un bol o tarro de cristal.',
+                        tip: 'Usar yogur griego para mayor proteína y cremosidad'
+                    },
+                    {
+                        step: 3,
+                        title: 'Añadir los toppings',
+                        description: 'Esparce los frutos secos picados sobre el yogur. Rocía con la miel y espolvorea con canela.',
+                        tip: 'Colocar la miel en el centro para que se distribuya al comer'
+                    },
+                    {
+                        step: 4,
+                        title: 'Servir',
+                        description: 'Mezcla justo antes de comer para mantener los frutos secos crujientes.',
+                        tip: 'Puedes añadir fruta fresca como plátano o frutos rojos'
+                    }
+                ],
+                macros: { protein: 20, carbs: 18, fat: 15 },
+                calories: 280,
+                tags: ['rápido', 'proteico', 'dulce', 'snack']
+            }
+            // Se pueden añadir muchas más recetas aquí
+        ];
+    }
+    
+    initializeWorkoutDatabase() {
+        return {
+            'muscle-gain': [
+                {
+                    focus: 'Fuerza e Hipertrofia',
+                    duration: '60-75 minutos',
+                    exercises: [
+                        { name: 'Press de Banca', sets: '4x6-8', rest: '120s', target: 'Pecho, hombros, tríceps' },
+                        { name: 'Sentadillas con Barra', sets: '4x6-8', rest: '120s', target: 'Piernas completas' },
+                        { name: 'Peso Muerto', sets: '3x5', rest: '150s', target: 'Espalda baja, glúteos' },
+                        { name: 'Dominadas con Peso', sets: '3x6-8', rest: '90s', target: 'Espalda, bíceps' },
+                        { name: 'Press Militar', sets: '3x8-10', rest: '90s', target: 'Hombros' }
+                    ]
+                }
+            ],
+            'fat-loss': [
+                {
+                    focus: 'Quema de Grasa - Circuito',
+                    duration: '45 minutos',
+                    exercises: [
+                        { name: 'Burpees', sets: '3x15', rest: '30s', target: 'Full body, cardio' },
+                        { name: 'Mountain Climbers', sets: '3x30s', rest: '20s', target: 'Core, cardio' },
+                        { name: 'Saltos de Caja', sets: '3x12', rest: '45s', target: 'Piernas, potencia' },
+                        { name: 'Kettlebell Swings', sets: '3x20', rest: '40s', target: 'Glúteos, cardio' },
+                        { name: 'Battle Ropes', sets: '3x30s', rest: '30s', target: 'Brazos, cardio' }
+                    ]
+                }
+            ],
+            'maintenance': [
+                {
+                    focus: 'Full Body Mantenimiento',
+                    duration: '50 minutos',
+                    exercises: [
+                        { name: 'Press Inclinado con Mancuernas', sets: '3x10-12', rest: '75s', target: 'Pecho superior' },
+                        { name: 'Prensa de Piernas', sets: '3x12-15', rest: '75s', target: 'Cuádriceps' },
+                        { name: 'Remo con Barra', sets: '3x10-12', rest: '75s', target: 'Espalda media' },
+                        { name: 'Curl de Bíceps', sets: '3x12-15', rest: '60s', target: 'Bíceps' },
+                        { name: 'Extensiones de Tríceps', sets: '3x12-15', rest: '60s', target: 'Tríceps' }
+                    ]
+                }
+            ],
+            'performance': [
+                {
+                    focus: 'Rendimiento Deportivo',
+                    duration: '70 minutos',
+                    exercises: [
+                        { name: 'Power Cleans', sets: '5x3', rest: '180s', target: 'Potencia explosiva' },
+                        { name: 'Box Jumps', sets: '4x6', rest: '90s', target: 'Potencia de piernas' },
+                        { name: 'Push Press', sets: '4x5', rest: '120s', target: 'Fuerza explosiva de hombros' },
+                        { name: 'Sprints en Cuesta', sets: '8x20m', rest: '60s', target: 'Velocidad, potencia' },
+                        { name: 'Plank con Toques de Hombro', sets: '3x45s', rest: '45s', target: 'Core estabilidad' }
+                    ]
+                }
+            ]
+        };
+    }
+}
+
+// Inicializar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    const chefIA = new ChefIA();
+    window.chefIA = chefIA; // Hacer accesible desde la consola si es necesario
+    
+    // Actualizar fecha actual
+    chefIA.updateDateDisplay();
+});
