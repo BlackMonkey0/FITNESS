@@ -1,1117 +1,454 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de la Compra | AI Fitness Tracker</title>
-  <!-- Fuentes y estilos -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de la Compra | AI Fitness Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="shopping-body">
-
-<!-- Canvas para efecto Matrix (si lo usas) -->
-<canvas id="matrixCanvas"></canvas>
-
-<!-- Header principal - Igual que index.html -->
-<header class="main-header">
-    <div class="header-container">
-        <div class="logo-section">
-            <div class="logo-icon">
-                <i class="fas fa-shopping-cart"></i>
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="logo-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="logo-text">
+                    <h1>AI FITNESS SHOPPING</h1>
+                    <p class="subtitle">SMART GROCERIES</p>
+                </div>
             </div>
-            <div class="logo-text">
-                <h1>AI FITNESS SHOPPING</h1>
-                <p class="subtitle">NUTRI-LIST v2.0 | SMART GROCERIES</p>
+            <div class="header-controls">
+                <div class="clock-display">
+                    <div class="time" id="currentTime">--:--:--</div>
+                    <div class="date" id="currentDate">--- --- -- ----</div>
+                </div>
+                <a href="index.html" class="gym-mode-btn" style="text-decoration:none;"><i class="fas fa-home"></i><span>Volver</span></a>
+                <button id="themeToggle" class="theme-toggle"><i class="fas fa-moon"></i></button>
             </div>
         </div>
-        
-        <div class="header-controls">
-            <div class="clock-display">
-                <div class="time" id="currentTime">--:--:--</div>
-                <div class="date" id="currentDate">--- --- -- ----</div>
+    </header>
+
+    <div class="shopping-container">
+        <div class="shopping-header">
+            <h1><i class="fas fa-shopping-basket"></i> Lista de la Compra</h1>
+            <p class="section-subtitle">Organiza tus alimentos fitness de forma inteligente</p>
+        </div>
+
+        <div class="shopping-stats">
+            <div class="stat-card">
+                <h3><i class="fas fa-check-circle"></i> Progreso</h3>
+                <div class="main-value" id="contador">0/0</div>
+                <div class="progress-container">
+                    <div class="progress-bar"><div class="progress-fill" id="shoppingProgress" style="width:0%"></div></div>
+                    <div class="progress-labels">
+                        <span id="progressPercent">0%</span>
+                        <span id="remainingItems">0 items</span>
+                    </div>
+                </div>
             </div>
-            
-            <a href="index.html" class="gym-mode-btn" style="text-decoration: none;">
-                <i class="fas fa-home"></i>
-                <span>VOLVER AL INICIO</span>
-            </a>
-            
-            <button id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">
-                <i class="fas fa-moon"></i>
-            </button>
-        </div>
-    </div>
-</header>
-
-<div class="shopping-container">
-  <!-- Panel de control superior -->
-  <div class="shopping-control-panel">
-    <div class="shopping-header">
-      <h1><i class="fas fa-shopping-basket"></i> Lista de la Compra Inteligente</h1>
-      <p class="shopping-subtitle">Gestión optimizada de alimentos para tu dieta fitness</p>
-    </div>
-    
-    <div class="shopping-stats">
-      <div class="stat-card shopping-stat">
-        <div class="card-header">
-          <h3><i class="fas fa-check-circle"></i> Progreso</h3>
-          <span class="goal-text" id="progressText">0% completado</span>
-        </div>
-        <div class="card-body">
-          <div class="main-value" id="contador">0/0 comprados</div>
-          <div class="progress-container">
-            <div class="progress-bar" role="progressbar">
-              <div class="progress-fill" id="shoppingProgress" style="width: 0%"></div>
+            <div class="stat-card">
+                <h3><i class="fas fa-search"></i> Buscador</h3>
+                <div class="search-container">
+                    <input type="text" id="busqueda" placeholder="🔍 Buscar alimento..." class="smart-search">
+                </div>
+                <div class="search-hint"><small><i class="fas fa-lightbulb"></i> Filtra por nombre, categoría o prioridad</small></div>
             </div>
-            <div class="progress-labels">
-              <span id="progressPercent">0%</span>
-              <span id="remainingItems">0 items restantes</span>
+            <div class="stat-card">
+                <h3><i class="fas fa-tools"></i> Acciones</h3>
+                <div class="quick-actions" style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+                    <button class="action-btn small-btn" onclick="marcarTodo(true)"><i class="fas fa-check-double"></i> Marcar todo</button>
+                    <button class="action-btn small-btn secondary-btn" onclick="marcarTodo(false)"><i class="fas fa-redo"></i> Reiniciar</button>
+                    <button class="action-btn small-btn" onclick="exportList()"><i class="fas fa-download"></i> Exportar</button>
+                    <button class="action-btn small-btn secondary-btn" onclick="printList()"><i class="fas fa-print"></i> Imprimir</button>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-      
-      <div class="stat-card shopping-stat">
-        <div class="card-header">
-          <h3><i class="fas fa-search"></i> Buscador Inteligente</h3>
-          <span class="goal-text"><i class="fas fa-robot"></i> IA Search</span>
-        </div>
-        <div class="card-body">
-          <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="busqueda" placeholder="🔍 Buscar alimento o categoría..." class="smart-search">
-            <button class="clear-search" id="clearSearchBtn">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-          <div class="search-hint">
-            <small><i class="fas fa-lightbulb"></i> Escribe para filtrar por nombre, categoría o tipo</small>
-          </div>
-        </div>
-      </div>
-      
-      <div class="stat-card shopping-stat">
-        <div class="card-header">
-          <h3><i class="fas fa-tools"></i> Acciones Rápidas</h3>
-        </div>
-        <div class="card-body">
-          <div class="quick-actions">
-            <button class="action-btn small-btn" onclick="marcarTodo(true)">
-              <i class="fas fa-check-double"></i> Marcar todo
-            </button>
-            <button class="action-btn small-btn secondary-btn" onclick="marcarTodo(false)">
-              <i class="fas fa-redo"></i> Reiniciar
-            </button>
-            <button class="action-btn small-btn" onclick="exportList()">
-              <i class="fas fa-download"></i> Exportar
-            </button>
-            <button class="action-btn small-btn secondary-btn" onclick="printList()">
-              <i class="fas fa-print"></i> Imprimir
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Categorías con diseño mejorado -->
-  <div class="categories-container">
-    
-    <!-- Proteínas -->
-    <div class="category-card" id="proteinas-card">
-      <div class="category-header" onclick="toggleLista('proteinas')">
-        <div class="category-icon">
-          <i class="fas fa-drumstick-bite"></i>
+        <div class="categories-container" id="categoriesContainer">
+            <!-- Las categorías se generan dinámicamente con JS para mantener orden y consistencia -->
         </div>
-        <div class="category-title">
-          <h2>🥩 Proteínas Esenciales</h2>
-          <p class="category-subtitle">Para construcción muscular y recuperación</p>
+
+        <div class="bottom-controls">
+            <div class="summary-card">
+                <h3><i class="fas fa-chart-pie"></i> Resumen</h3>
+                <div class="summary-grid">
+                    <div><span>Total:</span> <strong id="totalItems">0</strong></div>
+                    <div><span>Completados:</span> <strong id="completedItems">0</strong></div>
+                    <div><span>Pendientes:</span> <strong id="pendingItems">0</strong></div>
+                    <div><span>Prioridad alta:</span> <strong id="highPriority">0</strong></div>
+                </div>
+            </div>
+            <div class="action-buttons-bottom" style="display:flex; gap:12px;">
+                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+                <button class="primary-btn" onclick="shareList()"><i class="fas fa-share-alt"></i> Compartir</button>
+                <button class="secondary-btn" onclick="generateSmartList()"><i class="fas fa-robot"></i> Lista IA</button>
+            </div>
         </div>
-        <div class="category-stats">
-          <span class="category-count" id="proteinas-count">0/10</span>
-          <i class="fas fa-chevron-down toggle-icon" id="proteinas-icon"></i>
-        </div>
-      </div>
-      <ul id="proteinas" class="shopping-list">
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Pechugas de pollo <span class="item-quantity">(5 kg)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Pavo en filetes/picado <span class="item-quantity">(3 kg)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Huevos <span class="item-quantity">(10 docenas)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Atún en lata <span class="item-quantity">(20 latas)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Salmón fresco/congelado <span class="item-quantity">(1,5 kg)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Merluza o pescado blanco <span class="item-quantity">(1,5 kg)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Carne magra de ternera <span class="item-quantity">(1,5 kg)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Queso fresco batido 0% <span class="item-quantity">(4 kg)</span></span>
-            <span class="item-priority low">BAJA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Yogur griego natural sin azúcar <span class="item-quantity">(2 kg)</span></span>
-            <span class="item-priority low">BAJA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Clara de huevo líquida <span class="item-quantity">(2 litros)</span></span>
-            <span class="item-priority low">BAJA</span>
-          </label>
-        </li>
-      </ul>
     </div>
 
-    <!-- Carbohidratos -->
-    <div class="category-card" id="carbohidratos-card">
-      <div class="category-header" onclick="toggleLista('carbohidratos')">
-        <div class="category-icon">
-          <i class="fas fa-bread-slice"></i>
-        </div>
-        <div class="category-title">
-          <h2>🍚 Carbohidratos Complejos</h2>
-          <p class="category-subtitle">Energía sostenida y recuperación glucémica</p>
-        </div>
-        <div class="category-stats">
-          <span class="category-count" id="carbohidratos-count">0/8</span>
-          <i class="fas fa-chevron-down toggle-icon" id="carbohidratos-icon"></i>
-        </div>
-      </div>
-      <ul id="carbohidratos" class="shopping-list">
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Avena <span class="item-quantity">(3 kg)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Arroz integral <span class="item-quantity">(5 kg)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Pasta integral <span class="item-quantity">(4 kg)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Pan integral <span class="item-quantity">(8 barras)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Patatas <span class="item-quantity">(5 kg)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Boniatos/batatas <span class="item-quantity">(3 kg)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Tortillas de trigo integral <span class="item-quantity">(2 paquetes)</span></span>
-            <span class="item-priority low">BAJA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Harina integral <span class="item-quantity">(1 kg)</span></span>
-            <span class="item-priority low">BAJA</span>
-          </label>
-        </li>
-      </ul>
-    </div>
+    <div id="toastContainer" class="toast-container"></div>
 
-    <!-- Grasas saludables -->
-    <div class="category-card" id="grasas-card">
-      <div class="category-header" onclick="toggleLista('grasas')">
-        <div class="category-icon">
-          <i class="fas fa-seedling"></i>
-        </div>
-        <div class="category-title">
-          <h2>🥑 Grasas Saludables</h2>
-          <p class="category-subtitle">Ácidos grasos esenciales y salud hormonal</p>
-        </div>
-        <div class="category-stats">
-          <span class="category-count" id="grasas-count">0/5</span>
-          <i class="fas fa-chevron-down toggle-icon" id="grasas-icon"></i>
-        </div>
-      </div>
-      <ul id="grasas" class="shopping-list">
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Aguacates <span class="item-quantity">(10 uds)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Aceite de oliva virgen extra <span class="item-quantity">(1,5 L)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Frutos secos variados <span class="item-quantity">(2 kg)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Semillas de chía o lino <span class="item-quantity">(500 g)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Crema de cacahuete <span class="item-quantity">(1 kg)</span></span>
-            <span class="item-priority low">BAJA</span>
-          </label>
-        </li>
-      </ul>
-    </div>
+    <script>
+        // Datos de la lista de compras (estructura)
+        const shoppingData = {
+            'Proteínas Esenciales': {
+                icon: 'fa-drumstick-bite',
+                items: [
+                    { name: 'Pechugas de pollo', quantity: '5 kg', priority: 'high' },
+                    { name: 'Pavo en filetes', quantity: '3 kg', priority: 'high' },
+                    { name: 'Huevos', quantity: '10 docenas', priority: 'high' },
+                    { name: 'Atún en lata', quantity: '20 latas', priority: 'medium' },
+                    { name: 'Salmón fresco', quantity: '1.5 kg', priority: 'medium' },
+                    { name: 'Merluza', quantity: '1.5 kg', priority: 'medium' },
+                    { name: 'Carne magra de ternera', quantity: '1.5 kg', priority: 'medium' },
+                    { name: 'Queso fresco batido 0%', quantity: '4 kg', priority: 'low' },
+                    { name: 'Yogur griego natural', quantity: '2 kg', priority: 'low' },
+                    { name: 'Clara de huevo líquida', quantity: '2 L', priority: 'low' }
+                ]
+            },
+            'Carbohidratos Complejos': {
+                icon: 'fa-bread-slice',
+                items: [
+                    { name: 'Avena', quantity: '3 kg', priority: 'high' },
+                    { name: 'Arroz integral', quantity: '5 kg', priority: 'high' },
+                    { name: 'Pasta integral', quantity: '4 kg', priority: 'high' },
+                    { name: 'Pan integral', quantity: '8 barras', priority: 'medium' },
+                    { name: 'Patatas', quantity: '5 kg', priority: 'medium' },
+                    { name: 'Boniatos', quantity: '3 kg', priority: 'medium' },
+                    { name: 'Tortillas de trigo integral', quantity: '2 paq', priority: 'low' },
+                    { name: 'Harina integral', quantity: '1 kg', priority: 'low' }
+                ]
+            },
+            'Grasas Saludables': {
+                icon: 'fa-seedling',
+                items: [
+                    { name: 'Aguacates', quantity: '10 uds', priority: 'high' },
+                    { name: 'Aceite de oliva virgen extra', quantity: '1.5 L', priority: 'high' },
+                    { name: 'Frutos secos variados', quantity: '2 kg', priority: 'medium' },
+                    { name: 'Semillas de chía', quantity: '500 g', priority: 'medium' },
+                    { name: 'Crema de cacahuete', quantity: '1 kg', priority: 'low' }
+                ]
+            },
+            'Frutas Frescas': {
+                icon: 'fa-apple-alt',
+                items: [
+                    { name: 'Plátanos', quantity: '40 uds', priority: 'high' },
+                    { name: 'Manzanas', quantity: '30 uds', priority: 'high' },
+                    { name: 'Naranjas', quantity: '20 uds', priority: 'medium' },
+                    { name: 'Fresas', quantity: '1.5 kg', priority: 'medium' },
+                    { name: 'Uvas', quantity: '2 kg', priority: 'low' }
+                ]
+            },
+            'Verduras y Hortalizas': {
+                icon: 'fa-carrot',
+                items: [
+                    { name: 'Espinacas', quantity: '2 kg', priority: 'high' },
+                    { name: 'Brócoli', quantity: '2 kg', priority: 'high' },
+                    { name: 'Pimientos', quantity: '2 kg', priority: 'medium' },
+                    { name: 'Calabacines', quantity: '1.5 kg', priority: 'medium' },
+                    { name: 'Zanahorias', quantity: '2 kg', priority: 'medium' },
+                    { name: 'Tomates', quantity: '2 kg', priority: 'medium' },
+                    { name: 'Lechuga', quantity: '1.5 kg', priority: 'low' },
+                    { name: 'Cebollas', quantity: '1.5 kg', priority: 'low' }
+                ]
+            },
+            'Lácteos': {
+                icon: 'fa-cheese',
+                items: [
+                    { name: 'Leche', quantity: '12 L', priority: 'high' },
+                    { name: 'Queso fresco batido', quantity: '2 kg', priority: 'medium' },
+                    { name: 'Yogur griego', quantity: '2 kg', priority: 'medium' }
+                ]
+            },
+            'Hidratación y Energía': {
+                icon: 'fa-tint',
+                items: [
+                    { name: 'Agua mineral (0.5L)', quantity: '12 uds', priority: 'high' },
+                    { name: 'Agua de coco', quantity: '4 botellas', priority: 'medium' },
+                    { name: 'Bebida isotónica', quantity: '6 botellas', priority: 'medium' },
+                    { name: 'Agua saborizada', quantity: '2 L', priority: 'low' },
+                    { name: 'Infusiones', quantity: '20 sobres', priority: 'low' },
+                    { name: 'Zumo natural sin azúcar', quantity: '3 L', priority: 'medium' },
+                    { name: 'Leche vegetal', quantity: '8 L', priority: 'high' },
+                    { name: 'Bebida pre-entreno', quantity: '1', priority: 'medium' },
+                    { name: 'Monster Zero', quantity: '1-2/sem', priority: 'low' },
+                    { name: 'Bebida con electrolitos', quantity: '1', priority: 'medium' }
+                ]
+            },
+            'Suplementos Deportivos': {
+                icon: 'fa-capsules',
+                items: [
+                    { name: 'Vitamina C + Zinc', quantity: '1', priority: 'high' },
+                    { name: 'Magnesio + Calcio', quantity: '1', priority: 'high' },
+                    { name: 'Proteína whey', quantity: '2 kg', priority: 'high' },
+                    { name: 'Creatina monohidrato', quantity: '500 g', priority: 'medium' },
+                    { name: 'Multivitamínico', quantity: '1', priority: 'medium' }
+                ]
+            }
+        };
 
-    <!-- Frutas -->
-    <div class="category-card" id="frutas-card">
-      <div class="category-header" onclick="toggleLista('frutas')">
-        <div class="category-icon">
-          <i class="fas fa-apple-alt"></i>
-        </div>
-        <div class="category-title">
-          <h2>🍌 Frutas Frescas</h2>
-          <p class="category-subtitle">Vitaminas, fibra y antioxidantes naturales</p>
-        </div>
-        <div class="category-stats">
-          <span class="category-count" id="frutas-count">0/5</span>
-          <i class="fas fa-chevron-down toggle-icon" id="frutas-icon"></i>
-        </div>
-      </div>
-      <ul id="frutas" class="shopping-list">
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Plátanos <span class="item-quantity">(40-50 uds)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Manzanas <span class="item-quantity">(30 uds)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Naranjas <span class="item-quantity">(20 uds)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Fresas/frutos rojos <span class="item-quantity">(1,5 kg)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Uvas o mandarinas <span class="item-quantity">(2 kg)</span></span>
-            <span class="item-priority low">BAJA</span>
-          </label>
-        </li>
-      </ul>
-    </div>
+        // Estado de los items (guardado en localStorage)
+        let shoppingState = {};
+        let totalItems = 0;
 
-    <!-- Verduras -->
-    <div class="category-card" id="verduras-card">
-      <div class="category-header" onclick="toggleLista('verduras')">
-        <div class="category-icon">
-          <i class="fas fa-carrot"></i>
-        </div>
-        <div class="category-title">
-          <h2>🥦 Verduras y Hortalizas</h2>
-          <p class="category-subtitle">Fibra, minerales y fitonutrientes esenciales</p>
-        </div>
-        <div class="category-stats">
-          <span class="category-count" id="verduras-count">0/8</span>
-          <i class="fas fa-chevron-down toggle-icon" id="verduras-icon"></i>
-        </div>
-      </div>
-      <ul id="verduras" class="shopping-list">
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Espinacas <span class="item-quantity">(2 kg)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Brócoli <span class="item-quantity">(2 kg)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Pimientos <span class="item-quantity">(2 kg)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Calabacines <span class="item-quantity">(1,5 kg)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Zanahorias <span class="item-quantity">(2 kg)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Tomates <span class="item-quantity">(2 kg)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Lechuga <span class="item-quantity">(1,5 kg)</span></span>
-            <span class="item-priority low">BAJA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Cebollas <span class="item-quantity">(1,5 kg)</span></span>
-            <span class="item-priority low">BAJA</span>
-          </label>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Lácteos -->
-    <div class="category-card" id="lacteos-card">
-      <div class="category-header" onclick="toggleLista('lacteos')">
-        <div class="category-icon">
-          <i class="fas fa-cheese"></i>
-        </div>
-        <div class="category-title">
-          <h2>🥛 Lácteos y Alternativas</h2>
-          <p class="category-subtitle">Calcio, proteína y probióticos</p>
-        </div>
-        <div class="category-stats">
-          <span class="category-count" id="lacteos-count">0/3</span>
-          <i class="fas fa-chevron-down toggle-icon" id="lacteos-icon"></i>
-        </div>
-      </div>
-      <ul id="lacteos" class="shopping-list">
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Leche <span class="item-quantity">(12 litros)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Queso fresco batido</span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Yogur griego natural</span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Líquidos e hidratación -->
-    <div class="category-card" id="liquidos-card">
-      <div class="category-header" onclick="toggleLista('liquidos')">
-        <div class="category-icon">
-          <i class="fas fa-tint"></i>
-        </div>
-        <div class="category-title">
-          <h2>🥤 Hidratación & Energía</h2>
-          <p class="category-subtitle">Hidratación óptima y bebidas funcionales</p>
-        </div>
-        <div class="category-stats">
-          <span class="category-count" id="liquidos-count">0/10</span>
-          <i class="fas fa-chevron-down toggle-icon" id="liquidos-icon"></i>
-        </div>
-      </div>
-      <ul id="liquidos" class="shopping-list">
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Botellas pequeñas de agua mineral <span class="item-quantity">(0,5L - 12 uds)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Agua de coco natural <span class="item-quantity">(4 botellas)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Bebida isotónica baja en azúcar <span class="item-quantity">(6 botellas)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Agua saborizada natural</span>
-            <span class="item-priority low">BAJA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Infusiones suaves <span class="item-quantity">(20 sobres)</span></span>
-            <span class="item-priority low">BAJA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Zumo natural sin azúcar <span class="item-quantity">(3 litros)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Leche semidesnatada o bebida vegetal <span class="item-quantity">(8 litros)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Bebida pre-entreno natural</span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Monster Zero o Reign <span class="item-quantity">(máx. 1-2 por semana)</span></span>
-            <span class="item-priority low">BAJA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Bebida con electrolitos sin azúcar</span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Suplementos -->
-    <div class="category-card" id="suplementos-card">
-      <div class="category-header" onclick="toggleLista('suplementos')">
-        <div class="category-icon">
-          <i class="fas fa-capsules"></i>
-        </div>
-        <div class="category-title">
-          <h2>💊 Suplementos Deportivos</h2>
-          <p class="category-subtitle">Apoyo nutricional y optimización del rendimiento</p>
-        </div>
-        <div class="category-stats">
-          <span class="category-count" id="suplementos-count">0/5</span>
-          <i class="fas fa-chevron-down toggle-icon" id="suplementos-icon"></i>
-        </div>
-      </div>
-      <ul id="suplementos" class="shopping-list">
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Vitamina C + Zinc</span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Magnesio + Calcio</span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Proteína whey <span class="item-quantity">(2 kg)</span></span>
-            <span class="item-priority high">ALTA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Creatina monohidrato <span class="item-quantity">(500 g)</span></span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-        <li>
-          <label class="checkbox-container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            <span class="item-text">Multivitamínico</span>
-            <span class="item-priority medium">MEDIA</span>
-          </label>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Panel de acciones finales -->
-  <div class="bottom-controls">
-    <div class="summary-card">
-      <h3><i class="fas fa-chart-pie"></i> Resumen de Compra</h3>
-      <div class="summary-grid">
-        <div class="summary-item">
-          <span class="summary-label">Total Items:</span>
-          <span class="summary-value" id="totalItems">0</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">Completados:</span>
-          <span class="summary-value" id="completedItems">0</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">Por Comprar:</span>
-          <span class="summary-value" id="pendingItems">0</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">Prioridad Alta:</span>
-          <span class="summary-value" id="highPriority">0</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="action-buttons-bottom">
-      <a href="index.html" class="back-btn">
-        <i class="fas fa-arrow-left"></i>
-        Volver al Dashboard
-      </a>
-      <button class="primary-btn" onclick="shareList()">
-        <i class="fas fa-share-alt"></i>
-        Compartir Lista
-      </button>
-      <button class="secondary-btn" onclick="generateSmartList()">
-        <i class="fas fa-robot"></i>
-        Generar Lista IA
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Notificaciones toast -->
-<div id="toastContainer" class="toast-container"></div>
-
-<script>
-  // Variables globales
-  let isDarkMode = true; // Por defecto modo oscuro
-  
-  // Inicialización
-  document.addEventListener('DOMContentLoaded', function() {
-    initTheme();
-    initShoppingList();
-    setupEventListeners();
-    updateClock();
-    setInterval(updateClock, 1000);
-  });
-
-  // Inicializar tema
-  function initTheme() {
-    // Cargar preferencia de tema
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-      isDarkMode = false;
-      document.body.classList.remove('dark-mode');
-      document.body.classList.add('light-mode');
-      updateThemeIcon();
-    } else {
-      // Por defecto modo oscuro
-      isDarkMode = true;
-      document.body.classList.add('dark-mode');
-      document.body.classList.remove('light-mode');
-      updateThemeIcon();
-    }
-    
-    // Configurar botón de tema
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-      themeToggle.addEventListener('click', toggleTheme);
-    }
-  }
-
-  // Alternar tema claro/oscuro
-  function toggleTheme() {
-    isDarkMode = !isDarkMode;
-    
-    if (isDarkMode) {
-      document.body.classList.add('dark-mode');
-      document.body.classList.remove('light-mode');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.body.classList.remove('dark-mode');
-      document.body.classList.add('light-mode');
-      localStorage.setItem('theme', 'light');
-    }
-    
-    updateThemeIcon();
-  }
-
-  // Actualizar icono del tema
-  function updateThemeIcon() {
-    const themeIcon = document.querySelector('#themeToggle i');
-    if (themeIcon) {
-      if (isDarkMode) {
-        themeIcon.className = 'fas fa-moon';
-        themeIcon.setAttribute('aria-label', 'Cambiar a modo claro');
-      } else {
-        themeIcon.className = 'fas fa-sun';
-        themeIcon.setAttribute('aria-label', 'Cambiar a modo oscuro');
-      }
-    }
-  }
-
-  // Reloj en tiempo real
-  function updateClock() {
-    const now = new Date();
-    const timeElement = document.getElementById('currentTime');
-    const dateElement = document.getElementById('currentDate');
-    
-    if (timeElement) {
-      timeElement.textContent = now.toLocaleTimeString('es-ES', {hour12: false});
-    }
-    
-    if (dateElement) {
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      dateElement.textContent = now.toLocaleDateString('es-ES', options);
-    }
-  }
-
-  // Inicializar lista de compras
-  function initShoppingList() {
-    // Reinicio automático mensual
-    const currentMonth = new Date().getMonth();
-    const savedMonth = localStorage.getItem('shoppingMonth');
-    
-    if (!savedMonth || parseInt(savedMonth) !== currentMonth) {
-      localStorage.clear();
-      localStorage.setItem('shoppingMonth', currentMonth);
-      showNotification('¡Nuevo mes! Lista reiniciada automáticamente.', 'info');
-    }
-
-    // Cargar datos guardados
-    loadSavedData();
-    
-    // Actualizar contadores iniciales
-    updateAllCounts();
-    updateProgress();
-    
-    // Configurar todas las listas como visibles por defecto
-    document.querySelectorAll('.shopping-list').forEach(list => {
-      list.style.display = 'block';
-    });
-  }
-
-  // Configurar event listeners
-  function setupEventListeners() {
-    // Buscador
-    document.getElementById('busqueda').addEventListener('input', function(e) {
-      filterItems(e.target.value.toLowerCase());
-    });
-    
-    // Botón limpiar búsqueda
-    document.getElementById('clearSearchBtn').addEventListener('click', function() {
-      document.getElementById('busqueda').value = '';
-      filterItems('');
-    });
-    
-    // Checkboxes
-    document.querySelectorAll('.checkbox-container input[type="checkbox"]').forEach((checkbox, index) => {
-      // Cargar estado guardado
-      const savedState = localStorage.getItem(`shoppingItem_${index}`);
-      if (savedState === 'true') {
-        checkbox.checked = true;
-      }
-      
-      // Guardar estado al cambiar
-      checkbox.addEventListener('change', function() {
-        localStorage.setItem(`shoppingItem_${index}`, this.checked);
-        updateAllCounts();
-        updateProgress();
-        updateCategoryCount(this.closest('.category-card').id.replace('-card', ''));
-      });
-    });
-  }
-
-  // Filtrar items
-  function filterItems(searchTerm) {
-    const items = document.querySelectorAll('.shopping-list li');
-    let visibleCount = 0;
-    
-    items.forEach(item => {
-      const text = item.textContent.toLowerCase();
-      if (searchTerm === '' || text.includes(searchTerm)) {
-        item.style.display = 'flex';
-        visibleCount++;
-      } else {
-        item.style.display = 'none';
-      }
-    });
-    
-    // Actualizar contador de búsqueda
-    const searchCounter = document.getElementById('searchResults');
-    if (searchCounter) {
-      searchCounter.textContent = `${visibleCount} resultados`;
-    }
-  }
-
-  // Cargar datos guardados
-  function loadSavedData() {
-    const checks = document.querySelectorAll('.checkbox-container input[type="checkbox"]');
-    checks.forEach((check, i) => {
-      if (localStorage.getItem(`shoppingItem_${i}`) === 'true') {
-        check.checked = true;
-      }
-    });
-  }
-
-  // Actualizar todos los contadores
-  function updateAllCounts() {
-    updateProgress();
-    updateCategoryCount('proteinas');
-    updateCategoryCount('carbohidratos');
-    updateCategoryCount('grasas');
-    updateCategoryCount('frutas');
-    updateCategoryCount('verduras');
-    updateCategoryCount('lacteos');
-    updateCategoryCount('liquidos');
-    updateCategoryCount('suplementos');
-    updateSummary();
-  }
-
-  // Actualizar progreso general
-  function updateProgress() {
-    const checks = document.querySelectorAll('.checkbox-container input[type="checkbox"]');
-    const total = checks.length;
-    const checked = Array.from(checks).filter(c => c.checked).length;
-    const progress = total > 0 ? (checked / total) * 100 : 0;
-    
-    // Actualizar elementos
-    document.getElementById('contador').textContent = `${checked}/${total} comprados`;
-    document.getElementById('shoppingProgress').style.width = `${progress}%`;
-    document.getElementById('progressPercent').textContent = `${Math.round(progress)}%`;
-    document.getElementById('remainingItems').textContent = `${total - checked} items restantes`;
-    document.getElementById('progressText').textContent = `${Math.round(progress)}% completado`;
-  }
-
-  // Actualizar contador de categoría
-  function updateCategoryCount(categoryId) {
-    const categoryChecks = document.querySelectorAll(`#${categoryId} .checkbox-container input[type="checkbox"]`);
-    const total = categoryChecks.length;
-    const checked = Array.from(categoryChecks).filter(c => c.checked).length;
-    
-    const countElement = document.getElementById(`${categoryId}-count`);
-    if (countElement) {
-      countElement.textContent = `${checked}/${total}`;
-    }
-    
-    // Actualizar icono si la categoría está completa
-    const categoryCard = document.getElementById(`${categoryId}-card`);
-    if (checked === total && total > 0) {
-      categoryCard.classList.add('category-complete');
-    } else {
-      categoryCard.classList.remove('category-complete');
-    }
-  }
-
-  // Actualizar resumen
-  function updateSummary() {
-    const checks = document.querySelectorAll('.checkbox-container input[type="checkbox"]');
-    const total = checks.length;
-    const checked = Array.from(checks).filter(c => c.checked).length;
-    const highPriority = document.querySelectorAll('.item-priority.high').length;
-    
-    document.getElementById('totalItems').textContent = total;
-    document.getElementById('completedItems').textContent = checked;
-    document.getElementById('pendingItems').textContent = total - checked;
-    document.getElementById('highPriority').textContent = highPriority;
-  }
-
-  // Marcar/desmarcar todo
-  function marcarTodo(estado) {
-    const checks = document.querySelectorAll('.checkbox-container input[type="checkbox"]');
-    checks.forEach((check, i) => {
-      check.checked = estado;
-      localStorage.setItem(`shoppingItem_${i}`, estado);
-    });
-    updateAllCounts();
-    
-    // Mostrar notificación
-    const message = estado ? '✅ Todos los items marcados como comprados' : '🔄 Lista reiniciada correctamente';
-    showNotification(message, estado ? 'success' : 'info');
-  }
-
-  // Alternar visibilidad de lista
-  function toggleLista(categoryId) {
-    const lista = document.getElementById(categoryId);
-    const icon = document.getElementById(`${categoryId}-icon`);
-    
-    if (lista.style.display === 'none') {
-      lista.style.display = 'block';
-      icon.classList.remove('fa-chevron-down');
-      icon.classList.add('fa-chevron-up');
-    } else {
-      lista.style.display = 'none';
-      icon.classList.remove('fa-chevron-up');
-      icon.classList.add('fa-chevron-down');
-    }
-  }
-
-  // Funciones adicionales
-  function exportList() {
-    const checkedItems = Array.from(document.querySelectorAll('.checkbox-container input[type="checkbox"]:checked'))
-      .map(check => check.closest('li').querySelector('.item-text').textContent.trim());
-    
-    const uncheckedItems = Array.from(document.querySelectorAll('.checkbox-container input[type="checkbox"]:not(:checked)'))
-      .map(check => check.closest('li').querySelector('.item-text').textContent.trim());
-    
-    const exportText = `LISTA DE COMPRA FITNESS - ${new Date().toLocaleDateString()}\n\n` +
-                      `✅ COMPRADOS (${checkedItems.length}):\n${checkedItems.join('\n')}\n\n` +
-                      `⏰ PENDIENTES (${uncheckedItems.length}):\n${uncheckedItems.join('\n')}`;
-    
-    // Crear y descargar archivo
-    const blob = new Blob([exportText], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `lista-compra-fitness-${new Date().toISOString().split('T')[0]}.txt`;
-    a.click();
-    
-    showNotification('📥 Lista exportada correctamente', 'success');
-  }
-
-  function printList() {
-    window.print();
-  }
-
-  function shareList() {
-    if (navigator.share) {
-      const text = `Mi lista de compra fitness: ${document.getElementById('contador').textContent} completados.`;
-      navigator.share({
-        title: 'Lista de Compra Fitness',
-        text: text,
-        url: window.location.href
-      });
-    } else {
-      // Copiar al portapapeles
-      const text = `Mi lista de compra fitness:\n${window.location.href}\n\nProgreso: ${document.getElementById('contador').textContent}`;
-      navigator.clipboard.writeText(text).then(() => {
-        showNotification('📋 Enlace copiado al portapapeles', 'success');
-      });
-    }
-  }
-
-  function generateSmartList() {
-    showNotification('🤖 Generando lista inteligente con IA...', 'info');
-    // Simular generación IA
-    setTimeout(() => {
-      // Marcar automáticamente items de prioridad alta no comprados
-      const highPriorityItems = document.querySelectorAll('.item-priority.high');
-      let marked = 0;
-      highPriorityItems.forEach(item => {
-        const checkbox = item.closest('li').querySelector('input[type="checkbox"]');
-        if (!checkbox.checked) {
-          checkbox.checked = true;
-          const index = Array.from(document.querySelectorAll('.checkbox-container input')).indexOf(checkbox);
-          localStorage.setItem(`shoppingItem_${index}`, true);
-          marked++;
+        function initShopping() {
+            const stored = localStorage.getItem('shoppingState');
+            if (stored) {
+                shoppingState = JSON.parse(stored);
+            } else {
+                // Inicializar todos los items como false
+                let idx = 0;
+                for (const category in shoppingData) {
+                    shoppingData[category].items.forEach(item => {
+                        shoppingState[idx] = false;
+                        idx++;
+                    });
+                }
+                totalItems = idx;
+            }
+            renderShopping();
+            updateStats();
+            setupSearch();
         }
-      });
-      
-      updateAllCounts();
-      showNotification(`✅ IA marcó ${marked} items de prioridad alta`, 'success');
-    }, 1500);
-  }
 
-  // Mostrar notificaciones
-  function showNotification(message, type = 'info') {
-    // Crear contenedor si no existe
-    let toastContainer = document.getElementById('toastContainer');
-    if (!toastContainer) {
-      toastContainer = document.createElement('div');
-      toastContainer.id = 'toastContainer';
-      toastContainer.className = 'toast-container';
-      document.body.appendChild(toastContainer);
-    }
-    
-    const notification = document.createElement('div');
-    notification.className = `toast-notification ${type}`;
-    notification.innerHTML = `
-      <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
-      <span>${message}</span>
-    `;
-    
-    toastContainer.appendChild(notification);
-    
-    // Animar entrada
-    setTimeout(() => notification.classList.add('show'), 10);
-    
-    // Eliminar después de 3 segundos
-    setTimeout(() => {
-      notification.classList.remove('show');
-      setTimeout(() => notification.remove(), 300);
-    }, 3000);
-  }
-</script>
+        function renderShopping() {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = '';
+            let idx = 0;
+            for (const category in shoppingData) {
+                const data = shoppingData[category];
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.innerHTML = `
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <div class="category-icon"><i class="fas ${data.icon}"></i></div>
+                        <div class="category-title">
+                            <h2>${category}</h2>
+                            <p class="category-subtitle">${data.items.length} items</p>
+                        </div>
+                        <div class="category-stats">
+                            <span class="category-count" id="cat-${idx}">0/${data.items.length}</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </div>
+                    </div>
+                    <ul class="shopping-list" id="list-${idx}">
+                        ${data.items.map((item, i) => {
+                            const itemIdx = idx + i;
+                            const checked = shoppingState[itemIdx] ? 'checked' : '';
+                            return `
+                            <li>
+                                <label class="checkbox-container">
+                                    <input type="checkbox" data-idx="${itemIdx}" ${checked}>
+                                    <span class="checkmark"></span>
+                                    <span class="item-text">${item.name} <span class="item-quantity">(${item.quantity})</span></span>
+                                    <span class="item-priority ${item.priority}">${item.priority.toUpperCase()}</span>
+                                </label>
+                            </li>
+                            `;
+                        })}
+                    </ul>
+                `;
+                container.appendChild(card);
+                idx += data.items.length;
+            }
+            // Eventos de checkboxes
+            document.querySelectorAll('.checkbox-container input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    shoppingState[idx] = this.checked;
+                    localStorage.setItem('shoppingState', JSON.stringify(shoppingState));
+                    updateStats();
+                    updateCategoryCounts();
+                });
+            });
+            updateCategoryCounts();
+        }
 
+        function updateStats() {
+            const total = Object.keys(shoppingState).length;
+            const checked = Object.values(shoppingState).filter(v => v === true).length;
+            const progress = total > 0 ? (checked / total) * 100 : 0;
+            document.getElementById('contador').textContent = `${checked}/${total}`;
+            document.getElementById('shoppingProgress').style.width = `${progress}%`;
+            document.getElementById('progressPercent').textContent = `${Math.round(progress)}%`;
+            document.getElementById('remainingItems').textContent = `${total - checked} items restantes`;
+            document.getElementById('totalItems').textContent = total;
+            document.getElementById('completedItems').textContent = checked;
+            document.getElementById('pendingItems').textContent = total - checked;
+            // Prioridad alta (contar items con priority high no checkeados)
+            let high = 0;
+            let idx = 0;
+            for (const cat in shoppingData) {
+                shoppingData[cat].items.forEach(item => {
+                    if (item.priority === 'high' && !shoppingState[idx]) high++;
+                    idx++;
+                });
+            }
+            document.getElementById('highPriority').textContent = high;
+        }
 
+        function updateCategoryCounts() {
+            let idx = 0;
+            for (const cat in shoppingData) {
+                const items = shoppingData[cat].items;
+                const total = items.length;
+                let checked = 0;
+                for (let i = 0; i < total; i++) {
+                    if (shoppingState[idx + i]) checked++;
+                }
+                const el = document.getElementById(`cat-${idx}`);
+                if (el) el.textContent = `${checked}/${total}`;
+                idx += total;
+            }
+        }
 
+        function toggleCategory(header) {
+            const list = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            if (list.style.display === 'none') {
+                list.style.display = 'block';
+                icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            } else {
+                list.style.display = 'none';
+                icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+            }
+        }
+
+        function setupSearch() {
+            const input = document.getElementById('busqueda');
+            input.addEventListener('input', function() {
+                const term = this.value.toLowerCase();
+                document.querySelectorAll('.shopping-list li').forEach(li => {
+                    const text = li.textContent.toLowerCase();
+                    li.style.display = text.includes(term) ? 'flex' : 'none';
+                });
+            });
+        }
+
+        function marcarTodo(estado) {
+            for (const idx in shoppingState) {
+                shoppingState[idx] = estado;
+            }
+            localStorage.setItem('shoppingState', JSON.stringify(shoppingState));
+            document.querySelectorAll('.checkbox-container input[type="checkbox"]').forEach(cb => {
+                cb.checked = estado;
+            });
+            updateStats();
+            updateCategoryCounts();
+            showToast(estado ? '✅ Todos marcados' : '🔄 Lista reiniciada', 'info');
+        }
+
+        function exportList() {
+            const checked = [];
+            const unchecked = [];
+            let idx = 0;
+            for (const cat in shoppingData) {
+                shoppingData[cat].items.forEach(item => {
+                    const name = `${item.name} (${item.quantity})`;
+                    if (shoppingState[idx]) checked.push(name);
+                    else unchecked.push(name);
+                    idx++;
+                });
+            }
+            const text = `LISTA DE COMPRA FITNESS\n${new Date().toLocaleDateString()}\n\n✅ COMPRADOS (${checked.length}):\n${checked.join('\n')}\n\n⏰ PENDIENTES (${unchecked.length}):\n${unchecked.join('\n')}`;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lista-compra-${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('📥 Lista exportada', 'success');
+        }
+
+        function printList() { window.print(); }
+
+        function shareList() {
+            const text = `Mi lista de compra fitness: ${document.getElementById('contador').textContent} completados.`;
+            if (navigator.share) {
+                navigator.share({ title: 'Lista Fitness', text, url: window.location.href });
+            } else {
+                navigator.clipboard.writeText(text + ' ' + window.location.href);
+                showToast('📋 Enlace copiado', 'success');
+            }
+        }
+
+        function generateSmartList() {
+            showToast('🤖 IA marcando prioridades altas...', 'info');
+            setTimeout(() => {
+                let idx = 0;
+                let marked = 0;
+                for (const cat in shoppingData) {
+                    shoppingData[cat].items.forEach(item => {
+                        if (item.priority === 'high' && !shoppingState[idx]) {
+                            shoppingState[idx] = true;
+                            marked++;
+                        }
+                        idx++;
+                    });
+                }
+                localStorage.setItem('shoppingState', JSON.stringify(shoppingState));
+                document.querySelectorAll('.checkbox-container input[type="checkbox"]').forEach(cb => {
+                    cb.checked = shoppingState[parseInt(cb.dataset.idx)];
+                });
+                updateStats();
+                updateCategoryCounts();
+                showToast(`✅ IA marcó ${marked} items prioritarios`, 'success');
+            }, 1200);
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('es-ES', { hour12: false });
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('es-ES', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+        }
+
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            this.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar tema
+            if (localStorage.getItem('theme') === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('themeToggle').innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            initShopping();
+            updateClock();
+            setInterval(updateClock, 1000);
+        });
+
+        // Exponer funciones globales para los onclick
+        window.marcarTodo = marcarTodo;
+        window.exportList = exportList;
+        window.printList = printList;
+        window.shareList = shareList;
+        window.generateSmartList = generateSmartList;
+        window.toggleCategory = toggleCategory;
+    </script>
 </body>
 </html>
